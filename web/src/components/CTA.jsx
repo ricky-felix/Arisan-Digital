@@ -36,6 +36,7 @@ export function CTA() {
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
             <Button
               variant="primary"
+              href="http://localhost:3000/auth/login"
               aria-label="Coba aplikasi Arisan Digital"
             >
               Coba Sekarang

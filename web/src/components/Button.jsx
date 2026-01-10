@@ -2,6 +2,7 @@ export function Button({
   children,
   variant = "primary",
   className = "",
+  href,
   ...props
 }) {
   const baseStyles =
@@ -16,9 +17,23 @@ export function Button({
       "bg-transparent text-white border-2 border-white hover:bg-white/10 focus-visible:ring-white",
   };
 
+  const combinedClassName = `${baseStyles} ${variants[variant] || variants.primary} ${className}`;
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        className={`${combinedClassName} inline-block text-center`}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
-      className={`${baseStyles} ${variants[variant] || variants.primary} ${className}`}
+      className={combinedClassName}
       {...props}
     >
       {children}
