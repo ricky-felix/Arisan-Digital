@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "./Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@relume_io/relume-ui";
 import { AnimatePresence, motion } from "framer-motion";
+import { routes } from "../config";
 
 const TAB_DURATION = 5; // seconds per tab
 
@@ -145,7 +146,7 @@ export const Header103Defaults = {
         heading: "Arisan jadi mudah, transparan, dan aman untuk semua",
         description:
           "Kelola putaran tabungan bersama teman dengan satu aplikasi. Tidak ada lagi buku catatan, tidak ada lagi kebingungan.",
-        buttons: [{ title: "Mulai Sekarang", href: "http://localhost:3000/auth/login" }, { title: "Pelajari Lebih", variant: "secondary-alt" }],
+        buttons: [{ title: "Mulai Sekarang", href: routes.login }, { title: "Pelajari Lebih", variant: "secondary-alt" }],
         image: {
           src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
           alt: "Ilustrasi arisan digital dengan teman kerja - aplikasi yang menampilkan pencatatan otomatis dan transparan",
@@ -156,7 +157,7 @@ export const Header103Defaults = {
         heading: "Arisan yang bekerja, bukan yang merepotkan",
         description:
           "Kelola putaran tabungan bersama teman tanpa ribet. Satu aplikasi untuk semua yang kamu butuhkan.",
-        buttons: [{ title: "Unduh Aplikasi", href: "http://localhost:3000/auth/login" }, { title: "Lihat Fitur", variant: "secondary-alt" }],
+        buttons: [{ title: "Unduh Aplikasi", href: routes.login }, { title: "Lihat Fitur", variant: "secondary-alt" }],
         image: {
           src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
           alt: "Ilustrasi arisan digital untuk keluarga - manajemen arisan yang mudah dan efisien",
@@ -167,7 +168,7 @@ export const Header103Defaults = {
         heading: "Transparansi dalam setiap transaksi arisan",
         description:
           "Catat pembayaran, kelola giliran, dan percayai sistem yang adil untuk semua anggota grup.",
-        buttons: [{ title: "Coba Gratis", href: "http://localhost:3000/auth/login" }, { title: "Cara Kerja", variant: "secondary-alt" }],
+        buttons: [{ title: "Coba Gratis", href: routes.login }, { title: "Cara Kerja", variant: "secondary-alt" }],
         image: {
           src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
           alt: "Ilustrasi sistem transparansi arisan digital untuk komunitas - pencatatan pembayaran dan giliran yang jelas",
@@ -178,7 +179,7 @@ export const Header103Defaults = {
         heading: "Arisan modern untuk teman, keluarga, komunitas, dan bisnis anda",
         description:
           "Mulai grup arisan dalam menit, bukan hari. Semua orang tahu posisinya dan kapan harus bayar.",
-        buttons: [{ title: "Daftar Sekarang", href: "http://localhost:3000/auth/login" }, { title: "Hubungi Kami", variant: "secondary-alt" }],
+        buttons: [{ title: "Daftar Sekarang", href: routes.login }, { title: "Hubungi Kami", variant: "secondary-alt" }],
         image: {
           src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
           alt: "Ilustrasi arisan digital untuk bisnis - platform arisan profesional dengan fitur lengkap",

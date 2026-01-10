@@ -11,6 +11,7 @@ import {
 } from "react-icons/bi";
 import { FaXTwitter } from "react-icons/fa6";
 import { handleAnchorClick } from "../utils/smoothScroll";
+import { routes } from "../config";
 
 const ConditionalRender = ({ condition, children }) => {
   return condition ? <>{children}</> : null;
@@ -56,7 +57,7 @@ export function Navbar() {
             size="sm"
             variant="secondary"
             className="shadow-md hover:shadow-lg"
-            href="http://localhost:3000/auth/login"
+            href={routes.login}
           >
             Coba Sekarang
           </Button>
@@ -235,7 +236,7 @@ export function Navbar() {
               <div className="flex min-h-18 items-center justify-between gap-x-4">
                 <a
                   className="inline-flex items-center justify-center gap-2 border-0 p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:text-xl"
-                  href="http://localhost:3000/auth/login"
+                  href={routes.login}
                 >
                   Coba Sekarang
                 </a>
