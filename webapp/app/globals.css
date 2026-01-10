@@ -1,0 +1,461 @@
+/**
+ * Global Styles for Arisan Digital
+ *
+ * Includes Tailwind directives, CSS custom properties for shadcn/ui,
+ * base styles, and custom utility classes optimized for Indonesian
+ * currency formatting and Gen Z mobile-first design.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * CSS Custom Properties (CSS Variables)
+ * Values are in HSL format for shadcn/ui compatibility
+ * Primary colors use emerald palette for trust, growth, and money
+ */
+@layer base {
+  :root {
+    /* Background colors - Clean white base */
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+
+    /* Card colors - Slightly off-white for depth */
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+
+    /* Popover colors */
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+
+    /* Primary - Emerald green (#10B981 = HSL 160 84% 39.2%) */
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Deeper emerald (#059669 = HSL 166 94.3% 30.2%) */
+    --secondary: 166 94% 30%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted colors - Warm neutrals */
+    --muted: 60 5% 96%;
+    --muted-foreground: 25 5% 45%;
+
+    /* Accent - Amber for energy (#F59E0B = HSL 38 92% 50%) */
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive - Error red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border and input colors - Subtle warm gray */
+    --border: 20 6% 90%;
+    --input: 20 6% 90%;
+
+    /* Ring color for focus states - Primary emerald */
+    --ring: 160 84% 39%;
+
+    /* Border radius - Friendly rounded corners */
+    --radius: 0.75rem;
+  }
+
+  /**
+   * Dark mode color scheme
+   * Uses darker emerald tones with high contrast
+   */
+  .dark {
+    --background: 20 14% 4%;
+    --foreground: 60 9% 98%;
+
+    --card: 20 14% 4%;
+    --card-foreground: 60 9% 98%;
+
+    --popover: 20 14% 4%;
+    --popover-foreground: 60 9% 98%;
+
+    /* Primary - Lighter emerald for dark mode (#34D399 = HSL 160 69% 52%) */
+    --primary: 160 69% 52%;
+    --primary-foreground: 160 84% 10%;
+
+    /* Secondary - Adjusted for dark mode */
+    --secondary: 166 70% 40%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 25 5% 14%;
+    --muted-foreground: 60 5% 66%;
+
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 60 9% 98%;
+
+    --border: 25 5% 14%;
+    --input: 25 5% 14%;
+
+    --ring: 160 69% 52%;
+  }
+}
+
+/**
+ * Base element styles
+ * Sets up foundational typography and accessibility features
+ */
+@layer base {
+  /* Border color inheritance */
+  * {
+    @apply border-border;
+  }
+
+  /* Root HTML element */
+  html {
+    /* Prevent font size adjustments after orientation changes */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+
+    /* Enable font kerning and ligatures */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Body element with emoji support */
+  body {
+    @apply bg-background text-foreground;
+
+    /* Font features for better typography */
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+
+    /* Emoji-friendly font stack - ensures proper emoji rendering */
+    font-family: var(--font-plus-jakarta-sans),
+                 system-ui,
+                 -apple-system,
+                 BlinkMacSystemFont,
+                 "Segoe UI",
+                 "Segoe UI Emoji",
+                 "Segoe UI Symbol",
+                 "Apple Color Emoji",
+                 "Noto Color Emoji",
+                 sans-serif;
+
+    /* Prevent text selection highlighting on mobile tap */
+    -webkit-tap-highlight-color: transparent;
+
+    /* Better mobile scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Headings with tighter tracking for display */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /* Paragraph spacing */
+  p {
+    line-height: 1.6;
+  }
+
+  /* Link styles */
+  a {
+    @apply text-primary hover:text-primary/80 transition-colors duration-200;
+  }
+
+  /* Button reset */
+  button {
+    font-family: inherit;
+  }
+
+  /* Input and textarea base styles */
+  input, textarea, select {
+    @apply bg-background text-foreground;
+  }
+
+  /* Focus visible styles for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Image optimization */
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+/**
+ * Component layer styles
+ * Reusable component patterns
+ */
+@layer components {
+  /* Animation classes */
+  .animate-in {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  .animate-out {
+    animation: fade-out 0.2s ease-out;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    border: 3px solid hsl(var(--muted));
+    border-top: 3px solid hsl(var(--primary));
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Skeleton loading effect */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded-md;
+  }
+
+  /* Currency display with proper tabular numbers */
+  .currency {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.025em;
+  }
+
+  /* Indonesian Rupiah specific styling */
+  .rupiah {
+    @apply currency;
+    font-weight: 600;
+  }
+
+  /* Large currency display for hero sections */
+  .rupiah-large {
+    @apply rupiah text-3xl md:text-4xl lg:text-5xl;
+    color: hsl(var(--primary));
+  }
+
+  /* Medium currency display for cards */
+  .rupiah-medium {
+    @apply rupiah text-xl md:text-2xl;
+  }
+
+  /* Small currency display for tables */
+  .rupiah-small {
+    @apply rupiah text-sm md:text-base;
+  }
+
+  /* Phone number display with tabular nums */
+  .phone-number {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.025em;
+    direction: ltr;
+  }
+}
+
+/**
+ * Utility layer styles
+ * Custom utilities and helper classes
+ */
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Custom scrollbar styles with primary color */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted rounded-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-lg;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+
+  /* Touch-friendly minimum sizes */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Tabular numbers for consistent alignment */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Indonesian text styling */
+  .text-indonesia {
+    @apply tracking-normal;
+    hyphens: auto;
+    word-wrap: break-word;
+  }
+
+  /* Gradient text effects */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--secondary)) 100%
+    );
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    backdrop-filter: blur(12px) saturate(150%);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .glass-dark {
+    backdrop-filter: blur(12px) saturate(150%);
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  /* Frosted card effect */
+  .frosted {
+    @apply glass border border-white/20 shadow-lg;
+  }
+
+  /* Hide content visually but keep for screen readers */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/**
+ * Print styles
+ * Optimized for printing receipts and reports
+ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  /* Optimize colors for print */
+  * {
+    color: black !important;
+    background: white !important;
+  }
+
+  /* Show links */
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .page-break-avoid {
+    page-break-inside: avoid;
+  }
+}
+
+/**
+ * Mobile-specific optimizations
+ * Enhanced touch interactions and readability
+ */
+@media (max-width: 640px) {
+  body {
+    /* Prevent font size adjustments after orientation changes */
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Larger touch targets on mobile */
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+}
+
+/**
+ * Tablet and desktop optimizations
+ */
+@media (min-width: 768px) {
+  /* Hover effects only on devices that support hover */
+  @media (hover: hover) {
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.12);
+    }
+  }
+}
+
+/**
+ * High contrast mode support
+ * Ensures accessibility for users with vision impairments
+ */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 20 6% 50%;
+  }
+
+  .dark {
+    --border: 60 9% 80%;
+  }
+}
+
+/**
+ * Reduced motion support
+ * Respects user's motion preferences for accessibility
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
