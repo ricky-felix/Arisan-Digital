@@ -6,8 +6,11 @@
  * in the Next.js App Router.
  */
 
-import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+
+import { createServerClient } from '@supabase/ssr';
+
 import type { Database } from '@/lib/types/database';
 
 /**
@@ -138,7 +141,7 @@ export function createMiddlewareClient(request: Request) {
               return { name, value: rest.join('=') };
             }) ?? [];
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) {
           cookiesToSet.forEach(({ name, value }) => {
             request.headers.append('cookie', `${name}=${value}`);
           });
@@ -148,7 +151,7 @@ export function createMiddlewareClient(request: Request) {
             },
           });
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
+            response.cookies.set(name, value, options as never);
           });
         },
       },
@@ -157,6 +160,3 @@ export function createMiddlewareClient(request: Request) {
 
   return { supabase, response };
 }
-
-// Import NextResponse for middleware client
-import { NextResponse } from 'next/server';

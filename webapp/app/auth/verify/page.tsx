@@ -8,6 +8,7 @@
 'use client';
 
 import * as React from 'react';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -17,7 +18,7 @@ import { OTPInput } from '@/components/ui/otp-input';
 import { formatPhone } from '@/lib/utils';
 import { verifyOTP, signInWithPhone } from '@/lib/auth/actions';
 
-export default function VerifyPage() {
+function VerifyPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phoneNumber = searchParams.get('phone') || '';
@@ -225,5 +226,32 @@ export default function VerifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function VerifyPageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-50 p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl shadow-lg mb-4">
+            <span className="text-3xl">🔐</span>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Verifikasi Nomor HP</h1>
+          <div className="flex items-center justify-center gap-2 text-gray-600">
+            <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            Memuat...
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<VerifyPageFallback />}>
+      <VerifyPageContent />
+    </Suspense>
   );
 }
