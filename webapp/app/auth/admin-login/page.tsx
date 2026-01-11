@@ -1,24 +1,23 @@
 /**
  * Admin Login Page
  *
- * Simplified login for admin users that bypasses OTP verification.
+ * Email/password login for admin users.
  * For development use only.
  */
 
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/lib/supabase/client';
+import { signInWithEmail } from '@/lib/auth/actions';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
-  const [phone, setPhone] = useState('081234567890');
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('admin123');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAdminLogin = async (e: React.FormEvent) => {
@@ -26,53 +25,19 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
+      const result = await signInWithEmail(email, password);
 
-      // Normalize phone number
-      let formattedPhone = phone;
-      if (!phone.startsWith('+')) {
-        formattedPhone = phone.startsWith('0')
-          ? `+62${phone.substring(1)}`
-          : `+62${phone}`;
-      }
-
-      // Check if user exists in database
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('phone_number', formattedPhone)
-        .single();
-
-      if (userError || !user) {
-        toast.error('Admin user not found', {
-          description: 'Make sure the admin profile exists in the database',
+      if (result.success) {
+        toast.success('Login berhasil!', {
+          description: 'Selamat datang di Arisan Digital 🎉',
         });
-        setIsLoading(false);
-        return;
-      }
-
-      // Send OTP (required by Supabase)
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-        options: {
-          shouldCreateUser: false,
-        },
-      });
-
-      if (otpError) {
-        toast.error('Failed to send OTP', {
-          description: otpError.message,
+        // Use window.location for hard redirect to ensure cookies are sent
+        window.location.href = '/dashboard';
+      } else {
+        toast.error('Login gagal', {
+          description: result.error || 'Email atau password salah',
         });
-        setIsLoading(false);
-        return;
       }
-
-      // For admin, redirect directly to verify with a special flag
-      toast.success('Admin bypass activated!', {
-        description: 'You can enter any 6-digit code (like 000000)',
-      });
-
-      router.push(`/auth/verify?phone=${encodeURIComponent(formattedPhone)}&admin=true`);
     } catch (error) {
       console.error('Admin login error:', error);
       toast.error('Login failed', {
@@ -92,32 +57,40 @@ export default function AdminLoginPage() {
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Bypass OTP untuk admin (Development Only)
+            Login dengan email dan password (Development Only)
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAdminLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Nomor HP Admin</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="phone"
-                type="tel"
-                placeholder="081234567890"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="text-center text-lg"
               />
-              <p className="text-xs text-muted-foreground">
-                Default: 081234567890 (Admin)
-              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
             <Button
               type="submit"
               className="w-full"
               size="lg"
-              disabled={isLoading}
+              disabled={isLoading || !email || !password}
             >
               {isLoading ? 'Memproses...' : 'Login as Admin'}
             </Button>
@@ -127,8 +100,10 @@ export default function AdminLoginPage() {
                 ⚠️ Development Only
               </p>
               <p className="text-xs text-amber-800">
-                Setelah klik login, masukkan OTP apa saja (contoh: 000000 atau 123456).
-                Sistem akan otomatis menerima OTP apapun untuk admin.
+                Default credentials: admin@example.com / admin123
+              </p>
+              <p className="text-xs text-amber-800">
+                Akun akan dibuat otomatis jika belum ada.
               </p>
             </div>
           </form>

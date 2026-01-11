@@ -10,7 +10,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
@@ -121,11 +121,11 @@ async function compressImage(file: File, maxSizeMB = 2): Promise<File> {
 export function PaymentForm({
   roundId,
   groupId,
-  amount,
-  groupName,
-  roundNumber,
-  deadline,
-  existingPayment,
+  amount: _amount,
+  groupName: _groupName,
+  roundNumber: _roundNumber,
+  deadline: _deadline,
+  existingPayment: _existingPayment,
 }: PaymentFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);

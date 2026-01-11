@@ -109,7 +109,7 @@ export async function createUserProfile(userData: UserInsert): Promise<DbResult<
 
     const { data, error } = await supabase
       .from('users')
-      .insert(userData)
+      .insert(userData as never)
       .select()
       .single();
 
@@ -144,7 +144,7 @@ export async function updateUserProfile(
 
     const { data, error } = await supabase
       .from('users')
-      .update(updates)
+      .update(updates as never)
       .eq('id', userId)
       .select()
       .single();
@@ -192,7 +192,8 @@ export async function getUserGroups(userId: string): Promise<DbResultArray<Group
     const { data, error } = await supabase
       .from('group_members')
       .select('group_id, groups(*)')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .returns<Array<{ group_id: string; groups: Group }>>();
 
     if (error) {
       console.error('Error fetching user groups:', error);
@@ -308,7 +309,7 @@ export async function getGroupWithMembers(
   groupId: string
 ): Promise<DbResult<GroupWithMembers>> {
   try {
-    const supabase = await createClient();
+    await createClient();
 
     // Fetch group details
     const groupResult = await getGroupDetails(groupId);
@@ -361,7 +362,7 @@ export async function createGroup(groupData: GroupInsert): Promise<DbResult<Grou
 
     const { data, error } = await supabase
       .from('groups')
-      .insert(groupData)
+      .insert(groupData as never)
       .select()
       .single();
 
@@ -396,7 +397,7 @@ export async function updateGroup(
 
     const { data, error } = await supabase
       .from('groups')
-      .update(updates)
+      .update(updates as never)
       .eq('id', groupId)
       .select()
       .single();

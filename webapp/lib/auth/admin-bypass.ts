@@ -8,8 +8,6 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 /**
  * Admin phone numbers that can bypass OTP (development only)
@@ -64,7 +62,7 @@ export async function adminBypassLogin(phone: string) {
       .from('users')
       .select('*')
       .eq('phone_number', formattedPhone)
-      .single();
+      .single<{ id: string; phone_number: string; full_name: string }>();
 
     if (userError || !user) {
       return {
@@ -110,7 +108,7 @@ export async function adminBypassLogin(phone: string) {
  * Simpler approach: Just mark the admin as verified
  * This works by checking if user is admin during OTP verification
  */
-export async function bypassOTPForAdmin(phone: string, anyOtp: string = '000000') {
+export async function bypassOTPForAdmin(phone: string, _anyOtp: string = '000000') {
   'use server';
   
   if (!isAdminPhone(phone)) {

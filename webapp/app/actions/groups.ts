@@ -170,7 +170,9 @@ export async function updateGroupAction(
     const updates: GroupUpdate = {};
 
     const name = formData.get('name') as string;
-    if (name) updates.name = name;
+    if (name) {
+      updates.name = name;
+    }
 
     const contributionAmount = formData.get('contribution_amount') as string;
     if (contributionAmount) {
@@ -181,13 +183,19 @@ export async function updateGroupAction(
     }
 
     const frequency = formData.get('frequency') as Frequency;
-    if (frequency) updates.frequency = frequency;
+    if (frequency) {
+      updates.frequency = frequency;
+    }
 
     const status = formData.get('status') as GroupStatus;
-    if (status) updates.status = status;
+    if (status) {
+      updates.status = status;
+    }
 
     const startDate = formData.get('start_date') as string;
-    if (startDate) updates.start_date = startDate;
+    if (startDate) {
+      updates.start_date = startDate;
+    }
 
     // Update group
     const { error: updateError } = await updateGroup(groupId, updates);
@@ -428,7 +436,7 @@ export async function promoteMemberAction(
     // Promote member to admin
     const { error: promoteError } = await supabase
       .from('group_members')
-      .update({ is_admin: true })
+      .update({ is_admin: true } as never)
       .eq('group_id', groupId)
       .eq('user_id', userId);
 

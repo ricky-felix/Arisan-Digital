@@ -41,7 +41,7 @@ export async function createRound(
       .eq('user_id', user.id)
       .single();
 
-    if (memberError || !membership?.is_admin) {
+    if (memberError || !(membership as { is_admin: boolean } | null)?.is_admin) {
       return { success: false, error: 'Hanya admin yang dapat membuat round baru' };
     }
 
@@ -56,6 +56,8 @@ export async function createRound(
       return { success: false, error: 'Grup tidak ditemukan' };
     }
 
+    const groupData = group as { id: string; frequency: string; member_count: number; contribution_amount: number };
+
     // Get the latest round number
     const { data: latestRound } = await supabase
       .from('rounds')
@@ -65,11 +67,11 @@ export async function createRound(
       .limit(1)
       .single();
 
-    const nextRoundNumber = latestRound ? latestRound.round_number + 1 : 1;
+    const nextRoundNumber = latestRound ? (latestRound as { round_number: number }).round_number + 1 : 1;
 
     // Calculate payment deadline based on frequency
     const deadline = new Date();
-    if (group.frequency === 'weekly') {
+    if (groupData.frequency === 'weekly') {
       deadline.setDate(deadline.getDate() + 7);
     } else {
       deadline.setMonth(deadline.getMonth() + 1);
@@ -83,7 +85,7 @@ export async function createRound(
         round_number: nextRoundNumber,
         payment_deadline: deadline.toISOString(),
         status: 'pending' as RoundStatus,
-      })
+      } as never)
       .select('id')
       .single();
 
@@ -103,16 +105,17 @@ export async function createRound(
     }
 
     // Create payment records for all members
-    const payments = members.map((member) => ({
-      round_id: newRound.id,
+    const roundId = (newRound as { id: string }).id;
+    const payments = (members as { user_id: string }[]).map((member) => ({
+      round_id: roundId,
       user_id: member.user_id,
-      amount: group.contribution_amount,
+      amount: groupData.contribution_amount,
       status: 'pending' as PaymentStatus,
     }));
 
     const { error: paymentsError } = await supabase
       .from('payments')
-      .insert(payments);
+      .insert(payments as never);
 
     if (paymentsError) {
       console.error('Create payments error:', paymentsError);
@@ -121,7 +124,7 @@ export async function createRound(
 
     revalidatePath('/dashboard/groups');
     revalidatePath('/dashboard/payments');
-    return { success: true, roundId: newRound.id };
+    return { success: true, roundId };
   } catch (error) {
     console.error('Create round error:', error);
     return { success: false, error: 'Terjadi kesalahan pada server' };
@@ -161,20 +164,22 @@ export async function completeRound(
       return { success: false, error: 'Round tidak ditemukan' };
     }
 
+    const roundData = round as { id: string; group_id: string; winner_id: string | null };
+
     // Check if user is admin of this group
     const { data: membership, error: memberError } = await supabase
       .from('group_members')
       .select('is_admin')
-      .eq('group_id', round.group_id)
+      .eq('group_id', roundData.group_id)
       .eq('user_id', user.id)
       .single();
 
-    if (memberError || !membership?.is_admin) {
+    if (memberError || !(membership as { is_admin: boolean } | null)?.is_admin) {
       return { success: false, error: 'Hanya admin yang dapat menyelesaikan round' };
     }
 
     // Check if winner has been selected
-    if (!round.winner_id) {
+    if (!roundData.winner_id) {
       return { success: false, error: 'Pemenang harus dipilih terlebih dahulu' };
     }
 
@@ -184,7 +189,7 @@ export async function completeRound(
       .update({
         status: 'completed' as RoundStatus,
         completed_at: new Date().toISOString(),
-      })
+      } as never)
       .eq('id', roundId);
 
     if (updateError) {
@@ -236,20 +241,22 @@ export async function selectWinner(
       return { success: false, error: 'Round tidak ditemukan' };
     }
 
+    const roundInfo = round as { id: string; group_id: string; winner_id: string | null };
+
     // Check if user is admin of this group
     const { data: membership, error: memberError } = await supabase
       .from('group_members')
       .select('is_admin')
-      .eq('group_id', round.group_id)
+      .eq('group_id', roundInfo.group_id)
       .eq('user_id', user.id)
       .single();
 
-    if (memberError || !membership?.is_admin) {
+    if (memberError || !(membership as { is_admin: boolean } | null)?.is_admin) {
       return { success: false, error: 'Hanya admin yang dapat memilih pemenang' };
     }
 
     // Check if winner already selected
-    if (round.winner_id) {
+    if (roundInfo.winner_id) {
       return { success: false, error: 'Pemenang sudah dipilih untuk round ini' };
     }
 
@@ -261,25 +268,26 @@ export async function selectWinner(
       const { data: previousWinners } = await supabase
         .from('rounds')
         .select('winner_id')
-        .eq('group_id', round.group_id)
+        .eq('group_id', roundInfo.group_id)
         .not('winner_id', 'is', null);
 
       const previousWinnerIds = previousWinners
-        ? previousWinners.map((r) => r.winner_id).filter(Boolean)
+        ? (previousWinners as { winner_id: string | null }[]).map((r) => r.winner_id).filter(Boolean)
         : [];
 
       // Get all group members
       const { data: members, error: membersError } = await supabase
         .from('group_members')
         .select('user_id')
-        .eq('group_id', round.group_id);
+        .eq('group_id', roundInfo.group_id);
 
       if (membersError || !members || members.length === 0) {
         return { success: false, error: 'Tidak ada anggota dalam grup' };
       }
 
       // Filter out previous winners
-      const eligibleMembers = members.filter(
+      const membersList = members as { user_id: string }[];
+      const eligibleMembers = membersList.filter(
         (m) => !previousWinnerIds.includes(m.user_id)
       );
 
@@ -303,7 +311,7 @@ export async function selectWinner(
     const { data: winnerMembership, error: winnerError } = await supabase
       .from('group_members')
       .select('user_id')
-      .eq('group_id', round.group_id)
+      .eq('group_id', roundInfo.group_id)
       .eq('user_id', selectedWinnerId)
       .single();
 
@@ -316,7 +324,7 @@ export async function selectWinner(
       .from('rounds')
       .update({
         winner_id: selectedWinnerId,
-      })
+      } as never)
       .eq('id', roundId);
 
     if (updateError) {

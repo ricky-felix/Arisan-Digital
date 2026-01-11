@@ -38,7 +38,9 @@ export function CreateGroupWizard() {
 
   // Handle create group (Step 2 -> Step 3)
   const handleCreateGroup = async () => {
-    if (!formData) return;
+    if (!formData) {
+      return;
+    }
 
     setIsSubmitting(true);
 

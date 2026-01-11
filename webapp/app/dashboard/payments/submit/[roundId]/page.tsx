@@ -57,7 +57,17 @@ export default async function PaymentSubmitPage({
     `
     )
     .eq('id', roundId)
-    .single();
+    .single<{
+      id: string;
+      round_number: number;
+      payment_deadline: string;
+      status: string;
+      groups: {
+        id: string;
+        name: string;
+        contribution_amount: number;
+      };
+    }>();
 
   if (roundError || !round) {
     notFound();
@@ -71,12 +81,8 @@ export default async function PaymentSubmitPage({
     .eq('user_id', user.id)
     .maybeSingle();
 
-  // Get group info (fix TypeScript error by accessing properly)
-  const groupData = round.groups as unknown as {
-    id: string;
-    name: string;
-    contribution_amount: number;
-  } | null;
+  // Get group info
+  const groupData = round.groups;
 
   if (!groupData) {
     notFound();

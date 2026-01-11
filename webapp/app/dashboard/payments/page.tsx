@@ -191,7 +191,9 @@ export default async function PaymentsPage() {
                 const roundData = payment.rounds;
                 const groupData = roundData?.groups;
 
-                if (!roundData || !groupData) return null;
+                if (!roundData || !groupData) {
+                  return null;
+                }
 
                 return (
                   <PaymentCard
@@ -230,7 +232,9 @@ export default async function PaymentsPage() {
                 const roundData = payment.rounds;
                 const groupData = roundData?.groups;
 
-                if (!roundData || !groupData) return null;
+                if (!roundData || !groupData) {
+                  return null;
+                }
 
                 return (
                   <PaymentCard

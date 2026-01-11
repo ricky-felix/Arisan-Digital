@@ -38,9 +38,9 @@ export const Hero = (props) => {
   };
 
   return (
-    <section id="beranda" className="relative min-h-screen" aria-label="Hero section">
+    <section id="beranda" className="relative h-screen w-full overflow-hidden" aria-label="Hero section">
       <div id="main-content" className="sr-only">Main content starts here</div>
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full w-full bg-transparent">
         <AnimatePresence initial={false}>
           {tabs.content.map(
             (content, index) =>
@@ -48,14 +48,14 @@ export const Hero = (props) => {
                 <TabsContent
                   key={index}
                   value={content.value}
-                  className="relative max-h-[60rem] min-h-screen overflow-visible"
+                  className="absolute inset-0 h-full w-full"
                 >
                   <TabContent {...content} />
                 </TabsContent>
               ),
           )}
         </AnimatePresence>
-        <TabsList className="absolute bottom-12 left-0 right-0 top-auto z-20 mx-auto flex justify-center gap-4 px-[5vw] md:bottom-16 lg:bottom-20 lg:max-w-xl" role="tablist" aria-label="Pilih kategori arisan">
+        <TabsList className="absolute bottom-12 left-0 right-0 top-auto z-20 mx-auto flex justify-center gap-4 px-[5vw] md:bottom-16 lg:bottom-20 lg:max-w-xl bg-transparent" role="tablist" aria-label="Pilih kategori arisan">
           {tabs.trigger.map((trigger, index) => (
             <TabsTrigger
               key={index}
@@ -89,20 +89,31 @@ export const Hero = (props) => {
 
 const TabContent = ({ ...content }) => {
   return (
-    <div className="flex h-screen flex-col items-center justify-center">
-      <div className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="relative h-full w-full flex flex-col items-center justify-center">
+      {/* Background image */}
+      <div className="absolute inset-0 z-0 h-full w-full" role="presentation">
+        <img
+          className="absolute inset-0 h-full w-full object-cover"
+          src={content.image.src}
+          alt={content.image.alt}
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-neutral-black/50" aria-hidden="true" />
+      </div>
+      {/* Content */}
+      <div className="relative z-10 px-[5%] py-12 md:py-16 lg:py-20">
         <motion.div
-          className="relative z-10 mx-auto max-w-3xl text-center"
+          className="mx-auto max-w-2xl text-center"
           initial={{ y: "20%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "-20%", opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          <h1 className="mb-5 text-5xl font-bold leading-tight text-neutral-white md:mb-6 md:text-6xl lg:text-7xl">
+          <h1 className="mb-4 text-3xl font-bold leading-snug text-neutral-white sm:text-4xl md:mb-5 md:text-5xl lg:text-6xl">
             {content.heading}
           </h1>
-          <p className="text-base text-neutral-lighter md:text-lg">{content.description}</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
+          <p className="text-sm text-neutral-lighter sm:text-base md:text-lg max-w-xl mx-auto">{content.description}</p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:mt-8">
             {content.buttons.map((button, index) => (
               <Button key={index} {...button}>
                 {button.title}
@@ -110,10 +121,6 @@ const TabContent = ({ ...content }) => {
             ))}
           </div>
         </motion.div>
-      </div>
-      <div className="absolute inset-0 z-0" role="presentation">
-        <div className="absolute inset-0 z-10 bg-neutral-black/50" aria-hidden="true" />
-        <img className="size-full object-cover" src={content.image.src} alt={content.image.alt} loading="eager" />
       </div>
     </div>
   );
@@ -148,7 +155,7 @@ export const Header103Defaults = {
           "Kelola putaran tabungan bersama teman dengan satu aplikasi. Tidak ada lagi buku catatan, tidak ada lagi kebingungan.",
         buttons: [{ title: "Mulai Sekarang", href: routes.login }, { title: "Pelajari Lebih", variant: "secondary-alt" }],
         image: {
-          src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
+          src: "/pictures/teman-kerja.webp",
           alt: "Ilustrasi arisan digital dengan teman kerja - aplikasi yang menampilkan pencatatan otomatis dan transparan",
         },
       },
@@ -159,7 +166,7 @@ export const Header103Defaults = {
           "Kelola putaran tabungan bersama teman tanpa ribet. Satu aplikasi untuk semua yang kamu butuhkan.",
         buttons: [{ title: "Unduh Aplikasi", href: routes.login }, { title: "Lihat Fitur", variant: "secondary-alt" }],
         image: {
-          src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
+          src: "/pictures/keluarga.webp",
           alt: "Ilustrasi arisan digital untuk keluarga - manajemen arisan yang mudah dan efisien",
         },
       },
@@ -170,7 +177,7 @@ export const Header103Defaults = {
           "Catat pembayaran, kelola giliran, dan percayai sistem yang adil untuk semua anggota grup.",
         buttons: [{ title: "Coba Gratis", href: routes.login }, { title: "Cara Kerja", variant: "secondary-alt" }],
         image: {
-          src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
+          src: "/pictures/community.webp",
           alt: "Ilustrasi sistem transparansi arisan digital untuk komunitas - pencatatan pembayaran dan giliran yang jelas",
         },
       },
@@ -181,7 +188,7 @@ export const Header103Defaults = {
           "Mulai grup arisan dalam menit, bukan hari. Semua orang tahu posisinya dan kapan harus bayar.",
         buttons: [{ title: "Daftar Sekarang", href: routes.login }, { title: "Hubungi Kami", variant: "secondary-alt" }],
         image: {
-          src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg",
+          src: "/pictures/business.webp",
           alt: "Ilustrasi arisan digital untuk bisnis - platform arisan profesional dengan fitur lengkap",
         },
       },

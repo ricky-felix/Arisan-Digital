@@ -73,7 +73,7 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch (error) {
+          } catch (_error) {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing user sessions.
           }
@@ -139,7 +139,7 @@ export function createMiddlewareClient(request: Request) {
             }) ?? [];
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.headers.append('cookie', `${name}=${value}`);
           });
           response = NextResponse.next({

@@ -44,7 +44,7 @@ export function HowToUse() {
             </div>
             <div className="flex w-full flex-col items-center justify-center self-start">
               <img
-                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
+                src="/pictures/make-group.webp"
                 alt="Ilustrasi membuat grup arisan"
               />
             </div>
@@ -65,7 +65,7 @@ export function HowToUse() {
             </div>
             <div className="flex w-full flex-col items-center justify-center self-start">
               <img
-                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
+                src="/pictures/holding-phone.webp"
                 alt="Ilustrasi pencatatan kontribusi"
               />
             </div>
@@ -89,7 +89,7 @@ export function HowToUse() {
             </div>
             <div className="flex w-full flex-col items-center justify-center self-start">
               <img
-                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
+                src="/pictures/giving-cash.webp"
                 alt="Ilustrasi kelola giliran arisan"
               />
             </div>

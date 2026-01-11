@@ -30,7 +30,9 @@ export default function ProfileSetupPage() {
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -93,7 +95,7 @@ export default function ProfileSetupPage() {
       }
 
       // TODO: Upload avatar file if exists
-      let uploadedAvatarUrl: string | null = null;
+      const uploadedAvatarUrl: string | null = null;
       if (avatarFile) {
         setIsUploading(true);
         // Upload logic will be implemented later
@@ -108,7 +110,7 @@ export default function ProfileSetupPage() {
           full_name: fullName.trim(),
           profile_picture_url: uploadedAvatarUrl,
           updated_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', user.id);
 
       if (updateError) {

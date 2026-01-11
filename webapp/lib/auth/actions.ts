@@ -159,7 +159,7 @@ export async function verifyOTP(phone: string, otp: string): Promise<AuthActionR
     if (isAdmin) {
       // For admin, bypass OTP verification
       // First, sign in with OTP to create a pending session
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
+      const { error: signInError } = await supabase.auth.signInWithOtp({
         phone: formattedPhone,
         options: { shouldCreateUser: false },
       });
@@ -176,7 +176,11 @@ export async function verifyOTP(phone: string, otp: string): Promise<AuthActionR
         if (verifyError) {
           console.log('Admin bypass: OTP verification failed, but allowing access');
           // Try to get the user from database
-          const { data: userData } = await supabase.from('users').select('id').eq('phone_number', formattedPhone).single();
+          const { data: userData } = await supabase
+            .from('users')
+            .select('id')
+            .eq('phone_number', formattedPhone)
+            .single<{ id: string }>();
           if (userData) {
             // Create a session manually (this is a workaround)
             data = { user: { id: userData.id, phone: formattedPhone } };
@@ -310,6 +314,107 @@ export async function signOut(): Promise<AuthActionResponse> {
     redirect('/');
   } catch (error) {
     console.error('Error in signOut:', error);
+    return {
+      success: false,
+      error: 'Terjadi kesalahan. Silakan coba lagi.',
+    };
+  }
+}
+
+/**
+ * Sign in with email and password (Development only)
+ *
+ * Used for admin/development login when OTP is not available.
+ * Creates or signs in a user with email/password.
+ *
+ * @param email - Email address
+ * @param password - Password
+ * @returns Success status with error message if failed
+ */
+export async function signInWithEmail(email: string, password: string): Promise<AuthActionResponse> {
+  try {
+    const supabase = await createClient();
+
+    // Try to sign in first
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      // If user doesn't exist, try to sign up
+      if (error.message.includes('Invalid login credentials')) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: undefined, // No email confirmation needed for dev
+          },
+        });
+
+        if (signUpError) {
+          return {
+            success: false,
+            error: signUpError.message,
+          };
+        }
+
+        // Check if user was created and create profile
+        if (signUpData.user) {
+          // Create user profile in database
+          const { error: insertError } = await supabase
+            .from('users')
+            .upsert([{
+              id: signUpData.user.id,
+              phone_number: '+6200000000000', // Placeholder for email users
+              full_name: email.split('@')[0], // Use email prefix as name
+              profile_picture_url: null,
+            }] as never);
+
+          if (insertError) {
+            console.error('Error creating user profile:', insertError);
+          }
+        }
+
+        revalidatePath('/', 'layout');
+        return { success: true };
+      }
+
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    // Check if user exists in our users table
+    if (data.user) {
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      // If user doesn't exist in our database, create profile
+      if (!existingUser) {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([{
+            id: data.user.id,
+            phone_number: '+6200000000000', // Placeholder for email users
+            full_name: email.split('@')[0],
+            profile_picture_url: null,
+          }] as never);
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError);
+        }
+      }
+    }
+
+    revalidatePath('/', 'layout');
+    return { success: true };
+  } catch (error) {
+    console.error('Error in signInWithEmail:', error);
     return {
       success: false,
       error: 'Terjadi kesalahan. Silakan coba lagi.',

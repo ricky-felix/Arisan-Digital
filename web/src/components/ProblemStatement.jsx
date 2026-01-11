@@ -49,7 +49,7 @@ export function ProblemStatement() {
         </div>
         <motion.img
           {...scrollRevealScale}
-          src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
+          src="/pictures/problem.webp"
           className="w-full rounded-lg object-cover"
           alt="Ilustrasi permasalahan arisan tradisional"
         />

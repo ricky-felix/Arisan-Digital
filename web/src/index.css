@@ -84,6 +84,13 @@ body {
   font-size: 16px;
 }
 
+/* Override relume-ui Tabs background */
+[data-radix-tabs-content],
+[role="tablist"],
+[role="tabpanel"] {
+  background: transparent !important;
+}
+
 /* Container styles */
 .container {
   width: 100%;

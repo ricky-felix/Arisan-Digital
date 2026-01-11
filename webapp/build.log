@@ -1,0 +1,320 @@
+
+> arisan-digital@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./app/actions/groups.ts
+10:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `@/lib/supabase/queries` import should occur before import of `@/lib/supabase/server`  import/order
+
+./app/actions/payments.ts
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: `next/cache` import should occur before import of `@/lib/supabase/server`  import/order
+
+./app/actions/rounds.ts
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: `next/cache` import should occur before import of `@/lib/supabase/server`  import/order
+
+./app/auth/admin-login/page.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: `@/components/ui/button` import should occur before import of `@/components/ui/card`  import/order
+
+./app/auth/login/page.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `next/link` import should occur before import of `next/navigation`  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+18:1  Warning: `@/lib/auth/actions` import should occur before import of `@/lib/utils`  import/order
+
+./app/auth/profile-setup/page.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: `lucide-react` import should occur before import of `sonner`  import/order
+18:1  Warning: `@/components/ui/avatar` import should occur before import of `@/components/ui/button`  import/order
+20:1  Warning: `@/lib/supabase/client` import should occur before import of `@/lib/utils`  import/order
+
+./app/auth/signout/route.ts
+7:1  Warning: There should be at least one empty line between import groups  import/order
+7:1  Warning: `@/lib/supabase/server` import should occur after import of `next/server`  import/order
+
+./app/auth/verify/page.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `next/link` import should occur before import of `next/navigation`  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: `lucide-react` import should occur before import of `sonner`  import/order
+18:1  Warning: `@/lib/auth/actions` import should occur before import of `@/lib/utils`  import/order
+
+./app/dashboard/groups/create/create-group-wizard.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+15:1  Warning: `@/components/ui/button` import should occur before import of `@/components/ui/card`  import/order
+16:1  Warning: `@/components/groups/group-form` import should occur before import of `@/components/ui/card`  import/order
+17:1  Warning: `@/components/groups/invite-dialog` import should occur before import of `@/components/ui/card`  import/order
+18:1  Warning: There should be at least one empty line between import groups  import/order
+18:1  Warning: `@/app/actions/groups` import should occur before import of `@/components/ui/card`  import/order
+19:1  Warning: There should be at least one empty line between import groups  import/order
+19:1  Warning: `sonner` import should occur before import of `@/components/ui/card`  import/order
+
+./app/dashboard/groups/create/page.tsx
+8:1  Warning: There should be at least one empty line between import groups  import/order
+9:1  Warning: There should be at least one empty line between import groups  import/order
+
+./app/dashboard/groups/groups-list-client.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+15:1  Warning: `@/components/groups/group-card` import should occur before import of `@/components/ui/input`  import/order
+16:1  Warning: `@/components/ui/card` import should occur before import of `@/components/ui/input`  import/order
+17:1  Warning: There should be at least one empty line between import groups  import/order
+17:1  Warning: `@/components/ui/button` import should occur before import of `@/components/ui/input`  import/order
+18:1  Warning: There should be at least one empty line between import groups  import/order
+18:1  Warning: `next/link` import should occur before import of `lucide-react`  import/order
+177:1  Warning: `lucide-react` import should occur before import of `@/components/ui/input`  import/order
+
+./app/dashboard/groups/join/page.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `next/link` import should occur before import of `next/navigation`  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+18:1  Warning: `@/components/ui/card` import should occur before import of `@/components/ui/input`  import/order
+
+./app/dashboard/groups/page.tsx
+8:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: `lucide-react` import should occur before type import of `next`  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: `next/link` import should occur before type import of `next`  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: `@/lib/supabase/server` import should occur before import of `./groups-list-client`  import/order
+15:1  Warning: `@/lib/supabase/queries` import should occur before import of `./groups-list-client`  import/order
+
+./app/dashboard/groups/[id]/group-detail-client.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+27:1  Warning: There should be at least one empty line between import groups  import/order
+27:1  Warning: `next/link` import should occur before import of `next/navigation`  import/order
+29:1  Warning: `@/components/ui/badge` import should occur before import of `@/components/ui/button`  import/order
+32:1  Warning: `@/components/groups/member-card` import should occur before import of `@/components/ui/button`  import/order
+33:1  Warning: `@/components/groups/invite-dialog` import should occur before import of `@/components/ui/button`  import/order
+34:1  Warning: `@/components/ui/dialog` import should occur before import of `@/components/ui/tabs`  import/order
+42:1  Warning: There should be at least one empty line between import groups  import/order
+42:1  Warning: `@/app/actions/groups` import should occur before import of `@/components/ui/button`  import/order
+48:1  Warning: There should be at least one empty line between import groups  import/order
+48:1  Warning: `sonner` import should occur before import of `@/components/ui/button`  import/order
+50:1  Warning: `@/lib/types/database` type import should occur before import of `@/lib/utils`  import/order
+
+./app/dashboard/groups/[id]/page.tsx
+8:1  Warning: There should be at least one empty line between import groups  import/order
+9:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: `next/navigation` import should occur before type import of `next`  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `@/lib/supabase/queries` import should occur before import of `@/lib/supabase/server`  import/order
+
+./app/dashboard/layout.tsx
+18:1  Warning: There should be at least one empty line between import groups  import/order
+18:1  Warning: `next` type import should occur after import of `next/navigation`  import/order
+19:1  Warning: There should be at least one empty line between import groups  import/order
+20:1  Warning: `@/lib/supabase/server` import should occur after import of `@/components/shared/desktop-sidebar`  import/order
+21:1  Warning: `@/lib/supabase/queries` import should occur after import of `@/components/shared/desktop-sidebar`  import/order
+22:1  Warning: `@/components/shared/mobile-header` import should occur after import of `@/components/shared/desktop-sidebar`  import/order
+
+./app/dashboard/notifications/page.tsx
+9:1  Warning: There should be at least one empty line between import groups  import/order
+
+./app/dashboard/page.tsx
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+16:1  Warning: `@/lib/supabase/queries` import should occur before import of `@/lib/supabase/server`  import/order
+17:1  Warning: `@/components/ui/button` import should occur before import of `@/lib/supabase/server`  import/order
+18:1  Warning: `@/components/ui/card` import should occur before import of `@/lib/supabase/server`  import/order
+19:1  Warning: `@/components/groups/group-card` import should occur before import of `@/lib/supabase/server`  import/order
+20:1  Warning: `@/components/dashboard/dashboard-skeleton` import should occur before import of `@/lib/supabase/server`  import/order
+
+./app/dashboard/payments/page.tsx
+8:1  Warning: There should be at least one empty line between import groups  import/order
+9:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: `next/navigation` import should occur before type import of `next`  import/order
+11:1  Warning: `@/components/payments/payment-card` import should occur before import of `@/lib/supabase/server`  import/order
+12:1  Warning: `@/components/ui/tabs` import should occur before import of `@/lib/supabase/server`  import/order
+13:1  Warning: `@/components/ui/badge` import should occur before import of `@/lib/supabase/server`  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: `@/components/ui/card` import should occur before import of `@/lib/supabase/server`  import/order
+15:1  Warning: There should be at least one empty line between import groups  import/order
+15:1  Warning: `lucide-react` import should occur before type import of `next`  import/order
+194:47  Error: Expected { after 'if' condition.  curly
+233:47  Error: Expected { after 'if' condition.  curly
+
+./app/dashboard/payments/submit/[roundId]/page.tsx
+8:1  Warning: There should be at least one empty line between import groups  import/order
+8:1  Warning: `next` type import should occur after import of `lucide-react`  import/order
+9:1  Warning: `next/navigation` import should occur after import of `next/link`  import/order
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `@/lib/supabase/server` import should occur after import of `@/components/ui/button`  import/order
+
+./app/dashboard/profile/page.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+
+./app/layout.tsx
+1:1  Warning: There should be at least one empty line between import groups  import/order
+2:1  Warning: There should be at least one empty line between import groups  import/order
+2:1  Warning: `next/font/google` import should occur before type import of `next`  import/order
+
+./app/page.tsx
+3:1  Warning: There should be at least one empty line between import groups  import/order
+5:1  Warning: There should be at least one empty line between import groups  import/order
+5:1  Warning: `next/link` import should occur before import of `next/navigation`  import/order
+
+./components/groups/group-card.tsx
+18:1  Warning: There should be at least one empty line between import groups  import/order
+19:1  Warning: There should be at least one empty line between import groups  import/order
+20:1  Warning: There should be at least one empty line between import groups  import/order
+28:1  Warning: `@/components/ui/badge` import should occur before import of `@/components/ui/card`  import/order
+29:1  Warning: `@/components/ui/avatar` import should occur before import of `@/components/ui/card`  import/order
+31:1  Warning: `@/lib/types/database` type import should occur before import of `@/lib/utils`  import/order
+
+./components/groups/group-form.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: `@hookform/resolvers/zod` import should occur before import of `react-hook-form`  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+16:1  Warning: `@/components/ui/input` import should occur before import of `@/components/ui/label`  import/order
+24:1  Warning: `@/components/ui/button` import should occur before import of `@/components/ui/label`  import/order
+26:1  Warning: `@/lib/types/database` type import should occur before import of `@/lib/utils`  import/order
+
+./components/groups/invite-dialog.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+20:1  Warning: `@/components/ui/button` import should occur before import of `@/components/ui/dialog`  import/order
+21:1  Warning: There should be at least one empty line between import groups  import/order
+22:1  Warning: `sonner` import should occur before import of `@/components/ui/dialog`  import/order
+114:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/groups/member-card.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: `@/components/ui/card` import should occur after import of `@/components/ui/button`  import/order
+23:1  Warning: `@/lib/utils` import should occur after type import of `@/lib/types/database`  import/order
+
+./components/payments/payment-card.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: `@/components/ui/card` import should occur after import of `@/components/ui/button`  import/order
+23:1  Warning: `@/lib/utils` import should occur after type import of `@/lib/types/database`  import/order
+
+./components/payments/payment-form.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+13:30  Error: 'ImageIcon' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+24:1  Warning: There should be at least one empty line between import groups  import/order
+24:1  Warning: `@/app/actions/payments` import should occur before import of `@/components/ui/button`  import/order
+25:1  Warning: `sonner` import should occur before import of `@/components/ui/button`  import/order
+124:3  Error: 'amount' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+125:3  Error: 'groupName' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+126:3  Error: 'roundNumber' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+127:3  Error: 'deadline' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+128:3  Error: 'existingPayment' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+321:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/shared/bottom-nav.tsx
+17:1  Warning: There should be at least one empty line between import groups  import/order
+19:1  Warning: There should be at least one empty line between import groups  import/order
+20:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/shared/desktop-sidebar.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/shared/mobile-header.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+25:1  Warning: There should be at least one empty line between import groups  import/order
+25:1  Warning: `@/lib/supabase/client` import should occur before import of `@/lib/utils`  import/order
+26:1  Warning: `sonner` import should occur before import of `@/components/ui/avatar`  import/order
+
+./components/ui/avatar.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/badge.tsx
+9:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/button.tsx
+9:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/COMPONENTS_DEMO.tsx
+20:1  Warning: `./card` import should occur before import of `./input`  import/order
+28:1  Warning: `./badge` import should occur before import of `./button`  import/order
+29:1  Warning: `./avatar` import should occur before import of `./button`  import/order
+
+./components/ui/dialog.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/dropdown-menu.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/label.tsx
+9:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/otp-input.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/phone-input.tsx
+11:1  Warning: There should be at least one empty line between import groups  import/order
+12:1  Warning: There should be at least one empty line between import groups  import/order
+13:1  Warning: `@/lib/utils` import should occur before import of `./input`  import/order
+
+./components/ui/select.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+
+./components/ui/tabs.tsx
+10:1  Warning: There should be at least one empty line between import groups  import/order
+
+./lib/auth/actions.ts
+12:1  Warning: There should be at least one empty line between import groups  import/order
+14:1  Warning: There should be at least one empty line between import groups  import/order
+15:1  Warning: `@supabase/supabase-js` type import should occur before import of `@/lib/supabase/server`  import/order
+156:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+157:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+177:11  Warning: Unexpected console statement.  no-console
+
+./lib/supabase/client.ts
+8:1  Warning: There should be at least one empty line between import groups  import/order
+
+./lib/supabase/middleware.ts
+1:1  Warning: There should be at least one empty line between import groups  import/order
+2:1  Warning: `next/server` import should occur before import of `@supabase/ssr`  import/order
+21:5  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+22:5  Warning: Forbidden non-null assertion.  @typescript-eslint/no-non-null-assertion
+
+./lib/supabase/queries.ts
+8:1  Warning: There should be at least one empty line between import groups  import/order
+9:1  Warning: `@/lib/types/database` type import should occur before import of `./server`  import/order
+
+./lib/supabase/server.ts
+9:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: There should be at least one empty line between import groups  import/order
+10:1  Warning: `next/headers` import should occur before import of `@supabase/ssr`  import/order
+162:1  Warning: `next/server` import should occur before import of `@supabase/ssr`  import/order
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules

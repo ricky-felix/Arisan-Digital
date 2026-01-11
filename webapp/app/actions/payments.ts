@@ -38,7 +38,7 @@ export async function submitPayment(
     // Extract form data
     const proofFile = formData.get('proof') as File | null;
     const paymentMethod = formData.get('paymentMethod') as string;
-    const notes = formData.get('notes') as string | null;
+    // const notes = formData.get('notes') as string | null; // TODO: Add notes support
 
     if (!proofFile) {
       return { success: false, error: 'Bukti pembayaran harus diunggah' };
@@ -70,7 +70,7 @@ export async function submitPayment(
     }
 
     // Type assertion for nested relation
-    const groupData = round.groups as unknown as { contribution_amount: number } | null;
+    const groupData = (round as { groups: { contribution_amount: number } | null }).groups;
     if (!groupData) {
       return { success: false, error: 'Data grup tidak ditemukan' };
     }
@@ -78,12 +78,14 @@ export async function submitPayment(
     const amount = groupData.contribution_amount;
 
     // Check if payment already exists
-    const { data: existingPayment } = await supabase
+    const { data: existingPaymentData } = await supabase
       .from('payments')
       .select('id, proof_url')
       .eq('round_id', roundId)
       .eq('user_id', user.id)
       .single();
+
+    const existingPayment = existingPaymentData as { id: string; proof_url: string | null } | null;
 
     // Delete old proof if it exists and we're resubmitting
     if (existingPayment?.proof_url) {
@@ -99,7 +101,7 @@ export async function submitPayment(
     const fileName = `${roundId}_${user.id}_${timestamp}.${fileExtension}`;
 
     // Compress and upload image to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('payment-proofs')
       .upload(fileName, proofFile, {
         cacheControl: '3600',
@@ -125,7 +127,7 @@ export async function submitPayment(
           proof_url: publicUrl,
           status: 'pending' as PaymentStatus,
           paid_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', existingPayment.id);
 
       if (updateError) {
@@ -146,7 +148,7 @@ export async function submitPayment(
           proof_url: publicUrl,
           status: 'pending' as PaymentStatus,
           paid_at: new Date().toISOString(),
-        })
+        } as never)
         .select('id')
         .single();
 
@@ -156,7 +158,7 @@ export async function submitPayment(
       }
 
       revalidatePath('/dashboard/payments');
-      return { success: true, paymentId: newPayment.id };
+      return { success: true, paymentId: (newPayment as { id: string }).id };
     }
   } catch (error) {
     console.error('Submit payment error:', error);
@@ -198,7 +200,7 @@ export async function verifyPayment(
     }
 
     // Type assertion for nested relation
-    const roundData = payment.rounds as unknown as { group_id: string } | null;
+    const roundData = (payment as { rounds: { group_id: string } | null }).rounds;
     if (!roundData) {
       return { success: false, error: 'Data round tidak ditemukan' };
     }
@@ -211,7 +213,7 @@ export async function verifyPayment(
       .eq('user_id', user.id)
       .single();
 
-    if (memberError || !membership?.is_admin) {
+    if (memberError || !(membership as { is_admin: boolean } | null)?.is_admin) {
       return { success: false, error: 'Hanya admin yang dapat memverifikasi pembayaran' };
     }
 
@@ -220,7 +222,7 @@ export async function verifyPayment(
       .from('payments')
       .update({
         status: 'paid' as PaymentStatus,
-      })
+      } as never)
       .eq('id', paymentId);
 
     if (updateError) {

@@ -71,7 +71,7 @@ export default function VerifyPage() {
             .from('users')
             .select('full_name')
             .eq('id', user.id)
-            .single();
+            .single<{ full_name: string }>();
 
           // If new user or no full_name, redirect to profile setup
           if (!profile || !profile.full_name || profile.full_name.trim() === '') {
@@ -104,7 +104,9 @@ export default function VerifyPage() {
   };
 
   const handleResend = async () => {
-    if (!canResend) return;
+    if (!canResend) {
+      return;
+    }
 
     setError('');
     setCanResend(false);
