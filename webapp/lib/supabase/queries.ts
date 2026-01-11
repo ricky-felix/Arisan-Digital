@@ -455,7 +455,7 @@ export async function joinGroup(
 
     const { data, error } = await supabase
       .from('group_members')
-      .insert(memberData)
+      .insert(memberData as never)
       .select()
       .single();
 
@@ -568,7 +568,7 @@ export async function isGroupAdmin(
       .select('is_admin')
       .eq('group_id', groupId)
       .eq('user_id', userId)
-      .single();
+      .single<{ is_admin: boolean }>();
 
     if (error) {
       // Not found means not a member, hence not an admin

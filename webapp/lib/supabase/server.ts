@@ -68,10 +68,10 @@ export async function createClient() {
           return cookieStore.getAll();
         },
         // Set a cookie
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
+              cookieStore.set(name, value, options as never);
             });
           } catch (_error) {
             // The `setAll` method was called from a Server Component.
