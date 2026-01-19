@@ -10,7 +10,7 @@ const TAB_DURATION = 5; // seconds per tab
 
 export const Hero = (props) => {
   const { defaultTabValue, tabs } = {
-    ...Header103Defaults,
+    ...HeroDefault,
     ...props,
   };
 
@@ -38,7 +38,7 @@ export const Hero = (props) => {
   };
 
   return (
-    <section id="beranda" className="relative h-screen w-full overflow-hidden" aria-label="Hero section">
+    <section id="beranda" className="relative min-h-svh w-full overflow-hidden" aria-label="Hero section">
       <div id="main-content" className="sr-only">Main content starts here</div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full w-full bg-transparent">
         <AnimatePresence initial={false}>
@@ -55,19 +55,19 @@ export const Hero = (props) => {
               ),
           )}
         </AnimatePresence>
-        <TabsList className="absolute bottom-12 left-0 right-0 top-auto z-20 mx-auto flex justify-center gap-4 px-[5vw] md:bottom-16 lg:bottom-20 lg:max-w-xl bg-transparent" role="tablist" aria-label="Pilih kategori arisan">
+        <TabsList className="absolute bottom-6 left-0 right-0 top-auto z-20 mx-auto flex justify-center gap-1 px-3 sm:gap-2 sm:px-4 md:bottom-16 md:gap-4 md:px-[5vw] lg:bottom-20 lg:max-w-xl bg-transparent" role="tablist" aria-label="Pilih kategori arisan">
           {tabs.trigger.map((trigger, index) => (
             <TabsTrigger
               key={index}
               value={trigger.value}
               onClick={() => handleTabChange(trigger.value)}
-              className="relative flex-1 whitespace-normal border-0 bg-transparent px-4 py-4 text-center text-neutral-lighter duration-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-black data-[state=active]:bg-transparent data-[state=active]:text-neutral-white hover:text-white hover:bg-white/10 transition-colors sm:px-8 md:min-w-32"
+              className="relative flex-1 whitespace-normal border-0 bg-transparent px-2 py-3 text-center text-xs text-neutral-lighter duration-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-black data-[state=active]:bg-transparent data-[state=active]:text-neutral-white hover:text-white hover:bg-white/10 transition-colors sm:px-4 sm:py-4 sm:text-sm md:px-8 md:text-base md:min-w-32"
               role="tab"
               aria-selected={activeTab === trigger.value}
               aria-controls={`tabpanel-${trigger.value}`}
             >
               <span>{trigger.text}</span>
-              <div className="absolute inset-0 top-auto h-1 w-full bg-neutral-white/20">
+              <div className="absolute inset-0 top-auto h-0.5 w-full bg-neutral-white/20 sm:h-1">
                 <motion.div
                   key={`${trigger.value}-${animationKey}`}
                   className="h-full bg-neutral-white"
@@ -89,7 +89,7 @@ export const Hero = (props) => {
 
 const TabContent = ({ ...content }) => {
   return (
-    <div className="relative h-full w-full flex flex-col items-center justify-center">
+    <div className="relative min-h-svh w-full flex flex-col items-center justify-center">
       {/* Background image */}
       <div className="absolute inset-0 z-0 h-full w-full" role="presentation">
         <img
@@ -101,7 +101,7 @@ const TabContent = ({ ...content }) => {
         <div className="absolute inset-0 bg-neutral-black/50" aria-hidden="true" />
       </div>
       {/* Content */}
-      <div className="relative z-10 px-[5%] py-12 md:py-16 lg:py-20">
+      <div className="relative z-10 px-4 py-8 pb-24 sm:px-6 sm:py-12 sm:pb-28 md:px-[5%] md:py-16 md:pb-32 lg:py-20">
         <motion.div
           className="mx-auto max-w-2xl text-center"
           initial={{ y: "20%", opacity: 0 }}
@@ -109,11 +109,11 @@ const TabContent = ({ ...content }) => {
           exit={{ y: "-20%", opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          <h1 className="mb-4 text-3xl font-bold leading-snug text-neutral-white sm:text-4xl md:mb-5 md:text-5xl lg:text-6xl">
+          <h1 className="mb-3 text-2xl font-bold leading-tight text-neutral-white sm:mb-4 sm:text-3xl sm:leading-snug md:mb-5 md:text-5xl lg:text-6xl">
             {content.heading}
           </h1>
-          <p className="text-sm text-neutral-lighter sm:text-base md:text-lg max-w-xl mx-auto">{content.description}</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:mt-8">
+          <p className="text-sm leading-relaxed text-neutral-lighter sm:text-base md:text-lg max-w-xl mx-auto">{content.description}</p>
+          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:mt-6 sm:flex-row md:mt-8">
             {content.buttons.map((button, index) => (
               <Button key={index} {...button}>
                 {button.title}
@@ -126,7 +126,7 @@ const TabContent = ({ ...content }) => {
   );
 };
 
-export const Header103Defaults = {
+export const HeroDefault = {
   defaultTabValue: "tab-one",
   tabs: {
     trigger: [
