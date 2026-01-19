@@ -38,7 +38,7 @@ export const Hero = (props) => {
   };
 
   return (
-    <section id="beranda" className="relative min-h-svh w-full overflow-hidden" aria-label="Hero section">
+    <section id="beranda" className="relative h-svh w-full overflow-hidden" aria-label="Hero section">
       <div id="main-content" className="sr-only">Main content starts here</div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full w-full bg-transparent">
         <AnimatePresence initial={false}>
@@ -89,16 +89,22 @@ export const Hero = (props) => {
 
 const TabContent = ({ ...content }) => {
   return (
-    <div className="relative min-h-svh w-full flex flex-col items-center justify-center">
+    <div className="relative h-svh w-full flex flex-col items-center justify-center">
       {/* Background image */}
       <div className="absolute inset-0 z-0 h-full w-full" role="presentation">
-        <img
-          className="absolute inset-0 h-full w-full object-cover"
-          src={content.image.src}
-          alt={content.image.alt}
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-neutral-black/50" aria-hidden="true" />
+        <picture className="absolute inset-0 h-full w-full overflow-hidden">
+          {content.image.mobileSrc && (
+            <source media="(max-width: 640px)" srcSet={content.image.mobileSrc} />
+          )}
+          <img
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-h-full min-w-full w-auto h-auto object-cover"
+            src={content.image.src}
+            alt={content.image.alt}
+            loading="eager"
+            sizes="100vw"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-neutral-black/40 sm:bg-neutral-black/50" aria-hidden="true" />
       </div>
       {/* Content */}
       <div className="relative z-10 px-4 py-8 pb-24 sm:px-6 sm:py-12 sm:pb-28 md:px-[5%] md:py-16 md:pb-32 lg:py-20">
