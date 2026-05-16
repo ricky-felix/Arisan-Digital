@@ -1,0 +1,15 @@
+{
+  "name": "arisan-digital",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n frontend,backend -c cyan,green \"npm run dev --prefix frontend\" \"npm run start:dev --prefix backend\"",
+    "frontend": "npm run dev --prefix frontend",
+    "backend": "npm run start:dev --prefix backend",
+    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+    "build": "npm run build --prefix frontend",
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
