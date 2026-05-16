@@ -8,6 +8,44 @@ const TABS = [
   { key: "register", label: "Daftar" },
 ];
 
+/** Inline SVG brand mark — a rounded leaf/coin shape + wordmark, no external URL. */
+function BrandLogo() {
+  return (
+    <div className="flex items-center gap-2.5">
+      {/* Icon: stylised coin / leaf circle */}
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <circle cx="16" cy="16" r="16" fill="white" fillOpacity="0.2" />
+        <circle cx="16" cy="16" r="13" fill="white" fillOpacity="0.15" />
+        {/* Coin inner ring */}
+        <circle cx="16" cy="16" r="10" stroke="white" strokeWidth="1.5" fill="none" />
+        {/* Stylised Rp / leaf shape */}
+        <path
+          d="M12 11h5a3 3 0 010 6h-5V11z"
+          fill="white"
+        />
+        <path
+          d="M12 17h6M12 20h4"
+          stroke="white"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+
+      {/* Wordmark */}
+      <span className="text-base font-bold tracking-tight text-white">
+        Arisan<span className="font-light opacity-90"> Digital</span>
+      </span>
+    </div>
+  );
+}
+
 export function LoginOrRegister({ onClose, defaultTab = "login" }) {
   const [tab, setTab] = useState(defaultTab);
 
@@ -21,38 +59,42 @@ export function LoginOrRegister({ onClose, defaultTab = "login" }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 8 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between bg-[#10b981] px-6 py-5">
-          <img
-            src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
-            alt="Arisan Digital"
-            className="h-7"
-          />
+        {/* ── Header (sticky) ── */}
+        <div className="flex shrink-0 items-center justify-between bg-[#10b981] px-6 py-4">
+          <BrandLogo />
           {onClose && (
             <button
               onClick={onClose}
               aria-label="Tutup"
-              className="rounded-full p-1 text-white/80 transition hover:bg-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="flex size-9 items-center justify-center rounded-full text-white/80 transition hover:bg-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              <svg className="size-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <svg
+                className="size-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           )}
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 bg-gray-50">
+        {/* ── Tabs (sticky) ── */}
+        <div className="flex shrink-0 border-b border-gray-200 bg-gray-50">
           {TABS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`relative flex-1 py-3.5 text-sm font-semibold transition focus-visible:outline-none ${
-                tab === key ? "text-[#10b981]" : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={[
+                "relative flex-1 py-3.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#10b981]/40",
+                tab === key ? "text-[#10b981]" : "text-gray-500 hover:text-gray-700",
+              ].join(" ")}
             >
               {label}
               {tab === key && (
@@ -65,8 +107,8 @@ export function LoginOrRegister({ onClose, defaultTab = "login" }) {
           ))}
         </div>
 
-        {/* Body */}
-        <div className="overflow-y-auto px-6 py-6" style={{ maxHeight: "calc(100vh - 220px)" }}>
+        {/* ── Scrollable body ── */}
+        <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="mb-5">
             <h2 className="text-lg font-bold text-gray-900">
               {tab === "login" ? "Selamat datang kembali!" : "Buat akun baru"}
@@ -96,7 +138,7 @@ export function LoginOrRegister({ onClose, defaultTab = "login" }) {
                 Belum punya akun?{" "}
                 <button
                   onClick={() => setTab("register")}
-                  className="font-semibold text-[#10b981] hover:underline focus-visible:outline-none"
+                  className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
                 >
                   Daftar sekarang
                 </button>
@@ -106,7 +148,7 @@ export function LoginOrRegister({ onClose, defaultTab = "login" }) {
                 Sudah punya akun?{" "}
                 <button
                   onClick={() => setTab("login")}
-                  className="font-semibold text-[#10b981] hover:underline focus-visible:outline-none"
+                  className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
                 >
                   Masuk
                 </button>
