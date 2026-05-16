@@ -13,10 +13,6 @@ import { FaXTwitter } from "react-icons/fa6";
 import { handleAnchorClick } from "../utils/smoothScroll";
 import { routes } from "../config";
 
-const ConditionalRender = ({ condition, children }) => {
-  return condition ? <>{children}</> : null;
-};
-
 const useRelume = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -162,17 +158,16 @@ export function Navbar() {
         </div>
       </div>
       <AnimatePresence>
-        <ConditionalRender condition={useActive.isMenuOpen}>
+        {useActive.isMenuOpen && (
           <div
             id="mobile-menu"
             className="absolute inset-x-0 top-full h-[calc(100vh-4rem)] w-full overflow-hidden md:h-[calc(100vh-4.5rem)]"
           >
             <motion.div
-              variants={{ open: { opacity: 1 }, close: { opacity: 0 } }}
-              animate={useActive.animateMenu.menu}
-              initial="close"
-              exit="close"
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="flex h-full flex-col overflow-auto bg-[#10b981] px-[5%] pt-0.5"
             >
               <div className="my-auto grid max-w-[50rem] grid-cols-1 gap-x-10 gap-y-4 py-4 sm:grid-cols-2 md:py-0">
@@ -260,7 +255,7 @@ export function Navbar() {
               </div>
             </motion.div>
           </div>
-        </ConditionalRender>
+        )}
       </AnimatePresence>
     </nav>
   );

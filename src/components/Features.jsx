@@ -54,11 +54,11 @@ const useRelume = () => {
 };
 
 export function Features() {
-  const useScroll = useRelume();
+  const scroll = useRelume();
   return (
     <section
       id="fitur"
-      ref={useScroll.ref}
+      ref={scroll.ref}
       className="bg-[#ad8cf8] px-[5%] py-16 md:py-24 lg:py-28"
       aria-labelledby="features-heading"
     >
@@ -68,7 +68,7 @@ export function Features() {
             <h2 className="text-[6rem] font-bold leading-[1] text-white md:text-[14rem]">
               0
             </h2>
-            <motion.div className="text-center" style={{ y: useScroll.y }}>
+            <motion.div className="text-center" style={{ y: scroll.y }}>
               <h2 className="text-[6rem] font-bold leading-[1] text-white md:text-[14rem]">
                 {0}
               </h2>

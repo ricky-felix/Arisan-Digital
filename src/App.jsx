@@ -8,6 +8,7 @@ import { GrupPage } from "./pages/application/GrupPage";
 import { BayarPage } from "./pages/application/BayarPage";
 import { ProfilPage } from "./pages/application/ProfilPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 
 // ── Landing + modal overlay on /login ────────────────────────
 function LoginPage() {
@@ -121,6 +122,10 @@ function AppRoutes() {
         <Route path="/app/grup" element={<ProtectedRoute><GrupPage /></ProtectedRoute>} />
         <Route path="/app/bayar" element={<ProtectedRoute><BayarPage /></ProtectedRoute>} />
         <Route path="/app/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
+        <Route path="/app/notifikasi" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
+        <Route path="/app/analitik" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
+        <Route path="/app/buat-arisan" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
+        <Route path="/app/grup/:id" element={<ProtectedRoute><GrupPage /></ProtectedRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -133,7 +138,9 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <ToastProvider>
+        <AppRoutes />
+      </ToastProvider>
     </AuthProvider>
   );
 }

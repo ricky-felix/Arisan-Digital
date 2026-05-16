@@ -1,94 +1,94 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { AppHeader } from "../../components/app/AppHeader";
-import { SummaryCard } from "../../components/app/SummaryCard";
-import { QuickActions } from "../../components/app/QuickActions";
-import { ActiveGroups } from "../../components/app/ActiveGroups";
-import { UpcomingSchedule } from "../../components/app/UpcomingSchedule";
-import { RecentActivity } from "../../components/app/RecentActivity";
-import { BottomNav } from "../../components/app/BottomNav";
-import { useAuth } from "../../context/AuthContext";
-import { useGroups } from "../../hooks/useGroups";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import AppLayout from "../../components/application/AppLayout";
+import SummaryCard from "../../components/application/SummaryCard";
+import QuickActions from "../../components/application/QuickActions";
+import ActiveGroups from "../../components/application/ActiveGroups";
+import RecentActivity from "../../components/application/RecentActivity";
+import UpcomingSchedule from "../../components/application/UpcomingSchedule";
+import { groups as mockGroups, myBills as mockBills, activities as mockActivities } from "../../data/appMockData";
 import { useDashboard } from "../../hooks/useDashboard";
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.3, delay },
-});
-
-function SkeletonCard({ className = "" }) {
-  return <div className={`animate-pulse rounded-2xl bg-gray-200 ${className}`} />;
-}
-
 export function AppHomepage() {
-  const { profile } = useAuth();
-  const { groups, loading: groupsLoading } = useGroups();
-  const { summary, schedule, activity, loading: dashLoading } = useDashboard();
+  const navigate = useNavigate();
+  const { summary, schedule, activity, loading } = useDashboard();
 
-  const loading = groupsLoading || dashLoading;
-
-  const user = {
-    name: profile?.full_name ?? "Pengguna",
-    avatar: profile?.avatar_initials ?? "??",
-    notifications: 0,
-  };
+  // Use real data if available, otherwise fall back to mock
+  const displayGroups = mockGroups;
+  const displayBills = mockBills;
+  const displayActivities = mockActivities;
+  const nextBill = displayBills[0];
+  const totalSaved = 6_800_000;
 
   return (
-    <div className="flex min-h-svh flex-col bg-gray-50">
-      <AppHeader user={user} />
+    <AppLayout title="Dashboard">
+      <div className="app-scroll" style={{ padding: "16px 16px 24px" }}>
+        {/* Desktop greeting */}
+        <div className="hidden md:flex justify-between items-end mb-6">
+          <div>
+            <div style={{ fontSize: 13, color: "var(--ink-2)" }}>
+              {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </div>
+            <h1 style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, letterSpacing: "-0.02em" }}>
+              Dashboard 👋
+            </h1>
+            <p style={{ color: "var(--ink-2)", fontSize: 14, marginTop: 6 }}>
+              {displayGroups.length} grup aktif · 1 tagihan jatuh tempo minggu ini
+            </p>
+          </div>
+          <button
+            className="app-btn btn-primary btn-lg"
+            onClick={() => navigate("/app/buat-arisan")}
+          >
+            + Buat Arisan
+          </button>
+        </div>
 
-      <main className="mx-auto w-full max-w-lg flex-1 space-y-6 overflow-y-auto px-5 pb-28 pt-5">
-        {loading ? (
-          <>
-            <SkeletonCard className="h-40" />
-            <SkeletonCard className="h-24" />
-            <SkeletonCard className="h-48" />
-          </>
-        ) : (
-          <>
-            {summary && (
-              <motion.div {...fadeUp(0)}>
-                <SummaryCard summary={summary} />
-              </motion.div>
-            )}
+        {/* Metric cards */}
+        <SummaryCard
+          totalGroups={displayGroups.length}
+          nextBill={nextBill ? { amount: nextBill.amount, due: nextBill.due, group: nextBill.group } : { amount: 0, due: new Date(), group: "—" }}
+          totalSaved={totalSaved}
+        />
 
-            <motion.div {...fadeUp(0.05)}>
-              <QuickActions />
-            </motion.div>
+        {/* Quick actions */}
+        <div className="app-section-head">
+          <h2>Aksi Cepat</h2>
+        </div>
+        <QuickActions
+          onBuat={() => navigate("/app/buat-arisan")}
+          onBayar={() => navigate("/app/bayar")}
+          onJadwal={() => navigate("/app/grup/kantor")}
+          showAnalitik={false}
+        />
 
-            {groups.length > 0 && (
-              <motion.div {...fadeUp(0.1)}>
-                <ActiveGroups groups={groups} />
-              </motion.div>
-            )}
+        {/* Desktop: two-column layout */}
+        <div className="hidden md:grid mt-6" style={{ gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+          <ActiveGroups
+            groups={displayGroups}
+            onGroupClick={g => navigate(`/app/grup/${g.id}`)}
+            onViewAll={() => navigate("/app/grup")}
+          />
+          <RecentActivity activities={displayActivities} limit={5} />
+        </div>
 
-            {schedule.length > 0 && (
-              <motion.div {...fadeUp(0.15)}>
-                <UpcomingSchedule items={schedule} />
-              </motion.div>
-            )}
-
-            {activity.length > 0 && (
-              <motion.div {...fadeUp(0.2)}>
-                <RecentActivity items={activity} />
-              </motion.div>
-            )}
-
-            {!summary && groups.length === 0 && (
-              <motion.div {...fadeUp(0.1)} className="py-16 text-center">
-                <p className="text-base font-semibold text-gray-600">Selamat datang! 🎉</p>
-                <p className="mt-1 text-sm text-gray-400">
-                  Mulai dengan bergabung atau membuat grup arisan pertamamu.
-                </p>
-              </motion.div>
-            )}
-          </>
-        )}
-      </main>
-
-      <BottomNav />
-    </div>
+        {/* Mobile: single column */}
+        <div className="md:hidden">
+          <ActiveGroups
+            groups={displayGroups}
+            onGroupClick={g => navigate(`/app/grup/${g.id}`)}
+            onViewAll={() => navigate("/app/grup")}
+            limit={3}
+          />
+          <div style={{ marginTop: 4 }}>
+            <UpcomingSchedule bills={displayBills} />
+          </div>
+          <div style={{ marginTop: 4 }}>
+            <RecentActivity activities={displayActivities} limit={5} />
+          </div>
+        </div>
+      </div>
+    </AppLayout>
   );
 }
 

@@ -12,9 +12,10 @@ export function CTA() {
         <div className="mx-auto w-full max-w-3xl text-center">
           <h2 id="cta-heading" className="overflow-hidden">
             <motion.span
-              initial={{ x: "-50%" }}
-              animate={{ x: "0%" }}
-              transition={{ type: "spring", bounce: 0 }}
+              initial={{ x: "-50%", opacity: 0 }}
+              whileInView={{ x: "0%", opacity: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ type: "spring", bounce: 0, duration: 0.7 }}
               className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
             >
               Mulai gunakan Arisan Digital
@@ -22,9 +23,10 @@ export function CTA() {
           </h2>
           <h2 className="overflow-hidden">
             <motion.span
-              initial={{ x: "50%" }}
-              animate={{ x: "0%" }}
-              transition={{ type: "spring", bounce: 0 }}
+              initial={{ x: "50%", opacity: 0 }}
+              whileInView={{ x: "0%", opacity: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ type: "spring", bounce: 0, duration: 0.7, delay: 0.05 }}
               className="mb-5 block text-4xl font-bold leading-tight text-white md:mb-6 md:text-6xl lg:text-7xl"
             >
               Bergabunglah sekarang
