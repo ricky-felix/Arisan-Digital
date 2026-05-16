@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { InputField } from "./InputField";
 import { Divider } from "./Divider";
 import { useAuth } from "../../context/AuthContext";
 
 export function LoginForm() {
   const { signIn } = useAuth();
-  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +17,6 @@ export function LoginForm() {
     setLoading(true);
     try {
       await signIn({ email, password });
-      navigate("/app");
     } catch (err) {
       setError(err.message ?? "Gagal masuk. Periksa email dan kata sandi.");
     } finally {
