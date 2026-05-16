@@ -61,9 +61,10 @@ CREATE TABLE IF NOT EXISTS public.groups (
   status        TEXT        NOT NULL DEFAULT 'active'
                             CHECK (status IN ('active', 'paused', 'completed')),
   color         TEXT        NOT NULL DEFAULT '#10b981',
-  -- short invite code shown in the join-by-code sheet (e.g. "SARI-K3X9")
+  -- short invite code shown in the join-by-code sheet (e.g. "A3F2-09BC")
+  -- gen_random_bytes provides cryptographically secure entropy; md5(uuid) did not
   invite_code   TEXT        UNIQUE NOT NULL
-                            DEFAULT upper(substr(md5(gen_random_uuid()::text), 1, 4) || '-' || substr(md5(gen_random_uuid()::text), 1, 4)),
+                            DEFAULT upper(encode(gen_random_bytes(2), 'hex') || '-' || encode(gen_random_bytes(2), 'hex')),
   created_by    UUID        NOT NULL REFERENCES public.profiles(id),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -171,7 +172,7 @@ ALTER TABLE public.notifications  ENABLE ROW LEVEL SECURITY;
 
 -- Helper: is the current user an admin of a group?
 CREATE OR REPLACE FUNCTION public.is_group_admin(gid UUID)
-RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER STABLE AS $$
+RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.group_members
     WHERE group_id = gid AND user_id = auth.uid() AND role = 'admin'
@@ -180,7 +181,7 @@ $$;
 
 -- Helper: is the current user a member of a group?
 CREATE OR REPLACE FUNCTION public.is_group_member(gid UUID)
-RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER STABLE AS $$
+RETURNS BOOLEAN LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.group_members
     WHERE group_id = gid AND user_id = auth.uid()
@@ -273,11 +274,10 @@ CREATE POLICY "activities: group members read"
   ON public.activities FOR SELECT
   USING (group_id IS NULL OR public.is_group_member(group_id));
 
--- Activities are created by the server/triggers, not directly by users.
--- Admins can insert manually if needed.
+-- Activities are written by server-side triggers; group admins may insert group-scoped rows only.
 CREATE POLICY "activities: admin insert"
   ON public.activities FOR INSERT
-  WITH CHECK (group_id IS NULL OR public.is_group_admin(group_id));
+  WITH CHECK (group_id IS NOT NULL AND public.is_group_admin(group_id));
 
 -- ── notifications ─────────────────────────────────────────────
 CREATE POLICY "notifications: own"
@@ -299,7 +299,8 @@ CREATE POLICY "proof: own read"
     AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
--- Allow group admins to view proof images (path: {user_id}/{payment_id}.jpg)
+-- Allow group admins to view proof images (path: {user_id}/{payment_id}.ext)
+-- Matches via folder-based payer_id to avoid LIKE wildcard injection from user-controlled filenames
 CREATE POLICY "proof: admin read"
   ON storage.objects FOR SELECT
   USING (
@@ -308,7 +309,7 @@ CREATE POLICY "proof: admin read"
       SELECT 1
       FROM public.payments p
       JOIN public.group_members gm ON gm.group_id = p.group_id
-      WHERE p.proof_url LIKE '%' || storage.objects.name
+      WHERE p.payer_id::text = (storage.foldername(name))[1]
         AND gm.user_id = auth.uid()
         AND gm.role = 'admin'
     )
