@@ -125,11 +125,11 @@ export const myBills = [
 ];
 
 export const activities = [
-  { type: "paid",     text: "Pembayaran Anda untuk Arisan Kantor Lt. 3 ronde 8 telah dikonfirmasi.", ts: "2 jam lalu",      icon: "check-circle", color: "green",  boldPart: "Arisan Kantor Lt. 3" },
-  { type: "giliran",  text: "Rina Pratiwi akan menerima giliran di Arisan Kantor Lt. 3.",            ts: "Kemarin, 14:20",  icon: "trophy",       color: "violet", boldPart: "Rina Pratiwi" },
-  { type: "bill",     text: "Tagihan baru: Ibu-Ibu RT 07 ronde 11 — Rp 250.000.",                  ts: "Kemarin, 09:00",  icon: "wallet",       color: "amber",  boldPart: "Ibu-Ibu RT 07" },
-  { type: "joined",   text: "Lina Hartati bergabung di Arisan Kantor Lt. 3.",                       ts: "2 hari lalu",     icon: "users",        color: "violet", boldPart: "Lina Hartati" },
-  { type: "rejected", text: "Bukti pembayaran ronde 7 ditolak. Mohon upload ulang.",                ts: "3 hari lalu",     icon: "alert",        color: "red" },
+  { type: "paid",     text: "Pembayaran Anda untuk Arisan Kantor Lt. 3 ronde 8 telah dikonfirmasi.", ts: "2 jam lalu",      icon: "check-circle", color: "green",  boldPart: "Arisan Kantor Lt. 3", module: "arisan" },
+  { type: "giliran",  text: "Rina Pratiwi akan menerima giliran di Arisan Kantor Lt. 3.",            ts: "Kemarin, 14:20",  icon: "trophy",       color: "violet", boldPart: "Rina Pratiwi", module: "arisan" },
+  { type: "bill",     text: "Tagihan baru: Patungan Makan Siang — Rp 45.000.",                       ts: "Kemarin, 09:00",  icon: "wallet",       color: "amber",  boldPart: "Patungan Makan Siang", module: "patungan" },
+  { type: "joined",   text: "Lina Hartati bergabung di Arisan Kantor Lt. 3.",                       ts: "2 hari lalu",     icon: "users",        color: "violet", boldPart: "Lina Hartati", module: "arisan" },
+  { type: "payment",  text: "Pembayaran diterima untuk Patungan Kado Ulang Tahun.",                 ts: "3 hari lalu",     icon: "check-circle", color: "green", module: "patungan" },
 ];
 
 export const notifications = [

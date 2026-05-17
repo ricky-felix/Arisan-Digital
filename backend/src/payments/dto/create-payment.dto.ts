@@ -1,13 +1,25 @@
-import { IsString, IsNumber, IsUUID, Min } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  IsUUID,
+  Min,
+} from 'class-validator';
 
 export class CreatePaymentDto {
   @IsUUID()
-  group_id: string;
+  round_id: string;
 
-  @IsNumber()
+  @IsInt()
   @Min(1000)
   amount: number;
 
+  @IsOptional()
+  @IsUrl()
+  proof_url?: string;
+
+  @IsOptional()
   @IsString()
-  period: string;
+  notes?: string;
 }

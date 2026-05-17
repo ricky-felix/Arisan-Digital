@@ -43,6 +43,11 @@ const PATHS = {
   "arrow-up-right": <><path d="M7 17 17 7"/><path d="M8 7h9v9"/></>,
   "arrow-down-right": <><path d="M7 7l10 10"/><path d="M17 8v9H8"/></>,
   qr: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v3M14 18v3h3M18 21h3"/></>,
+  split: <><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M8 8l8 8M16 8l-8 8"/></>,
+  repeat: <><path d="m17 1 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 23-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></>,
+  receipt: <><path d="M5 3h14v18l-2-1.5L15 21l-2-1.5L11 21l-2-1.5L7 21l-2-1.5Z"/><path d="M9 8h6M9 12h6M9 16h4"/></>,
+  comment: <><path d="M21 12a8 8 0 0 1-12 7l-6 1 1-5A8 8 0 1 1 21 12Z"/></>,
+  refresh: <><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></>,
 };
 
 export default function Icon({ name, size = 20, stroke = 2, className = "", style }) {

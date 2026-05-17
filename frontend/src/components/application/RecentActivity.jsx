@@ -14,7 +14,20 @@ export default function RecentActivity({ activities = [], limit }) {
               <Icon name={a.icon} size={16} />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13 }}>{a.text}</div>
+              <div style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+                {a.module && (
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: a.module === "arisan" ? "var(--emerald)" : "var(--lavender-dark)",
+                      flexShrink: 0
+                    }}
+                  />
+                )}
+                <span>{a.text}</span>
+              </div>
               <div style={{ fontSize: 11, color: "var(--ink-3)", marginTop: 2 }}>{a.ts}</div>
             </div>
           </div>

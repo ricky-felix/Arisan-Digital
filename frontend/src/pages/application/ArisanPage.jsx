@@ -14,7 +14,7 @@ const FILTERS = [
   { id: "member", label: "Sebagai Anggota" },
 ];
 
-export function GrupPage() {
+export function ArisanPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [search, setSearch] = useState("");
@@ -34,16 +34,21 @@ export function GrupPage() {
   };
 
   return (
-    <AppLayout title="Grup Saya">
+    <AppLayout title="Arisan Saya">
       <div className="app-scroll" style={{ padding: "16px 16px 24px" }}>
         {/* Desktop heading */}
         <div className="hidden md:flex justify-between items-end mb-6">
           <div>
-            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: "-0.02em" }}>Grup Saya</h1>
-            <p style={{ color: "var(--ink-2)", fontSize: 13, marginTop: 4 }}>{mockGroups.length} grup aktif</p>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="badge-module-arisan app-badge" style={{ padding: "3px 10px" }}>
+                <Icon name="users" size={11}/> Arisan
+              </span>
+            </div>
+            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: "-0.02em" }}>Arisan Saya</h1>
+            <p style={{ color: "var(--ink-2)", fontSize: 13, marginTop: 4 }}>{mockGroups.length} grup arisan aktif</p>
           </div>
-          <button className="app-btn btn-primary" onClick={() => navigate("/app/buat-arisan")}>
-            <Icon name="plus" size={16} /> Buat Grup
+          <button className="app-btn btn-primary" onClick={() => navigate("/app/arisan/buat")}>
+            <Icon name="plus" size={16} /> Buat Arisan
           </button>
         </div>
 
@@ -55,7 +60,7 @@ export function GrupPage() {
         {/* Create/Join buttons (mobile) */}
         <div className="md:hidden mb-4">
           <CreateJoinButtons
-            onBuat={() => navigate("/app/buat-arisan")}
+            onBuat={() => navigate("/app/arisan/buat")}
             onGabung={() => setShowJoinSheet(true)}
           />
         </div>
@@ -86,7 +91,7 @@ export function GrupPage() {
               <GroupListCard
                 key={g.id}
                 group={g}
-                onClick={() => navigate(`/app/grup/${g.id}`)}
+                onClick={() => navigate(`/app/arisan/${g.id}`)}
               />
             ))}
           </div>
@@ -124,4 +129,4 @@ export function GrupPage() {
   );
 }
 
-export default GrupPage;
+export default ArisanPage;

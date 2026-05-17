@@ -5,17 +5,17 @@ import Icon from "./Icon";
 import Avatar from "./Avatar";
 
 const NAV = [
-  { id: "dashboard", label: "Dashboard", icon: "home",    path: "/app" },
-  { id: "groups",    label: "Grup",       icon: "users",   path: "/app/grup" },
-  { id: "payments",  label: "Bayar",      icon: "wallet",  path: "/app/bayar" },
+  { id: "dashboard", label: "Beranda",    icon: "home",    path: "/app" },
+  { id: "arisan",    label: "Arisan",     icon: "users",   path: "/app/arisan", module: "arisan" },
+  { id: "patungan",  label: "Patungan",   icon: "split",   path: "/app/patungan", module: "patungan" },
   { id: "notifs",    label: "Notifikasi", icon: "bell",    path: "/app/notifikasi", pip: 3 },
   { id: "profile",   label: "Profil",     icon: "user",    path: "/app/profil" },
 ];
 
 function getActive(pathname) {
   if (pathname === "/app") return "dashboard";
-  if (pathname.startsWith("/app/grup")) return "groups";
-  if (pathname.startsWith("/app/bayar")) return "payments";
+  if (pathname.startsWith("/app/arisan")) return "arisan";
+  if (pathname.startsWith("/app/patungan")) return "patungan";
   if (pathname.startsWith("/app/notifikasi")) return "notifs";
   if (pathname.startsWith("/app/profil")) return "profile";
   if (pathname.startsWith("/app/analitik")) return "analytics";
@@ -64,7 +64,7 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
               <div style={{ fontSize: 13, fontWeight: 700 }}>Buat Arisan Baru</div>
             </div>
             <div style={{ fontSize: 12, color: "var(--ink-2)", marginBottom: 10 }}>Atur kelompok arisan dalam 4 langkah.</div>
-            <button className="app-btn btn-primary btn-block" style={{ padding: "8px 14px", fontSize: 13 }} onClick={() => navigate("/app/buat-arisan")}>
+            <button className="app-btn btn-primary btn-block" style={{ padding: "8px 14px", fontSize: 13 }} onClick={() => navigate("/app/arisan/buat")}>
               <Icon name="plus" size={16} /> Mulai
             </button>
           </div>

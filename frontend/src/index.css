@@ -569,6 +569,10 @@ img {
   --shadow-sm-app: 0 1px 2px rgba(17,24,39,0.04), 0 1px 1px rgba(17,24,39,0.03);
   --shadow-md-app: 0 6px 20px rgba(17,24,39,0.06);
   --font-app:      "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* V3 design tokens */
+  --lavender-dark: #8b5cf6;
+  --gold:          #f59e0b;
+  --gold-soft:     #fef3c7;
 }
 
 /* App font */
@@ -611,6 +615,10 @@ img {
 .badge-upcoming { background: var(--lavender-soft); color: #6d28d9; }
 .badge-done { background: var(--gray-soft); color: #4b5563; }
 .badge-admin { background: var(--emerald-tint); color: var(--emerald-dark); border: 1px solid var(--emerald-soft); }
+.badge-open { background: var(--warn-soft); color: #b45309; }
+.badge-settled { background: var(--emerald-soft); color: var(--emerald-dark); }
+.badge-belum { background: #fee2e2; color: #b91c1c; }
+.badge-sebagian { background: #fef3c7; color: #b45309; }
 
 /* Buttons */
 .app-btn {
@@ -631,6 +639,8 @@ img {
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-block { width: 100%; }
 .btn-lg { padding: 14px 22px; font-size: 15px; }
+.btn-violet { background: var(--lavender-dark); color: #fff; }
+.btn-violet:hover { background: #7c3aed; }
 
 /* Pill button */
 .app-pill {
@@ -1045,4 +1055,179 @@ img {
 @keyframes app-confetti-fall {
   0% { transform: translateY(-10px) rotate(0); opacity: 1; }
   100% { transform: translateY(900px) rotate(720deg); opacity: 0; }
+}
+
+/* ===========================
+   V3 PATUNGAN STYLES
+   =========================== */
+
+/* V3 Patungan badges */
+.badge-belum { background: var(--danger-soft); color: #b91c1c; }
+.badge-sebagian { background: var(--warn-soft); color: #b45309; }
+.badge-open { background: var(--lavender-soft); color: #6d28d9; }
+.badge-settled { background: var(--gray-soft); color: #4b5563; }
+.badge-module-arisan { background: var(--emerald-soft); color: var(--emerald-dark); }
+.badge-module-patungan { background: var(--lavender-soft); color: #6d28d9; }
+
+/* Module dot indicator */
+.mod-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+.mod-dot.arisan { background: var(--emerald); }
+.mod-dot.patungan { background: var(--lavender-dark); }
+
+/* Violet/Patungan button variants */
+.btn-violet { background: var(--lavender-dark); color: #fff; }
+.btn-violet:hover { background: #7c3aed; }
+.btn-outline-violet { background: transparent; color: var(--lavender-dark); border: 1px solid var(--lavender-light); }
+.btn-outline-violet:hover { background: var(--lavender-tint); }
+
+/* Module-tinted dashboard rows */
+.module-row { border-radius: var(--r-card); padding: 16px 18px; position: relative; overflow: hidden; }
+.module-row.arisan { background: linear-gradient(135deg, var(--emerald-tint), #fff); border: 1px solid var(--emerald-soft); }
+.module-row.patungan { background: linear-gradient(135deg, var(--lavender-tint), #fff); border: 1px solid var(--lavender-soft); }
+
+/* Category icon picker for Patungan */
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cat-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 6px; border-radius: 14px; border: 2px solid var(--line); background: #fff; cursor: pointer; transition: all 0.15s; }
+.cat-tile:hover { border-color: var(--lavender); background: var(--lavender-tint); }
+.cat-tile.on { border-color: var(--lavender-dark); background: var(--lavender-tint); }
+.cat-tile .emo { font-size: 24px; }
+.cat-tile .name { font-size: 11px; font-weight: 600; color: var(--ink-1); }
+
+/* Avatar stack */
+.avatar-stack { display: inline-flex; }
+.avatar-stack .avatar { border: 2px solid var(--surface); }
+.avatar-stack .avatar + .avatar { margin-left: -10px; }
+.avatar-stack .more { border-radius: 999px; background: var(--gray-soft); color: var(--ink-2); font-size: 11px; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--surface); }
+.avatar-stack.sm .more { width: 28px; height: 28px; }
+.avatar-stack.md .more { width: 36px; height: 36px; font-size: 12px; }
+
+/* Bill card for Patungan */
+.bill-card { background: #fff; border-radius: var(--r-card); border: 1px solid var(--lavender-soft); padding: 16px; display: flex; gap: 14px; align-items: center; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.bill-card:hover { border-color: var(--lavender); box-shadow: var(--shadow-sm-app); }
+.bill-thumb { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--lavender-soft), var(--lavender-light)); color: var(--lavender-dark); display: grid; place-items: center; font-weight: 700; font-size: 22px; flex-shrink: 0; }
+
+/* Recurring badge */
+.recur-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--lavender-tint); color: var(--lavender-dark); font-size: 11px; font-weight: 600; }
+
+/* Split preview table */
+.split-table { background: #fff; border-radius: var(--r-card); border: 1px solid var(--line-soft); overflow: hidden; }
+.split-table .row { padding: 12px 14px; }
+.split-table .row .amt { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--lavender-dark); }
+
+/* Upload progress */
+.upload-prog { background: var(--surface); border-radius: 12px; border: 1px solid var(--line); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.upload-prog .bar { flex: 1; height: 6px; border-radius: 999px; background: var(--gray-soft); overflow: hidden; }
+.upload-prog .bar > div { height: 100%; background: var(--lavender-dark); transition: width 0.3s ease; }
+
+/* Comment thread */
+.comment { display: flex; gap: 10px; padding: 12px 0; }
+.comment + .comment { border-top: 1px solid var(--line-soft); }
+.comment .body { flex: 1; }
+.comment .head { display: flex; align-items: center; gap: 8px; }
+.comment .head .name { font-size: 13px; font-weight: 600; }
+.comment .head .ts { font-size: 11px; color: var(--ink-3); }
+.comment .txt { font-size: 13px; margin-top: 4px; line-height: 1.45; color: var(--ink-1); }
+.comment.deleted .txt { color: var(--ink-3); font-style: italic; }
+
+/* Refresh button */
+.refresh-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 12px; font-weight: 500; color: var(--ink-2); cursor: pointer; }
+.refresh-btn:hover { background: var(--line-soft); }
+.refresh-btn .spin { animation: spin 0.8s linear infinite; }
+
+/* Role badges */
+.role-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.role-badge.member { background: var(--gray-soft); color: var(--ink-2); }
+.role-badge.admin { background: var(--emerald-soft); color: var(--emerald-dark); }
+.role-badge.super { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: 1px solid #fcd34d; }
+
+/* ===========================
+   PATUNGAN MODULE STYLES
+   =========================== */
+
+/* Module badge */
+.badge-module-patungan {
+  background: var(--lavender-tint);
+  color: var(--lavender-dark);
+  border: 1px solid var(--lavender-soft);
+}
+
+/* Bill card */
+.bill-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.bill-card:hover {
+  border-color: var(--lavender-dark);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+  transform: translateY(-2px);
+}
+
+.bill-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--lavender-soft), var(--lavender-tint));
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+/* Recurring badge */
+.recur-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--lavender-tint);
+  color: var(--lavender-dark);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Avatar stack */
+.avatar-stack {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.avatar-stack .avatar {
+  margin-left: -8px;
+  border: 2px solid var(--surface);
+}
+
+.avatar-stack .avatar:first-child {
+  margin-left: 0;
+}
+
+.avatar-stack.sm .avatar {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.avatar-stack .more {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--gray-soft);
+  color: var(--ink-2);
+  font-size: 10px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  margin-left: -8px;
+  border: 2px solid var(--surface);
 }
