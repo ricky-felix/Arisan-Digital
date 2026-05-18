@@ -43,8 +43,9 @@ export function Navbar() {
           className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#10b981] rounded"
         >
           <img
-            src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
+            src="/Arisan-Digital-Logo-nobg.png"
             alt="Arisan Digital - Logo"
+            style={{ height: "48px", width: "auto" }}
           />
         </a>
         <div className="flex items-center justify-center gap-2 lg:gap-4">

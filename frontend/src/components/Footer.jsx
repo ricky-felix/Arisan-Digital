@@ -23,9 +23,9 @@ export function Footer() {
                 className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
               >
                 <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
+                  src="/Arisan-Digital-Full-Logo-no-bg.webp"
                   alt="Logo Arisan Digital"
-                  className="inline-block"
+                  style={{ height: "128px", width: "auto" }}
                 />
               </a>
             </div>

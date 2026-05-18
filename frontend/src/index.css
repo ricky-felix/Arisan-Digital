@@ -131,8 +131,8 @@ body {
   }
 }
 
-/* Image responsiveness */
-img {
+/* Image responsiveness — :where() gives zero specificity so Tailwind utilities always override */
+:where(img) {
   max-width: 100%;
   height: auto;
   display: block;
@@ -215,7 +215,7 @@ a:active {
 }
 
 /* Image lazy loading animation */
-img {
+:where(img) {
   animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 

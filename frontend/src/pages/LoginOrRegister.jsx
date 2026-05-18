@@ -8,41 +8,13 @@ const TABS = [
   { key: "register", label: "Daftar" },
 ];
 
-/** Inline SVG brand mark — a rounded leaf/coin shape + wordmark, no external URL. */
 function BrandLogo() {
   return (
-    <div className="flex items-center gap-2.5">
-      {/* Icon: stylised coin / leaf circle */}
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 32 32"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <circle cx="16" cy="16" r="16" fill="white" fillOpacity="0.2" />
-        <circle cx="16" cy="16" r="13" fill="white" fillOpacity="0.15" />
-        {/* Coin inner ring */}
-        <circle cx="16" cy="16" r="10" stroke="white" strokeWidth="1.5" fill="none" />
-        {/* Stylised Rp / leaf shape */}
-        <path
-          d="M12 11h5a3 3 0 010 6h-5V11z"
-          fill="white"
-        />
-        <path
-          d="M12 17h6M12 20h4"
-          stroke="white"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-      </svg>
-
-      {/* Wordmark */}
-      <span className="text-base font-bold tracking-tight text-white">
-        Arisan<span className="font-light opacity-90"> Digital</span>
-      </span>
-    </div>
+    <img
+      src="/Arisan-Digital-Full-Logo-no-bg.webp"
+      alt="Arisan Digital"
+      style={{ height: "56px", width: "auto" }}
+    />
   );
 }
 
