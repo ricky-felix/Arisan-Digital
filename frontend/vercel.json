@@ -1,6 +1,5 @@
 {
-	"outputDirectory": "frontend/dist",
-	"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+	"rewrites": [{ "source": "/(.*)", "destination": "/" }],
 	"build": {
 		"env": {
 			"NODE_ENV": "production"
