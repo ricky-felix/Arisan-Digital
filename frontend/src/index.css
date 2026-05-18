@@ -171,8 +171,8 @@ textarea,
 select,
 [role="button"],
 [role="link"] {
-  transition-property: color, background-color, border-color, transform, opacity, box-shadow;
-  transition-duration: 0.3s;
+  transition-property: color, background-color, border-color, transform, box-shadow;
+  transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
