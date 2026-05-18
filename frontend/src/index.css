@@ -214,11 +214,6 @@ a:active {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Image lazy loading animation */
-:where(img) {
-  animation: fadeIn 0.5s cubic-bezier(0, 0, 0.2, 1);
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;

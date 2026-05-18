@@ -89,7 +89,13 @@ export const Hero = (props) => {
 
 const TabContent = ({ ...content }) => {
   return (
-    <div className="relative h-svh w-full flex flex-col items-center justify-center">
+    <motion.div
+      className="relative h-svh w-full flex flex-col items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       {/* Background image */}
       <div className="absolute inset-0 z-0 h-full w-full" role="presentation">
         <picture className="absolute inset-0 h-full w-full overflow-hidden">
@@ -110,9 +116,9 @@ const TabContent = ({ ...content }) => {
       <div className="relative z-10 px-4 py-8 pb-24 sm:px-6 sm:py-12 sm:pb-28 md:px-[5%] md:py-16 md:pb-32 lg:py-20">
         <motion.div
           className="mx-auto max-w-2xl text-center"
-          initial={{ y: "20%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "-20%", opacity: 0 }}
+          initial={{ y: "15%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "-15%" }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <h1 className="mb-3 text-2xl font-bold leading-tight text-neutral-white sm:mb-4 sm:text-3xl sm:leading-snug md:mb-5 md:text-5xl lg:text-6xl">
@@ -128,7 +134,7 @@ const TabContent = ({ ...content }) => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
