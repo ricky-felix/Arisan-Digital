@@ -106,45 +106,43 @@ export function Hero() {
         Main content starts here
       </div>
 
-      {/* Crossfade slides — AnimatePresence owns actual motion.div children */}
-      <AnimatePresence initial={false}>
+      {/* Always-mounted backgrounds — prevents blink on mobile from late image loads */}
+      {TABS.map((t, i) => (
+        <div
+          key={t.value}
+          className="absolute inset-0 transition-opacity duration-500 ease-in-out"
+          style={{ opacity: i === activeIndex ? 1 : 0 }}
+          role="presentation"
+          aria-hidden={i !== activeIndex}
+        >
+          <picture className="absolute inset-0 h-full w-full overflow-hidden">
+            {t.image.mobileSrc && (
+              <source media="(max-width: 640px)" srcSet={t.image.mobileSrc} />
+            )}
+            <img
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-h-full min-w-full w-auto h-auto object-cover"
+              src={t.image.src}
+              alt={t.image.alt}
+              loading="eager"
+              sizes="100vw"
+            />
+          </picture>
+          <div className="absolute inset-0 bg-neutral-black/45 sm:bg-neutral-black/50" />
+        </div>
+      ))}
+
+      {/* Text content — AnimatePresence only for copy, no image re-mount */}
+      <AnimatePresence mode="wait">
         <motion.div
           key={tab.value}
           className="absolute inset-0 flex flex-col items-center justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          {/* Background image */}
-          <div className="absolute inset-0" role="presentation">
-            <picture className="absolute inset-0 h-full w-full overflow-hidden">
-              {tab.image.mobileSrc && (
-                <source media="(max-width: 640px)" srcSet={tab.image.mobileSrc} />
-              )}
-              <img
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-h-full min-w-full w-auto h-auto object-cover"
-                src={tab.image.src}
-                alt={tab.image.alt}
-                loading="eager"
-                sizes="100vw"
-              />
-            </picture>
-            <div
-              className="absolute inset-0 bg-neutral-black/45 sm:bg-neutral-black/50"
-              aria-hidden="true"
-            />
-          </div>
-
-          {/* Text content */}
           <div className="relative z-10 px-4 py-8 pb-24 sm:px-6 sm:py-12 sm:pb-28 md:px-[5%] md:py-16 md:pb-32 lg:py-20">
-            <motion.div
-              className="mx-auto max-w-2xl text-center"
-              initial={{ y: 16 }}
-              animate={{ y: 0 }}
-              exit={{ y: -8 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
-            >
+            <div className="mx-auto max-w-2xl text-center">
               <h1 className="mb-3 text-2xl font-bold leading-tight text-neutral-white sm:mb-4 sm:text-3xl sm:leading-snug md:mb-5 md:text-5xl lg:text-6xl">
                 {tab.heading}
               </h1>
@@ -158,7 +156,7 @@ export function Hero() {
                   </Button>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -189,9 +187,9 @@ export function Hero() {
               {activeIndex === index && (
                 <motion.div
                   key={tickKey}
-                  className="h-full bg-neutral-white"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
+                  className="h-full w-full origin-left bg-neutral-white"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
                   transition={{ duration: TAB_DURATION, ease: "linear" }}
                 />
               )}
