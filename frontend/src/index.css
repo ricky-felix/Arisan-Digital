@@ -1012,6 +1012,7 @@ a:active {
 
 /* Bottom tabbar */
 .app-tabbar {
+  position: sticky; bottom: 0; z-index: 30;
   height: 78px; background: #fff;
   border-top: 1px solid var(--line-soft);
   display: flex; padding: 8px 0 18px; flex-shrink: 0;

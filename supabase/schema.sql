@@ -232,6 +232,39 @@ AS $$
 $$;
 
 -- ─────────────────────────────────────────────────
+-- AUTH TRIGGER — auto-create a profile row on sign-up
+-- ─────────────────────────────────────────────────
+
+-- Creates a public.users row whenever an auth.users row is inserted.
+-- Anonymous-safe: an anonymous sign-in carries no `full_name` metadata,
+-- so without the COALESCE fallback the NOT NULL `name` constraint would
+-- fail and roll back the entire auth.users INSERT — surfacing as
+-- "Database error creating anonymous user" from GoTrue.
+-- SECURITY DEFINER so it bypasses RLS; explicit search_path for safety.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO public.users (id, name, phone)
+  VALUES (
+    NEW.id,
+    COALESCE(NULLIF(NEW.raw_user_meta_data->>'full_name', ''), 'Tamu'),
+    NULLIF(NEW.raw_user_meta_data->>'phone', '')
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ─────────────────────────────────────────────────
 -- ROW LEVEL SECURITY (RLS)
 -- ─────────────────────────────────────────────────
 

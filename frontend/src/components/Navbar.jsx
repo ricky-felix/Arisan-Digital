@@ -3,6 +3,7 @@
 import { Button } from "./Button";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BiLogoFacebookCircle,
   BiLogoInstagram,
@@ -28,6 +29,7 @@ const useRelume = () => {
 
 export function Navbar() {
   const useActive = useRelume();
+  const navigate = useNavigate();
 
   return (
     <nav
@@ -49,6 +51,15 @@ export function Navbar() {
           />
         </a>
         <div className="flex items-center justify-center gap-2 lg:gap-4">
+          <Button
+            title="Masuk"
+            size="sm"
+            variant="secondary-alt"
+            className="hidden sm:inline-block"
+            onClick={() => navigate(routes.login)}
+          >
+            Masuk
+          </Button>
           <Button
             title="Coba Sekarang"
             size="sm"
@@ -237,12 +248,24 @@ export function Navbar() {
                 </a>
               </div>
               <div className="flex min-h-18 items-center justify-between gap-x-4">
-                <a
-                  className="inline-flex items-center justify-center gap-2 border-0 p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:text-xl"
-                  href={routes.app}
-                >
-                  Coba Sekarang
-                </a>
+                <div className="flex items-center gap-x-4">
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center gap-2 border-0 bg-transparent p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-xl"
+                    onClick={() => {
+                      useActive.toggleMenu();
+                      navigate(routes.login);
+                    }}
+                  >
+                    Masuk
+                  </button>
+                  <a
+                    className="inline-flex items-center justify-center gap-2 border-0 p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:text-xl"
+                    href={routes.app}
+                  >
+                    Coba Sekarang
+                  </a>
+                </div>
                 <div className="flex items-center gap-3">
                   <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Facebook">
                     <BiLogoFacebookCircle className="size-6" />

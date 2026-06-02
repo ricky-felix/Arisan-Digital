@@ -75,7 +75,7 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
       {/* Right side: topbar + content + mobile nav */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Desktop topbar — hidden on mobile */}
-        <header className="hidden md:flex items-center gap-4 flex-shrink-0" style={{ height: 64, padding: "0 28px", background: "#fff", borderBottom: "1px solid var(--line-soft)" }}>
+        <header className="hidden md:flex items-center gap-4 flex-shrink-0" style={{ position: "sticky", top: 0, zIndex: 30, height: 64, padding: "0 28px", background: "#fff", borderBottom: "1px solid var(--line-soft)" }}>
           <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: "-0.01em", color: "var(--ink-1)" }}>{title}</div>
           <div style={{ flex: 1, maxWidth: 420, display: "flex", alignItems: "center", gap: 10, background: "var(--gray-soft)", borderRadius: 12, padding: "9px 14px", color: "var(--ink-2)" }}>
             <Icon name="search" size={16} />
@@ -92,7 +92,7 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
         </header>
 
         {/* Mobile header — hidden on desktop */}
-        <header className="md:hidden flex-shrink-0 flex items-center justify-between" style={{ padding: "12px 16px 8px", background: "#fff", borderBottom: "1px solid var(--line-soft)" }}>
+        <header className="md:hidden flex-shrink-0 flex items-center justify-between" style={{ position: "sticky", top: 0, zIndex: 30, padding: "12px 16px 8px", background: "#fff", borderBottom: "1px solid var(--line-soft)" }}>
           <div>
             <div style={{ fontSize: 13, color: "var(--ink-2)" }}>Selamat datang kembali</div>
             <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.01em" }}>Halo, {firstName} 👋</div>
