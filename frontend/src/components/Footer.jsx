@@ -175,8 +175,8 @@ export function Footer() {
           </div>
         </div>
         <div className="flex flex-col-reverse items-start justify-between pb-4 pt-6 text-sm md:flex-row md:items-center md:pb-0 md:pt-8">
-          <p className="mt-8 text-white md:mt-0">© 2024 Arisan Digital. All rights reserved.</p>
-          <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm md:grid-flow-col md:gap-x-6 md:gap-y-0">
+          <p className="mt-8 text-white md:mt-0">© 2025 Arisan Digital. All rights reserved.</p>
+          {/* <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm md:grid-flow-col md:gap-x-6 md:gap-y-0">
             <li className="underline">
               <a
                 href="#"
@@ -210,7 +210,7 @@ export function Footer() {
                 Kebijakan privasi
               </a>
             </li>
-          </ul>
+          </ul> */}
         </div>
       </div>
     </footer>
