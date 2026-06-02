@@ -23,7 +23,14 @@ export function LoginOrRegister({ onClose, onSuccess, reason, defaultTab = "logi
   const done = onSuccess || onClose;
 
   return (
-    <div
+    // Backdrop is a motion element so AnimatePresence fades the dim + blur
+    // out and unmounts it cleanly on close — otherwise the blur is left
+    // stuck over the page after the modal card has gone.
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50 px-4 py-8 backdrop-blur-sm"
       onClick={onClose}
     >
@@ -132,7 +139,7 @@ export function LoginOrRegister({ onClose, onSuccess, reason, defaultTab = "logi
           </p>
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 

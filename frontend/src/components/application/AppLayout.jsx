@@ -32,7 +32,7 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
   const firstName = displayName.split(" ")[0];
 
   return (
-    <div className="app-root flex min-h-svh" style={{ background: "var(--app-bg)", fontFamily: "var(--font-app)" }}>
+    <div className="app-root flex h-svh overflow-hidden" style={{ background: "var(--app-bg)", fontFamily: "var(--font-app)" }}>
       {/* Desktop sidebar — hidden on mobile */}
       <aside className="hidden md:flex flex-col flex-shrink-0" style={{ width: 260, height: "100vh", position: "sticky", top: 0, background: "#fff", borderRight: "1px solid var(--line-soft)", padding: "20px 14px", overflowY: "auto" }}>
         {/* Brand */}

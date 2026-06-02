@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "../../components/application/AppLayout";
 import Icon from "../../components/application/Icon";
 import Avatar from "../../components/application/Avatar";
@@ -37,6 +38,7 @@ function Divider() { return <div style={{ height: 1, background: "var(--line-sof
 
 export function ProfilPage() {
   const toast = useToast();
+  const navigate = useNavigate();
   const { profile, updateProfile, isAnonymous, signOut } = useAuth();
   const { promptRegister } = useAccountPrompt();
 
@@ -44,8 +46,9 @@ export function ProfilPage() {
     try {
       await signOut();
     } catch { /* ignore */ }
-    // Reload so a fresh anonymous guest session is created.
-    window.location.href = "/app";
+    // Full reload back to the landing page; AuthProvider will bootstrap a
+    // fresh anonymous guest session on next app visit.
+    window.location.href = "/";
   };
   const [notifPrefs, setNotifPrefs] = useState({ bill: true, conf: true, marketing: false });
   const [editing, setEditing] = useState(false);
@@ -147,21 +150,21 @@ export function ProfilPage() {
           </SettingRow>
         </SettingsGroup>
 
-        {/* Account (registered users only) */}
-        {!isAnonymous && (
-          <>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.07em", margin: "0 0 8px 4px" }}>Akun</div>
-            <SettingsGroup>
-              <SettingRow ico="logout" label="Keluar" sub="Keluar dari akun ini" iconBg="var(--danger-soft)" iconColor="var(--danger)" onClick={handleSignOut}>
-                <Icon name="chevron-right" size={16} style={{ color: "var(--ink-3)" }} />
-              </SettingRow>
-            </SettingsGroup>
-          </>
-        )}
+        {/* Account */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.07em", margin: "0 0 8px 4px" }}>Akun</div>
+        <SettingsGroup>
+          <SettingRow ico="logout" label="Keluar" sub={isAnonymous ? "Akhiri sesi tamu & kembali ke halaman utama" : "Keluar dari akun ini"} iconBg="var(--danger-soft)" iconColor="var(--danger)" onClick={handleSignOut}>
+            <Icon name="chevron-right" size={16} style={{ color: "var(--ink-3)" }} />
+          </SettingRow>
+        </SettingsGroup>
 
         {/* About */}
         <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.07em", margin: "0 0 8px 4px" }}>Tentang</div>
         <SettingsGroup>
+          <SettingRow ico="globe" label="Buka Website" sub="Kunjungi halaman utama Arisan Digital" iconBg="var(--emerald-tint)" iconColor="var(--emerald-dark)" onClick={() => navigate("/")}>
+            <Icon name="chevron-right" size={16} style={{ color: "var(--ink-3)" }} />
+          </SettingRow>
+          <Divider />
           <SettingRow ico="info" label="Versi Aplikasi" sub="MVP · Arisan Digital" iconBg="var(--gray-soft)" iconColor="var(--ink-2)" />
           <Divider />
           <SettingRow ico="link" label="Syarat & Ketentuan" iconBg="var(--gray-soft)" iconColor="var(--ink-2)" onClick={() => {}}>

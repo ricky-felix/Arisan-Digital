@@ -17,10 +17,10 @@ export default function LandingPage() {
       <main id="main-content">
         <Hero />
         <ProblemStatement />
-        <HowToUse />
-        <Features />
-        <BillSplitting />
         <Gallery />
+        <HowToUse />
+        <BillSplitting />
+        <Features />
         <FAQs />
         <CTA />
       </main>

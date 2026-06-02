@@ -18,24 +18,25 @@ import { ToastProvider } from "./context/ToastContext";
 import { AccountPromptProvider } from "./context/AccountPromptContext";
 
 // ── Landing + modal overlay on /login ────────────────────────
-function LoginPage() {
+// Both "/" and "/login" render this SAME component, so React keeps the
+// single <LandingPage /> instance mounted when navigating between them.
+// That stops every framer-motion `whileInView` reveal from replaying
+// (which read as a full-page blink). The login modal is just toggled on
+// top via AnimatePresence based on the current path.
+function LandingShell() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const showLogin = location.pathname === "/login";
   return (
     <>
       <LandingPage />
       <AnimatePresence>
-        <LoginOrRegister onClose={() => navigate("/")} />
+        {showLogin && (
+          <LoginOrRegister key="login-modal" onClose={() => navigate("/")} />
+        )}
       </AnimatePresence>
     </>
   );
-}
-
-// ── Redirect authenticated users away from /login ─────────────
-function PublicRoute({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return <AppLoadingScreen />;
-  if (user) return <Navigate to="/app" replace />;
-  return children;
 }
 
 // ── App routes are open in this MVP (no login). We just wait for
@@ -137,16 +138,9 @@ function AppRoutes() {
     <>
       <SkipToContent />
       <Routes>
-        {/* Public */}
-        <Route path="/" element={<LandingPage />} />
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
+        {/* Public — same element for both paths keeps LandingPage mounted */}
+        <Route path="/" element={<LandingShell />} />
+        <Route path="/login" element={<LandingShell />} />
 
         {/* App routes (open — anonymous session, no login) */}
         <Route path="/app" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
