@@ -21,7 +21,7 @@ export default function GroupCard({ group, onClick }) {
         </div>
       </div>
       <div className="flex flex-col items-end gap-1.5">
-        <StatusBadge status={group.status} />
+        <StatusBadge status={group.badgeStatus} />
         {group.isAdmin && (
           <span className="app-badge badge-admin" style={{ fontSize: 11 }}>Admin</span>
         )}

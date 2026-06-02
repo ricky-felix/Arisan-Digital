@@ -5,4 +5,6 @@ export const config = {
 
 export const routes = {
   login: "/login",
+  // MVP has no login — "Coba Sekarang" CTAs open the app directly.
+  app: "/app",
 };

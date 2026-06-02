@@ -53,7 +53,7 @@ function ErrorAlert({ message }) {
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ onSuccess }) {
   const { signIn } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -67,6 +67,7 @@ export function LoginForm() {
     setLoading(true);
     try {
       await signIn({ email, password });
+      if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.message ?? "Gagal masuk. Periksa email dan kata sandi.");
     } finally {

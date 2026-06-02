@@ -5,12 +5,17 @@ import LandingPage from "./pages/LandingPage";
 import { LoginOrRegister } from "./pages/LoginOrRegister";
 import { AppHomepage } from "./pages/application/AppHomepage";
 import { ArisanPage } from "./pages/application/ArisanPage";
+import CreateArisanPage from "./pages/application/CreateArisanPage";
+import GroupDetailPage from "./pages/application/GroupDetailPage";
 import { BayarPage } from "./pages/application/BayarPage";
 import { ProfilPage } from "./pages/application/ProfilPage";
 import PatunganPage from "./pages/application/PatunganPage";
+import CreatePatunganPage from "./pages/application/CreatePatunganPage";
+import BillDetailPage from "./pages/application/BillDetailPage";
 import AppLayout from "./components/application/AppLayout";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
+import { AccountPromptProvider } from "./context/AccountPromptContext";
 
 // ── Landing + modal overlay on /login ────────────────────────
 function LoginPage() {
@@ -33,12 +38,36 @@ function PublicRoute({ children }) {
   return children;
 }
 
-// ── Guard app routes — redirect to /login if not authenticated ─
+// ── App routes are open in this MVP (no login). We just wait for
+//    the anonymous session to bootstrap, and surface a setup hint if
+//    anonymous auth hasn't been enabled in Supabase yet. ─────────
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading, authError } = useAuth();
   if (loading) return <AppLoadingScreen />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (authError) return <AuthSetupScreen error={authError} />;
+  if (!user) return <AppLoadingScreen />;
   return children;
+}
+
+// ── Shown when the anonymous session can't be created ─────────
+function AuthSetupScreen({ error }) {
+  return (
+    <div className="flex min-h-svh items-center justify-center bg-gray-50 p-6">
+      <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h1 className="text-lg font-bold text-gray-900">Perlu satu langkah setup</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Aplikasi memakai sesi anonim Supabase agar bisa dipakai tanpa login.
+          Aktifkan dulu di dashboard Supabase:
+          <br />
+          <span className="font-medium text-gray-800">
+            Authentication → Sign In / Providers → Anonymous
+          </span>
+          , lalu muat ulang halaman ini.
+        </p>
+        <p className="mt-3 rounded-lg bg-gray-50 p-2 font-mono text-xs text-gray-500">{error}</p>
+      </div>
+    </div>
+  );
 }
 
 // ── Full-screen loading while auth resolves ───────────────────
@@ -119,20 +148,20 @@ function AppRoutes() {
           }
         />
 
-        {/* Protected app routes */}
+        {/* App routes (open — anonymous session, no login) */}
         <Route path="/app" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
         <Route path="/app/arisan" element={<ProtectedRoute><ArisanPage /></ProtectedRoute>} />
-        <Route path="/app/arisan/:id" element={<ProtectedRoute><ArisanPage /></ProtectedRoute>} />
-        <Route path="/app/arisan/buat" element={<ProtectedRoute><ArisanPage /></ProtectedRoute>} />
+        <Route path="/app/arisan/buat" element={<ProtectedRoute><CreateArisanPage /></ProtectedRoute>} />
+        <Route path="/app/buat-arisan" element={<ProtectedRoute><CreateArisanPage /></ProtectedRoute>} />
+        <Route path="/app/arisan/:id" element={<ProtectedRoute><GroupDetailPage /></ProtectedRoute>} />
         <Route path="/app/bayar" element={<ProtectedRoute><BayarPage /></ProtectedRoute>} />
         <Route path="/app/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
         <Route path="/app/notifikasi" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
         <Route path="/app/analitik" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
-        <Route path="/app/buat-arisan" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
-        <Route path="/app/patungan" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
-        <Route path="/app/patungan/:billId" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
-        <Route path="/app/patungan/buat" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
-        <Route path="/app/patungan/rutin" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
+        <Route path="/app/patungan" element={<ProtectedRoute><AppLayout title="Patungan"><PatunganPage /></AppLayout></ProtectedRoute>} />
+        <Route path="/app/patungan/buat" element={<ProtectedRoute><CreatePatunganPage /></ProtectedRoute>} />
+        <Route path="/app/patungan/rutin" element={<ProtectedRoute><AppLayout title="Patungan"><PatunganPage /></AppLayout></ProtectedRoute>} />
+        <Route path="/app/patungan/:billId" element={<ProtectedRoute><BillDetailPage /></ProtectedRoute>} />
 
         {/* Dev-only unguarded routes used by scripts/screenshot-app.mjs to
             capture the in-app screens for the landing Gallery. Excluded from
@@ -159,7 +188,9 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <AppRoutes />
+        <AccountPromptProvider>
+          <AppRoutes />
+        </AccountPromptProvider>
       </ToastProvider>
     </AuthProvider>
   );

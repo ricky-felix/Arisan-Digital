@@ -31,7 +31,7 @@ export default function GroupListCard({ group, onClick }) {
                 {formatRupiah(group.amount)}/ronde · {group.members} anggota · {group.frequency}
               </div>
             </div>
-            <StatusBadge status={group.status} dot={false} />
+            <StatusBadge status={group.badgeStatus} dot={false} />
           </div>
           <div style={{ marginTop: 10 }}>
             <div className="app-progress" style={{ height: 6 }}>

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import Icon from "./Icon";
 import Avatar from "./Avatar";
+import SaveAccountBanner from "./SaveAccountBanner";
 
 const NAV = [
   { id: "dashboard", label: "Beranda",    icon: "home",    path: "/app" },
@@ -27,7 +28,7 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
   const location = useLocation();
   const { profile } = useAuth();
   const active = getActive(location.pathname);
-  const displayName = profile?.full_name || "Pengguna";
+  const displayName = profile?.name || "Tamu";
   const firstName = displayName.split(" ")[0];
 
   return (
@@ -91,7 +92,7 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
         </header>
 
         {/* Mobile header — hidden on desktop */}
-        <header className="md:hidden flex-shrink-0" style={{ padding: "12px 16px 8px", background: "#fff", borderBottom: "1px solid var(--line-soft)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <header className="md:hidden flex-shrink-0 flex items-center justify-between" style={{ padding: "12px 16px 8px", background: "#fff", borderBottom: "1px solid var(--line-soft)" }}>
           <div>
             <div style={{ fontSize: 13, color: "var(--ink-2)" }}>Selamat datang kembali</div>
             <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.01em" }}>Halo, {firstName} 👋</div>
@@ -101,6 +102,9 @@ export default function AppLayout({ children, title, hideTabbar = false }) {
             <span style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: 999, background: "var(--danger)", border: "2px solid #fff" }} />
           </button>
         </header>
+
+        {/* Deferred-registration nudge (anonymous users with data) */}
+        <SaveAccountBanner />
 
         {/* Main content */}
         <main id="main-content" className="flex-1 overflow-hidden flex flex-col">

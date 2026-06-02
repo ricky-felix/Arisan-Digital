@@ -106,8 +106,8 @@ function PasswordStrengthBar({ password }) {
   );
 }
 
-export function RegisterForm() {
-  const { signUp } = useAuth();
+export function RegisterForm({ onSuccess }) {
+  const { signUp, convertToAccount, isAnonymous } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -148,8 +148,12 @@ export function RegisterForm() {
     setErrors({});
     setLoading(true);
     try {
-      await signUp(form);
-      navigate("/app");
+      // Anonymous users are upgraded in place (data preserved); a fresh
+      // visitor (rare — only the standalone /login route) falls back to signUp.
+      if (isAnonymous) await convertToAccount(form);
+      else await signUp(form);
+      if (onSuccess) onSuccess();
+      else navigate("/app");
     } catch (err) {
       setServerError(err.message ?? "Gagal mendaftar. Coba lagi.");
     } finally {

@@ -1,64 +1,82 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { ensureProfile, updateProfile as updateProfileRow } from "../lib/data";
 
 const AuthContext = createContext(null);
 
+// ─────────────────────────────────────────────────────────────
+// MVP auth: there is no login screen. On load we ensure an
+// anonymous Supabase session exists, then make sure the user has a
+// row in `users` (their editable profile). Real email/password
+// sign-in is still available via signIn/signUp for later use.
+// ─────────────────────────────────────────────────────────────
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
 
-  // Fetch profile row for the authenticated user
-  async function fetchProfile(userId) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    setProfile(data ?? null);
+  async function bootstrap(session) {
+    try {
+      let active = session;
+      if (!active) {
+        const { data, error } = await supabase.auth.signInAnonymously();
+        if (error) throw error;
+        active = data.session;
+      }
+      setSession(active);
+      if (active?.user) {
+        const row = await ensureProfile(active.user.id);
+        setProfile(row);
+      }
+    } catch (err) {
+      // Most common cause: "Anonymous sign-ins are disabled" in the
+      // Supabase dashboard. Surface it instead of spinning forever.
+      console.error("Auth bootstrap failed:", err);
+      setAuthError(err.message || String(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-    // Load current session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) fetchProfile(session.user.id);
-      else setLoading(false);
+    supabase.auth.getSession().then(({ data }) => bootstrap(data.session));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      if (s?.user) ensureProfile(s.user.id).then(setProfile).catch(() => {});
+      else setProfile(null);
     });
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
-        setLoading(false);
-      }
-    );
-
     return () => subscription.unsubscribe();
   }, []);
 
-  // Stop loading once profile is set or session is null
-  useEffect(() => {
-    if (profile !== null || session === null) {
-      setLoading(false);
-    }
-  }, [profile, session]);
-
   async function signUp({ firstName, lastName, phone, email, password }) {
-    const fullName = `${firstName.trim()} ${lastName.trim()}`;
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { full_name: fullName, phone },
-      },
+      options: { data: { full_name: fullName, phone } },
     });
     if (error) throw error;
+    return data;
+  }
+
+  // Deferred registration: upgrade the CURRENT anonymous user into a
+  // permanent email/password account. Same auth uid → all arisan &
+  // patungan they already created stay theirs (no data migration).
+  async function convertToAccount({ firstName, lastName, phone, email, password }) {
+    const name = `${firstName.trim()} ${lastName.trim()}`.trim();
+    const { data, error } = await supabase.auth.updateUser({
+      email,
+      password,
+      data: { full_name: name, phone },
+    });
+    if (error) throw error;
+    // Keep our profile row (users table) in sync with the new identity.
+    if (session?.user) {
+      await updateProfileRow(session.user.id, { name, phone: phone || null }).catch(() => {});
+      setProfile((prev) => ({ ...prev, name, phone: phone || null }));
+    }
     return data;
   }
 
@@ -74,18 +92,18 @@ export function AuthProvider({ children }) {
   }
 
   async function updateProfile(updates) {
-    const { error } = await supabase
-      .from("profiles")
-      .update(updates)
-      .eq("id", session.user.id);
-    if (error) throw error;
+    if (!session?.user) return;
+    await updateProfileRow(session.user.id, updates);
     setProfile((prev) => ({ ...prev, ...updates }));
   }
 
   const user = session?.user ?? null;
+  const isAnonymous = !!user?.is_anonymous;
 
   return (
-    <AuthContext.Provider value={{ user, profile, session, loading, signUp, signIn, signOut, updateProfile }}>
+    <AuthContext.Provider
+      value={{ user, profile, session, loading, authError, isAnonymous, signUp, signIn, signOut, convertToAccount, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

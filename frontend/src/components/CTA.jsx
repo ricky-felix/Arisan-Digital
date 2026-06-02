@@ -39,7 +39,7 @@ export function CTA() {
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
             <Button
               variant="primary"
-              href={routes.login}
+              href={routes.app}
               aria-label="Coba aplikasi Arisan Digital"
             >
               Coba Sekarang

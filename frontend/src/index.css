@@ -1023,6 +1023,9 @@ a:active {
   text-decoration: none; cursor: pointer;
 }
 .app-tabbar a.on { color: var(--emerald-dark); }
+/* Tailwind v4 puts `md:hidden` in @layer utilities, which loses to this
+   unlayered rule — so hide the mobile tab bar on desktop explicitly. */
+@media (min-width: 768px) { .app-tabbar { display: none; } }
 
 .app-fade-in { animation: app-fade-in 0.25s ease-out; }
 

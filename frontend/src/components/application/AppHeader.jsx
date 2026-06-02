@@ -5,7 +5,7 @@ import Icon from "./Icon";
 export default function AppHeader() {
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const name = profile?.full_name || "Pengguna";
+  const name = profile?.name || "Tamu";
   const firstName = name.split(" ")[0];
 
   return (

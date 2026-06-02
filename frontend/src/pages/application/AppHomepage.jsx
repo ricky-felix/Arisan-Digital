@@ -2,24 +2,31 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AppLayout from "../../components/application/AppLayout";
 import SummaryCard from "../../components/application/SummaryCard";
-import QuickActions from "../../components/application/QuickActions";
 import ActiveGroups from "../../components/application/ActiveGroups";
-import RecentActivity from "../../components/application/RecentActivity";
 import UpcomingSchedule from "../../components/application/UpcomingSchedule";
 import Icon from "../../components/application/Icon";
-import { groups as mockGroups, myBills as mockBills, activities as mockActivities } from "../../data/appMockData";
-import { useDashboard } from "../../hooks/useDashboard";
+import { getDashboard } from "../../lib/data";
+import { formatRupiah } from "../../utils/formatRupiah";
+
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 
 export function AppHomepage() {
   const navigate = useNavigate();
-  const { summary, schedule, activity, loading } = useDashboard();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Use real data if available, otherwise fall back to mock
-  const displayGroups = mockGroups;
-  const displayBills = mockBills;
-  const displayActivities = mockActivities;
-  const nextBill = displayBills[0];
-  const totalSaved = 6_800_000;
+  useEffect(() => {
+    let alive = true;
+    getDashboard()
+      .then((d) => alive && setData(d))
+      .catch(() => alive && setData(null))
+      .finally(() => alive && setLoading(false));
+    return () => { alive = false; };
+  }, []);
+
+  const groups = data?.groups ?? [];
+  const myBills = data?.myBills ?? [];
+  const nextBill = myBills[0];
 
   return (
     <AppLayout title="Dashboard">
@@ -30,112 +37,103 @@ export function AppHomepage() {
             <div style={{ fontSize: 13, color: "var(--ink-2)" }}>
               {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </div>
-            <h1 style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, letterSpacing: "-0.02em" }}>
-              Dashboard 👋
-            </h1>
+            <h1 style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, letterSpacing: "-0.02em" }}>Dashboard 👋</h1>
             <p style={{ color: "var(--ink-2)", fontSize: 14, marginTop: 6 }}>
-              {displayGroups.length} grup aktif · 1 tagihan jatuh tempo minggu ini
+              {groups.length} grup aktif{myBills.length ? ` · ${myBills.length} tagihan menunggu` : ""}
             </p>
           </div>
-          <button
-            className="app-btn btn-primary btn-lg"
-            onClick={() => navigate("/app/buat-arisan")}
-          >
-            + Buat Arisan
-          </button>
+          <button className="app-btn btn-primary btn-lg" onClick={() => navigate("/app/arisan/buat")}>+ Buat Arisan</button>
         </div>
 
-        {/* Metric cards */}
-        <SummaryCard
-          totalGroups={displayGroups.length}
-          nextBill={nextBill ? { amount: nextBill.amount, due: nextBill.due, group: nextBill.group } : { amount: 0, due: new Date(), group: "—" }}
-          totalSaved={totalSaved}
-        />
+        {loading ? (
+          <div className="app-card" style={{ padding: 40, textAlign: "center", color: "var(--ink-2)" }}>Memuat…</div>
+        ) : (
+          <>
+            <SummaryCard
+              totalGroups={groups.length}
+              nextBill={nextBill ? { amount: nextBill.amount, due: nextBill.due, group: nextBill.group } : { amount: 0, due: new Date(), group: "—" }}
+              totalSaved={data?.owedToMe ?? 0}
+            />
 
-        {/* Arisan Module Row */}
-        <div className="module-row arisan mt-4">
-          <div className="flex items-center gap-2.5 mb-3">
-            <div className="w-8 h-8 rounded-[10px] grid place-items-center bg-[var(--emerald)] text-white">
-              <Icon name="users" size={16}/>
+            {/* Arisan module row */}
+            <div className="module-row arisan mt-4">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 rounded-[10px] grid place-items-center bg-[var(--emerald)] text-white"><Icon name="users" size={16}/></div>
+                <div>
+                  <h3 className="text-sm font-bold m-0">Arisan</h3>
+                  <span className="text-[11px] text-[var(--ink-2)]">Tabungan bergilir</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[11px] text-[var(--ink-2)]">Grup Aktif</div>
+                  <div className="text-[17px] font-bold tracking-tight mt-0.5">{groups.length}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-[var(--ink-2)]">Iuran Berikutnya</div>
+                  <div className="text-[17px] font-bold tracking-tight mt-0.5">{nextBill ? formatRupiah(nextBill.amount) : "—"}</div>
+                  {nextBill && <div className="text-[11px] text-[var(--ink-3)]">Jatuh tempo {nextBill.due.getDate()} {MONTHS_SHORT[nextBill.due.getMonth()]}</div>}
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold m-0">Arisan</h3>
-              <span className="text-[11px] text-[var(--ink-2)]">Tabungan bergilir</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="text-[11px] text-[var(--ink-2)]">Grup Aktif</div>
-              <div className="text-[17px] font-bold tracking-tight mt-0.5">4</div>
-            </div>
-            <div>
-              <div className="text-[11px] text-[var(--ink-2)]">Iuran Berikutnya</div>
-              <div className="text-[17px] font-bold tracking-tight mt-0.5">Rp 500.000</div>
-              <div className="text-[11px] text-[var(--ink-3)]">Jatuh tempo 25 Mei</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Patungan Module Row */}
-        <div className="module-row patungan mt-3">
-          <div className="flex items-center gap-2.5 mb-3">
-            <div className="w-8 h-8 rounded-[10px] grid place-items-center" style={{ background: "var(--lavender-dark)", color: "white" }}>
-              <Icon name="split" size={16}/>
+            {/* Patungan module row */}
+            <div className="module-row patungan mt-3">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 rounded-[10px] grid place-items-center" style={{ background: "var(--lavender-dark)", color: "white" }}><Icon name="split" size={16}/></div>
+                <div>
+                  <h3 className="text-sm font-bold m-0">Patungan</h3>
+                  <span className="text-[11px] text-[var(--ink-2)]">Bagi pengeluaran</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[11px] text-[var(--ink-2)]">Tagihan Open</div>
+                  <div className="text-[17px] font-bold tracking-tight mt-0.5">{data?.openBillCount ?? 0}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] text-[var(--ink-2)]">Belum Dibayar ke Saya</div>
+                  <div className="text-[17px] font-bold tracking-tight mt-0.5">{formatRupiah(data?.owedToMe ?? 0)}</div>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold m-0">Patungan</h3>
-              <span className="text-[11px] text-[var(--ink-2)]">Bagi pengeluaran</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="text-[11px] text-[var(--ink-2)]">Tagihan Open</div>
-              <div className="text-[17px] font-bold tracking-tight mt-0.5">3</div>
-            </div>
-            <div>
-              <div className="text-[11px] text-[var(--ink-2)]">Total Ditagih ke Saya</div>
-              <div className="text-[17px] font-bold tracking-tight mt-0.5">Rp 198.500</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Quick actions */}
-        <div className="flex gap-2 mt-4">
-          <button className="app-pill flex-1" onClick={() => navigate("/app/arisan/buat")}>
-            <span className="ico"><Icon name="plus" size={14}/></span>
-            <span>Buat Arisan</span>
-          </button>
-          <button className="app-pill flex-1" onClick={() => navigate("/app/patungan/buat")}>
-            <span className="ico violet"><Icon name="plus" size={14}/></span>
-            <span>Buat Tagihan</span>
-          </button>
-        </div>
+            {/* Quick actions */}
+            <div className="flex gap-2 mt-4">
+              <button className="app-pill flex-1" onClick={() => navigate("/app/arisan/buat")}>
+                <span className="ico"><Icon name="plus" size={14}/></span><span>Buat Arisan</span>
+              </button>
+              <button className="app-pill flex-1" onClick={() => navigate("/app/patungan/buat")}>
+                <span className="ico violet"><Icon name="plus" size={14}/></span><span>Buat Tagihan</span>
+              </button>
+            </div>
 
-        {/* Desktop: two-column layout */}
-        <div className="hidden md:grid mt-6" style={{ gridTemplateColumns: "2fr 1fr", gap: 24 }}>
-          <ActiveGroups
-            groups={displayGroups}
-            onGroupClick={g => navigate(`/app/grup/${g.id}`)}
-            onViewAll={() => navigate("/app/grup")}
-          />
-          <RecentActivity activities={displayActivities} limit={5} />
-        </div>
-
-        {/* Mobile: single column */}
-        <div className="md:hidden">
-          <ActiveGroups
-            groups={displayGroups}
-            onGroupClick={g => navigate(`/app/grup/${g.id}`)}
-            onViewAll={() => navigate("/app/grup")}
-            limit={3}
-          />
-          <div style={{ marginTop: 4 }}>
-            <UpcomingSchedule bills={displayBills} />
-          </div>
-          <div style={{ marginTop: 4 }}>
-            <RecentActivity activities={displayActivities} limit={5} />
-          </div>
-        </div>
+            {groups.length === 0 && myBills.length === 0 ? (
+              <div className="app-card app-empty mt-6" style={{ textAlign: "center", padding: 32 }}>
+                <div className="illus"><Icon name="sparkles" size={36} /></div>
+                <h3>Selamat datang 👋</h3>
+                <p>Mulai dengan membuat arisan atau tagihan patungan pertama Anda.</p>
+                <button className="app-btn btn-primary mt-2" onClick={() => navigate("/app/arisan/buat")}>
+                  <Icon name="plus" size={16}/> Buat Arisan
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="hidden md:block mt-6">
+                  <ActiveGroups groups={groups} onGroupClick={(g) => navigate(`/app/arisan/${g.id}`)} onViewAll={() => navigate("/app/arisan")} />
+                </div>
+                <div className="md:hidden">
+                  <ActiveGroups groups={groups} onGroupClick={(g) => navigate(`/app/arisan/${g.id}`)} onViewAll={() => navigate("/app/arisan")} limit={3} />
+                  {myBills.length > 0 && (
+                    <div style={{ marginTop: 4 }}>
+                      <UpcomingSchedule bills={myBills} />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </div>
     </AppLayout>
   );

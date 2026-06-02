@@ -18,8 +18,9 @@ function BrandLogo() {
   );
 }
 
-export function LoginOrRegister({ onClose, defaultTab = "login" }) {
+export function LoginOrRegister({ onClose, onSuccess, reason, defaultTab = "login" }) {
   const [tab, setTab] = useState(defaultTab);
+  const done = onSuccess || onClose;
 
   return (
     <div
@@ -83,12 +84,14 @@ export function LoginOrRegister({ onClose, defaultTab = "login" }) {
         <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="mb-5">
             <h2 className="text-lg font-bold text-gray-900">
-              {tab === "login" ? "Selamat datang kembali!" : "Buat akun baru"}
+              {tab === "login" ? "Selamat datang kembali!" : "Simpan akunmu"}
             </h2>
             <p className="mt-0.5 text-sm text-gray-500">
               {tab === "login"
                 ? "Masuk untuk melanjutkan arisan digitalmu."
-                : "Bergabung dan mulai arisan digitalmu sekarang."}
+                : reason
+                  ? reason
+                  : "Daftar agar arisan & patunganmu tersimpan dan bisa diakses di perangkat lain."}
             </p>
           </div>
 
@@ -100,7 +103,7 @@ export function LoginOrRegister({ onClose, defaultTab = "login" }) {
               exit={{ opacity: 0, x: tab === "login" ? 10 : -10 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
             >
-              {tab === "login" ? <LoginForm /> : <RegisterForm />}
+              {tab === "login" ? <LoginForm onSuccess={done} /> : <RegisterForm onSuccess={done} />}
             </motion.div>
           </AnimatePresence>
 
