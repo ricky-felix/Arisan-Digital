@@ -4,6 +4,7 @@ import { Hero } from "../components/Hero";
 import { ProblemStatement } from "../components/ProblemStatement";
 import { HowToUse } from "../components/HowToUse";
 import { Features } from "../components/Features";
+import { BillSplitting } from "../components/BillSplitting";
 import { Gallery } from "../components/Gallery";
 import { FAQs } from "../components/FAQs";
 import { CTA } from "../components/CTA";
@@ -18,6 +19,7 @@ export default function LandingPage() {
         <ProblemStatement />
         <HowToUse />
         <Features />
+        <BillSplitting />
         <Gallery />
         <FAQs />
         <CTA />

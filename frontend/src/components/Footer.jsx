@@ -31,19 +31,13 @@ export function Footer() {
             </div>
             <div className="mb-6 md:mb-8">
               <p className="mb-1 text-sm font-semibold text-white">Lokasi</p>
-              <p className="mb-5 text-sm text-white md:mb-6">Jakarta, Indonesia</p>
+              <p className="mb-5 text-sm text-white md:mb-6">Medan, Indonesia</p>
               <p className="mb-1 text-sm font-semibold text-white">Hubungi</p>
               <a
-                href="tel:+6281234567890"
+                href="mailto:arisandigital@outlook.com"
                 className="block text-sm text-white underline decoration-text-primary underline-offset-1 transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
               >
-                +62 812 3456 7890
-              </a>
-              <a
-                href="mailto:info@arisandigital.id"
-                className="block text-sm text-white underline decoration-text-primary underline-offset-1 transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
-              >
-                info@arisandigital.id
+                arisandigital@outlook.com
               </a>
             </div>
             <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
@@ -82,6 +76,15 @@ export function Footer() {
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
                   Cara kerja
+                </a>
+              </li>
+              <li className="py-2 text-sm font-semibold">
+                <a
+                  href="#bagi-tagihan"
+                  onClick={(e) => handleAnchorClick(e, 'bagi-tagihan')}
+                  className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
+                >
+                  Bagi tagihan
                 </a>
               </li>
               <li className="py-2 text-sm font-semibold">

@@ -40,6 +40,29 @@ const useCarousel = () => {
   return { api, setApi, current, handleDotClick, dotClassName };
 };
 
+const slides = [
+  {
+    src: "/pictures/app/beranda.png",
+    alt: "Dashboard Arisan Digital di tampilan desktop dan mobile, menampilkan ringkasan grup aktif, tagihan, dan tabungan",
+  },
+  {
+    src: "/pictures/app/arisan.png",
+    alt: "Daftar grup arisan di desktop dan mobile dengan status ronde, jumlah anggota, dan jadwal berikutnya",
+  },
+  {
+    src: "/pictures/app/bayar.png",
+    alt: "Halaman pembayaran di desktop dan mobile untuk mengelola tagihan iuran dan konfirmasi bukti transfer",
+  },
+  {
+    src: "/pictures/app/patungan.png",
+    alt: "Fitur bagi tagihan di desktop dan mobile untuk membagi pengeluaran bersama dengan teman",
+  },
+  {
+    src: "/pictures/app/profil.png",
+    alt: "Halaman profil dan pengaturan akun di desktop dan mobile dengan kontrol notifikasi dan keamanan",
+  },
+];
+
 export function Gallery() {
   const carousel = useCarousel();
   return (
@@ -62,76 +85,21 @@ export function Gallery() {
           className="overflow-hidden px-[5%] lg:px-0"
         >
           <CarouselContent className="ml-0">
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Tampilan dashboard Arisan Digital menampilkan grup aktif dan riwayat pembayaran"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Fitur notifikasi otomatis untuk pengingat pembayaran arisan"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Pencatatan kontribusi transparan dengan detail pembayaran semua anggota"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Sistem pengelolaan giliran arisan yang fair dan transparan"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Fitur chat group untuk komunikasi mudah antar anggota arisan"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Riwayat arisan lengkap dengan catatan transaksi dan giliran"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
-            <CarouselItem className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5">
-              <div>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Pengaturan keamanan data dengan enkripsi tingkat bank"
-                  loading="lazy"
-                  className="size-full object-cover"
-                />
-              </div>
-            </CarouselItem>
+            {slides.map((slide) => (
+              <CarouselItem
+                key={slide.src}
+                className="basis-[95%] pl-0 pr-6 sm:basis-4/5 md:basis-1/2 md:pr-8 lg:basis-4/5"
+              >
+                <div className="overflow-hidden rounded-lg border border-border-primary">
+                  <img
+                    src={slide.src}
+                    alt={slide.alt}
+                    loading="lazy"
+                    className="size-full object-cover"
+                  />
+                </div>
+              </CarouselItem>
+            ))}
           </CarouselContent>
           <div className="mt-12 flex items-center justify-between">
             <div className="flex gap-2 md:gap-4">
@@ -145,55 +113,16 @@ export function Gallery() {
               />
             </div>
             <div className="absolute right-[5%] mt-5 flex items-center justify-end md:right-8 lg:right-16" role="tablist" aria-label="Indikator carousel">
-              <button
-                onClick={carousel.handleDotClick(0)}
-                className={`${carousel.dotClassName(0)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 1"
-                role="tab"
-                aria-selected={carousel.current === 1}
-              />
-              <button
-                onClick={carousel.handleDotClick(1)}
-                className={`${carousel.dotClassName(1)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 2"
-                role="tab"
-                aria-selected={carousel.current === 2}
-              />
-              <button
-                onClick={carousel.handleDotClick(2)}
-                className={`${carousel.dotClassName(2)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 3"
-                role="tab"
-                aria-selected={carousel.current === 3}
-              />
-              <button
-                onClick={carousel.handleDotClick(3)}
-                className={`${carousel.dotClassName(3)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 4"
-                role="tab"
-                aria-selected={carousel.current === 4}
-              />
-              <button
-                onClick={carousel.handleDotClick(4)}
-                className={`${carousel.dotClassName(4)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 5"
-                role="tab"
-                aria-selected={carousel.current === 5}
-              />
-              <button
-                onClick={carousel.handleDotClick(5)}
-                className={`${carousel.dotClassName(5)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 6"
-                role="tab"
-                aria-selected={carousel.current === 6}
-              />
-              <button
-                onClick={carousel.handleDotClick(6)}
-                className={`${carousel.dotClassName(6)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
-                aria-label="Pergi ke slide 7"
-                role="tab"
-                aria-selected={carousel.current === 7}
-              />
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={carousel.handleDotClick(index)}
+                  className={`${carousel.dotClassName(index)} hover:scale-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 transition-all`}
+                  aria-label={`Pergi ke slide ${index + 1}`}
+                  role="tab"
+                  aria-selected={carousel.current === index + 1}
+                />
+              ))}
             </div>
           </div>
         </Carousel>

@@ -8,6 +8,7 @@ import { ArisanPage } from "./pages/application/ArisanPage";
 import { BayarPage } from "./pages/application/BayarPage";
 import { ProfilPage } from "./pages/application/ProfilPage";
 import PatunganPage from "./pages/application/PatunganPage";
+import AppLayout from "./components/application/AppLayout";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 
@@ -132,6 +133,19 @@ function AppRoutes() {
         <Route path="/app/patungan/:billId" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
         <Route path="/app/patungan/buat" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
         <Route path="/app/patungan/rutin" element={<ProtectedRoute><PatunganPage /></ProtectedRoute>} />
+
+        {/* Dev-only unguarded routes used by scripts/screenshot-app.mjs to
+            capture the in-app screens for the landing Gallery. Excluded from
+            production builds via import.meta.env.DEV. */}
+        {import.meta.env.DEV && (
+          <>
+            <Route path="/screens/beranda" element={<AppHomepage />} />
+            <Route path="/screens/arisan" element={<ArisanPage />} />
+            <Route path="/screens/bayar" element={<BayarPage />} />
+            <Route path="/screens/patungan" element={<AppLayout title="Patungan"><PatunganPage /></AppLayout>} />
+            <Route path="/screens/profil" element={<ProfilPage />} />
+          </>
+        )}
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -52,13 +52,14 @@ export function FAQs() {
                 <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
               }
             >
-              Apakah data saya aman?
+              Apa itu Arisan Digital dan bagaimana cara kerjanya?
             </AccordionTrigger>
             <AccordionContent className="text-text-primary md:pb-6">
-              Kami mengenkripsi semua transaksi dan data pribadi dengan standar
-              keamanan bank. Setiap pembayaran tercatat dan tidak bisa diubah
-              setelah dikonfirmasi, memberikan catatan permanen yang jelas untuk
-              semua anggota.
+              Arisan Digital adalah aplikasi untuk mengelola arisan secara online.
+              Anda membuat grup, mengundang anggota, dan menentukan jumlah iuran
+              serta jadwal putaran. Setiap periode aplikasi mencatat pembayaran,
+              menentukan pemenang giliran, dan menyalurkan dana secara otomatis,
+              jadi tidak perlu lagi catatan manual atau uang tunai.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem
@@ -71,12 +72,13 @@ export function FAQs() {
                 <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
               }
             >
-              Berapa biaya penggunaan?
+              Bagaimana cara memulai grup arisan?
             </AccordionTrigger>
             <AccordionContent className="text-text-primary md:pb-6">
-              Arisan Digital sepenuhnya gratis untuk diunduh dan digunakan. Tidak ada biaya
-              tersembunyi atau komisi dari setiap transaksi anggota. Kami tidak mengambil
-              potongan dari uang yang beredar dalam grup Anda.
+              Cukup unduh aplikasi, buat grup baru, lalu atur nominal iuran,
+              periode putaran, dan metode pemilihan giliran. Setelah itu bagikan
+              tautan undangan ke anggota Anda. Grup siap berjalan dalam hitungan
+              menit tanpa proses yang rumit.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem
@@ -89,12 +91,13 @@ export function FAQs() {
                 <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
               }
             >
-              Berapa anggota maksimal dalam satu grup?
+              Bagaimana giliran ditentukan agar adil?
             </AccordionTrigger>
             <AccordionContent className="text-text-primary md:pb-6">
-              Grup arisan bisa memiliki hingga 50 anggota. Sistem kami dirancang
-              untuk menangani kelompok besar dengan mudah. Tidak peduli ukuran grup,
-              performa tetap cepat dan responsif di semua perangkat.
+              Anda bisa memilih undian acak yang transparan atau urutan giliran
+              yang sudah disepakati bersama. Setiap hasil undian tercatat dan dapat
+              dilihat semua anggota, sehingga prosesnya jujur, terbuka, dan bebas
+              dari kecurangan.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem
@@ -107,12 +110,13 @@ export function FAQs() {
                 <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
               }
             >
-              Bagaimana jika ada anggota tidak bayar?
+              Apakah data dan uang saya aman?
             </AccordionTrigger>
             <AccordionContent className="text-text-primary md:pb-6">
-              Aplikasi mengirim pengingat otomatis sebelum tenggat waktu pembayaran.
-              Admin grup bisa melihat status pembayaran real-time dan menghubungi
-              anggota yang belum membayar langsung melalui fitur chat internal.
+              Kami mengenkripsi semua transaksi dan data pribadi dengan standar
+              keamanan perbankan. Setiap pembayaran tercatat dan tidak bisa diubah
+              setelah dikonfirmasi, memberikan catatan permanen yang jelas dan
+              transparan untuk semua anggota.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem
@@ -125,12 +129,13 @@ export function FAQs() {
                 <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
               }
             >
-              Bisa digunakan tanpa internet?
+              Bagaimana jika ada anggota yang menunggak?
             </AccordionTrigger>
             <AccordionContent className="text-text-primary md:pb-6">
-              Arisan Digital memerlukan koneksi internet untuk sinkronisasi
-              data antar anggota. Namun aplikasi dirancang ringan dan bekerja lancar
-              bahkan dengan koneksi 3G atau jaringan yang lambat sekalipun.
+              Aplikasi mengirim pengingat otomatis sebelum tenggat pembayaran.
+              Admin grup dapat memantau status pembayaran secara real-time dan
+              menghubungi anggota yang belum membayar langsung melalui chat dalam
+              aplikasi, sehingga putaran tetap berjalan lancar.
             </AccordionContent>
           </AccordionItem>
           <AccordionItem
@@ -143,12 +148,56 @@ export function FAQs() {
                 <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
               }
             >
+              Bagaimana cara menerima dana saat giliran saya?
+            </AccordionTrigger>
+            <AccordionContent className="text-text-primary md:pb-6">
+              Ketika giliran Anda tiba, dana akan otomatis tersedia di aplikasi
+              dan dapat dicairkan ke rekening bank atau e-wallet Anda. Prosesnya
+              cepat, dan Anda akan menerima notifikasi di setiap tahap pencairan.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem
+            value="item-faq-7"
+            className="border border-border-primary bg-background-primary px-5 md:px-6"
+          >
+            <AccordionTrigger
+              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
+              icon={
+                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
+              }
+            >
+              Berapa biaya penggunaan?
+            </AccordionTrigger>
+            <AccordionContent className="text-text-primary md:pb-6">
+              Untuk saat ini, Arisan Digital sepenuhnya gratis untuk diunduh dan
+              digunakan. Tidak ada biaya sama sekali, tidak ada biaya tersembunyi,
+              dan kami tidak mengambil komisi atau potongan apa pun dari uang yang
+              beredar dalam grup Anda.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem
+            value="item-faq-8"
+            className="border border-border-primary bg-background-primary px-5 md:px-6"
+          >
+            <AccordionTrigger
+              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
+              icon={
+                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
+              }
+            >
               Bagaimana cara menghubungi tim dukungan?
             </AccordionTrigger>
             <AccordionContent className="text-text-primary md:pb-6">
-              Tim dukungan kami siap membantu Anda kapan saja melalui email, chat
-              dalam aplikasi, atau WhatsApp. Kami biasanya merespons dalam waktu
-              kurang dari 24 jam untuk bantuan lebih lanjut.
+              Tim dukungan kami siap membantu kapan saja melalui email di{" "}
+              <a
+                href="mailto:arisandigital@outlook.com"
+                className="font-semibold underline underline-offset-2"
+              >
+                arisandigital@outlook.com
+              </a>
+              . Kami biasanya merespons dalam waktu kurang dari 24 jam untuk
+              membantu menyelesaikan kendala Anda. Layanan dukungan via telepon
+              belum tersedia untuk saat ini.
             </AccordionContent>
           </AccordionItem>
         </Accordion>

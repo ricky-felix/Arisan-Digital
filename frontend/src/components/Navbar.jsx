@@ -187,6 +187,13 @@ export function Navbar() {
                   Fitur
                 </a>
                 <a
+                  href="#bagi-tagihan"
+                  onClick={(e) => handleAnchorClick(e, 'bagi-tagihan', useActive.toggleMenu)}
+                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
+                >
+                  Bagi tagihan
+                </a>
+                <a
                   href="#pelajari"
                   onClick={(e) => handleAnchorClick(e, 'pelajari', useActive.toggleMenu)}
                   className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
