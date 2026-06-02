@@ -116,31 +116,37 @@ export const staggerItem = {
   },
 };
 
+// Scroll-reveal variants trigger on `amount` (fraction visible) only — no
+// negative `viewport.margin`. A negative margin becomes the IntersectionObserver
+// rootMargin, and on mobile the visual viewport resizes when the address bar
+// collapses on first scroll, shifting that inset edge right as the reveal fires.
+// The resulting enter→leave→enter replayed the animation and read as a blink /
+// the component mounting twice. `once: true` + amount-based triggering is stable.
 export const scrollReveal = {
   initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px", amount: 0.2 },
+  viewport: { once: true, amount: 0.2 },
   transition: { duration: DURATION.slow, ease: EASING.easeOut },
 };
 
 export const scrollRevealLeft = {
   initial: { opacity: 0, x: -40 },
   whileInView: { opacity: 1, x: 0 },
-  viewport: { once: true, margin: "-100px", amount: 0.2 },
+  viewport: { once: true, amount: 0.2 },
   transition: { duration: DURATION.slow, ease: EASING.easeOut },
 };
 
 export const scrollRevealRight = {
   initial: { opacity: 0, x: 40 },
   whileInView: { opacity: 1, x: 0 },
-  viewport: { once: true, margin: "-100px", amount: 0.2 },
+  viewport: { once: true, amount: 0.2 },
   transition: { duration: DURATION.slow, ease: EASING.easeOut },
 };
 
 export const scrollRevealScale = {
   initial: { opacity: 0, scale: 0.9 },
   whileInView: { opacity: 1, scale: 1 },
-  viewport: { once: true, margin: "-100px", amount: 0.2 },
+  viewport: { once: true, amount: 0.2 },
   transition: { duration: DURATION.slow, ease: EASING.easeOut },
 };
 

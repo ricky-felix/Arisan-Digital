@@ -19,7 +19,7 @@ export function FAQs() {
           className="mb-12 md:mb-16 lg:mb-20"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5, ease: [0, 0, 0.2, 1] }}
         >
           <div className="mx-auto w-full max-w-lg text-center">
@@ -35,7 +35,7 @@ export function FAQs() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5, ease: [0, 0, 0.2, 1], delay: 0.1 }}
         >
         <Accordion
@@ -206,7 +206,7 @@ export function FAQs() {
           className="mx-auto mt-12 max-w-md text-center md:mt-16 lg:mt-20"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5, ease: [0, 0, 0.2, 1], delay: 0.15 }}
         >
           <h3 className="mb-3 text-2xl font-bold text-text-primary md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">

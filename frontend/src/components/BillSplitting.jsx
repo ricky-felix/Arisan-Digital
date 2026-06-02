@@ -80,7 +80,7 @@ export function BillSplitting() {
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, amount: 0.2 }}
           className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8"
         >
           {splitCards.map((card) => {

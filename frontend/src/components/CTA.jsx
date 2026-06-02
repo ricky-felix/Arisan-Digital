@@ -14,7 +14,7 @@ export function CTA() {
             <motion.span
               initial={{ x: "-50%", opacity: 0 }}
               whileInView={{ x: "0%", opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ type: "spring", bounce: 0, duration: 0.7 }}
               className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
             >
@@ -25,7 +25,7 @@ export function CTA() {
             <motion.span
               initial={{ x: "50%", opacity: 0 }}
               whileInView={{ x: "0%", opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ type: "spring", bounce: 0, duration: 0.7, delay: 0.05 }}
               className="mb-5 block text-4xl font-bold leading-tight text-white md:mb-6 md:text-6xl lg:text-7xl"
             >

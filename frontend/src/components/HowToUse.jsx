@@ -26,7 +26,7 @@ export function HowToUse() {
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.2 }}
         >
           <motion.div
             className="flex flex-col border border-border-primary bg-background-primary"
