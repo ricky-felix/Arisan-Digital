@@ -10,18 +10,19 @@ import { Button } from "./Button";
 import React from "react";
 import { motion } from "framer-motion";
 import { RxPlus } from "react-icons/rx";
+import { staggerContainer, staggerItem } from "../utils/animations";
 
 export function FAQs() {
   return (
     <section id="faq" className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="faq-heading">
-      <div className="container mx-auto">
-        <motion.div
-          className="mb-12 md:mb-16 lg:mb-20"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.5, ease: [0, 0, 0.2, 1] }}
-        >
+      <motion.div
+        className="container mx-auto"
+        variants={staggerContainer}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <motion.div className="mb-12 md:mb-16 lg:mb-20" variants={staggerItem}>
           <div className="mx-auto w-full max-w-lg text-center">
             <h2 id="faq-heading" className="mb-5 text-5xl font-bold leading-tight text-text-primary md:mb-6 md:text-7xl lg:text-8xl">
               Tanya Jawab
@@ -32,12 +33,7 @@ export function FAQs() {
             </p>
           </div>
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.5, ease: [0, 0, 0.2, 1], delay: 0.1 }}
-        >
+        <motion.div variants={staggerItem}>
         <Accordion
           type="multiple"
           className="grid w-full grid-cols-1 items-start gap-x-8 gap-y-4 md:grid-cols-2"
@@ -204,10 +200,7 @@ export function FAQs() {
         </motion.div>
         <motion.div
           className="mx-auto mt-12 max-w-md text-center md:mt-16 lg:mt-20"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.5, ease: [0, 0, 0.2, 1], delay: 0.15 }}
+          variants={staggerItem}
         >
           <h3 className="mb-3 text-2xl font-bold text-text-primary md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">
             Masih ada pertanyaan?
@@ -226,7 +219,7 @@ export function FAQs() {
             </Button>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }

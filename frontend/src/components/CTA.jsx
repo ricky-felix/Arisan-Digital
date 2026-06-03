@@ -4,18 +4,40 @@ import { Button } from "./Button";
 import { motion } from "framer-motion";
 import React from "react";
 import { routes } from "../config";
+import { staggerContainer } from "../utils/animations";
+
+const slideFromLeft = {
+  initial: { x: "-50%", opacity: 0 },
+  animate: {
+    x: "0%",
+    opacity: 1,
+    transition: { type: "spring", bounce: 0, duration: 0.7 },
+  },
+};
+
+const slideFromRight = {
+  initial: { x: "50%", opacity: 0 },
+  animate: {
+    x: "0%",
+    opacity: 1,
+    transition: { type: "spring", bounce: 0, duration: 0.7 },
+  },
+};
 
 export function CTA() {
   return (
     <section id="tentang-kami" className="bg-[#10b981] px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="cta-heading">
       <div className="container mx-auto">
-        <div className="mx-auto w-full max-w-3xl text-center">
+        <motion.div
+          className="mx-auto w-full max-w-3xl text-center"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           <h2 id="cta-heading" className="overflow-hidden">
             <motion.span
-              initial={{ x: "-50%", opacity: 0 }}
-              whileInView={{ x: "0%", opacity: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ type: "spring", bounce: 0, duration: 0.7 }}
+              variants={slideFromLeft}
               className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
             >
               Mulai gunakan Arisan Digital
@@ -23,10 +45,7 @@ export function CTA() {
           </h2>
           <h2 className="overflow-hidden">
             <motion.span
-              initial={{ x: "50%", opacity: 0 }}
-              whileInView={{ x: "0%", opacity: 1 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ type: "spring", bounce: 0, duration: 0.7, delay: 0.05 }}
+              variants={slideFromRight}
               className="mb-5 block text-4xl font-bold leading-tight text-white md:mb-6 md:text-6xl lg:text-7xl"
             >
               Bergabunglah sekarang
@@ -51,7 +70,7 @@ export function CTA() {
               Daftar
             </Button> */}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

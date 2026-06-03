@@ -116,6 +116,40 @@ export const staggerItem = {
   },
 };
 
+// Directional stagger children. Use these (not the standalone scrollReveal*
+// spreads) for elements inside a `staggerContainer`. A child with its own
+// `whileInView` spawns a second IntersectionObserver that fires at its own
+// threshold, so a section with several of them reveals in multiple staggered
+// flashes (reads as a double blink). These variants instead inherit the
+// container's single in-view trigger via framer-motion variant propagation, so
+// the whole section animates from one observer.
+export const staggerItemLeft = {
+  initial: { opacity: 0, x: -40 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: DURATION.slow, ease: EASING.easeOut },
+  },
+};
+
+export const staggerItemRight = {
+  initial: { opacity: 0, x: 40 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: DURATION.slow, ease: EASING.easeOut },
+  },
+};
+
+export const staggerItemScale = {
+  initial: { opacity: 0, scale: 0.9 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: DURATION.slow, ease: EASING.easeOut },
+  },
+};
+
 // Scroll-reveal variants trigger on `amount` (fraction visible) only — no
 // negative `viewport.margin`. A negative margin becomes the IntersectionObserver
 // rootMargin, and on mobile the visual viewport resizes when the address bar

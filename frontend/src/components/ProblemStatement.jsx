@@ -3,20 +3,26 @@
 import { Button } from "./Button";
 import React from "react";
 import { motion } from "framer-motion";
-import { scrollRevealLeft, scrollRevealRight, scrollRevealScale, buttonHover, buttonTap } from "../utils/animations";
+import { staggerContainer, staggerItemLeft, staggerItemRight, staggerItemScale, buttonHover, buttonTap } from "../utils/animations";
 
 export function ProblemStatement() {
   return (
     <section id="pelajari" className="bg-[#10b981] px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="problem-heading">
-      <div className="container mx-auto">
+      <motion.div
+        className="container mx-auto"
+        variants={staggerContainer}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.2 }}
+      >
         <div className="mb-12 grid grid-cols-1 items-start justify-between gap-x-12 gap-y-8 md:mb-16 md:grid-cols-2 md:gap-x-12 lg:mb-20 lg:gap-x-20">
-          <motion.div {...scrollRevealLeft}>
+          <motion.div variants={staggerItemLeft}>
             <p className="mb-3 font-semibold text-white md:mb-4">Masalah</p>
             <h2 id="problem-heading" className="text-5xl font-bold leading-tight text-white md:text-7xl lg:text-8xl">
               Arisan tradisional butuh solusi modern
             </h2>
           </motion.div>
-          <motion.div {...scrollRevealRight}>
+          <motion.div variants={staggerItemRight}>
             <p className="mb-5 text-base text-white md:mb-6 md:text-lg">
               Buku catatan hilang, giliran terlewat, uang tidak terhitung.
               Arisan membutuhkan cara yang lebih baik untuk mengelola
@@ -48,12 +54,12 @@ export function ProblemStatement() {
           </motion.div>
         </div>
         <motion.img
-          {...scrollRevealScale}
+          variants={staggerItemScale}
           src="/pictures/problem.webp"
           className="w-full rounded-lg object-cover"
           alt="Ilustrasi permasalahan arisan tradisional"
         />
-      </div>
+      </motion.div>
     </section>
   );
 }

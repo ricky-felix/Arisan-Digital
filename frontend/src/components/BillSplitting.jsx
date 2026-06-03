@@ -6,11 +6,10 @@ import { motion } from "framer-motion";
 import { BiReceipt, BiGroup, BiWallet } from "react-icons/bi";
 import { RxCheck } from "react-icons/rx";
 import {
-  scrollReveal,
-  scrollRevealLeft,
-  scrollRevealRight,
   staggerContainer,
   staggerItem,
+  staggerItemLeft,
+  staggerItemRight,
   buttonHover,
   buttonTap,
 } from "../utils/animations";
@@ -43,9 +42,15 @@ export function BillSplitting() {
       className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28"
       aria-labelledby="bill-splitting-heading"
     >
-      <div className="container mx-auto">
+      <motion.div
+        className="container mx-auto"
+        variants={staggerContainer}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, amount: 0.2 }}
+      >
         <div className="mb-12 grid grid-cols-1 items-start gap-x-12 gap-y-8 md:mb-16 md:grid-cols-2 lg:mb-20 lg:gap-x-20">
-          <motion.div {...scrollRevealLeft}>
+          <motion.div variants={staggerItemLeft}>
             <span className="mb-4 inline-block rounded-full bg-[#7c5cfc] px-4 py-1 text-sm font-semibold text-white">
               Baru
             </span>
@@ -56,7 +61,7 @@ export function BillSplitting() {
               Sekarang bisa bagi tagihan
             </h2>
           </motion.div>
-          <motion.div {...scrollRevealRight}>
+          <motion.div variants={staggerItemRight}>
             <p className="mb-6 text-base text-text-primary md:text-lg">
               Selain mengelola arisan, Arisan Digital kini hadir dengan fitur
               bagi tagihan. Patungan makan bareng, split biaya liburan, atau bagi
@@ -78,9 +83,6 @@ export function BillSplitting() {
 
         <motion.div
           variants={staggerContainer}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, amount: 0.2 }}
           className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8"
         >
           {splitCards.map((card) => {
@@ -104,7 +106,7 @@ export function BillSplitting() {
         </motion.div>
 
         <motion.div
-          {...scrollReveal}
+          variants={staggerItem}
           className="mx-auto mt-12 max-w-3xl rounded-lg border border-border-primary bg-[#10b981] p-8 md:mt-16 md:p-10"
         >
           <p className="mb-4 text-lg font-semibold text-white md:text-xl">
@@ -123,7 +125,7 @@ export function BillSplitting() {
             ))}
           </ul>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }
