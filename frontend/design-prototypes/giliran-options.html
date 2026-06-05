@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilih gaya "Giliran" — Arisan card</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ─── Page chrome ─── */
+body {
+  background: #dde4ec;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 48px 32px 80px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-header {
+  margin-bottom: 52px;
+  max-width: 1100px;
+}
+.page-eyebrow {
+  font-size: 11px; font-weight: 700;
+  color: #059669; letter-spacing: .1em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.page-title {
+  font-size: 30px; font-weight: 800;
+  color: #111827; letter-spacing: -0.03em;
+  margin-bottom: 8px; line-height: 1.1;
+}
+.page-sub {
+  font-size: 14px; color: #6b7280;
+  font-weight: 500; line-height: 1.6;
+  max-width: 600px;
+}
+
+/* ─── Four-column grid ─── */
+.variants-row {
+  display: flex;
+  gap: 36px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+
+.variant-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.variant-label-block {
+  text-align: center;
+  width: 300px;
+}
+.variant-number {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #111827; color: white;
+  font-size: 11px; font-weight: 800;
+  margin-bottom: 8px;
+}
+.variant-number.rec { background: #059669; }
+.variant-name {
+  font-size: 14px; font-weight: 800;
+  color: #111827; letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.variant-desc {
+  font-size: 11px; color: #6b7280;
+  line-height: 1.5; font-weight: 500;
+}
+.rec-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px;
+  background: #059669; color: white;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .05em; text-transform: uppercase;
+  margin-left: 6px; vertical-align: middle;
+}
+
+/* ─── Phone bezel ─── */
+.phone {
+  width: 300px;
+  height: 580px;
+  background: #065f46;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 0 0 7px #1a1a1a, 0 0 0 9px #2e2e2e,
+              0 24px 60px rgba(0,0,0,.28), 0 4px 16px rgba(0,0,0,.14);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ─── Emerald card (full bleed) ─── */
+.em-card {
+  position: absolute; inset: 0;
+  background: linear-gradient(165deg,
+    #064e3b 0%, #065f46 28%, #059669 62%, #10b981 82%, #34d399 100%);
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 18px 20px;
+}
+
+/* Decorative blobs */
+.blob1 {
+  position: absolute; top: -30px; right: -30px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,.07); pointer-events: none;
+}
+.blob2 {
+  position: absolute; bottom: 80px; left: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none;
+}
+.blob3 {
+  position: absolute; top: 120px; right: -60px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,.03); pointer-events: none;
+}
+
+/* Status bar */
+.s-status {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 36px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 20px;
+  z-index: 10;
+}
+.s-time { font-size: 13px; font-weight: 700; color: white; }
+.s-icons { display: flex; gap: 5px; align-items: center; opacity: .85; }
+
+/* Story segments */
+.s-segments {
+  position: absolute; top: 38px; left: 14px; right: 14px;
+  display: flex; gap: 3px; z-index: 10; pointer-events: none;
+}
+.s-seg {
+  flex: 1; height: 2.5px; border-radius: 99px;
+  background: rgba(255,255,255,.28);
+}
+.s-seg.active { background: white; }
+.s-seg.past { background: rgba(255,255,255,.62); }
+
+/* Chips */
+.s-chips {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  margin-bottom: 12px;
+}
+.s-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 99px;
+  background: rgba(255,255,255,.2);
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .06em; text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.2);
+}
+.s-urgent {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 99px;
+  background: rgba(239,68,68,.85);
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .03em;
+}
+
+/* Group name */
+.s-group-name {
+  font-size: 26px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1.05;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.s-status-line {
+  font-size: 11px; color: rgba(255,255,255,.82);
+  font-weight: 600; margin-bottom: 12px; line-height: 1.4;
+}
+
+/* Progress */
+.s-prog-track {
+  height: 7px; border-radius: 99px;
+  background: rgba(255,255,255,.2); overflow: hidden;
+  margin-bottom: 5px;
+}
+.s-prog-fill {
+  height: 100%; border-radius: 99px;
+  background: rgba(255,255,255,.9);
+}
+.s-prog-labels {
+  display: flex; justify-content: space-between;
+  font-size: 9px; color: rgba(255,255,255,.68); font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* CTA */
+.s-cta {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: white; border-radius: 12px; border: none;
+  padding: 12px 16px;
+  font-family: inherit; font-size: 13px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.22);
+  color: #065f46; width: 100%; letter-spacing: -.01em;
+}
+
+/* ═══════════════════════════════════════
+   GILIRAN ZONE — the swappable element
+   ═══════════════════════════════════════ */
+.giliran-zone {
+  margin-bottom: 12px;
+}
+
+/* ─── VARIANT 1: Spotlight the Winner ─── */
+.v1-spotlight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.v1-label {
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,.65);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.v1-winner-wrap {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.v1-glow {
+  position: absolute;
+  width: 84px; height: 84px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(52,211,153,.55) 0%, rgba(52,211,153,0) 72%);
+  animation: v1GlowPulse 2.4s ease-in-out infinite;
+}
+@keyframes v1GlowPulse {
+  0%, 100% { transform: scale(1); opacity: .7; }
+  50%       { transform: scale(1.18); opacity: 1; }
+}
+.v1-avatar-main {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(255,255,255,.32);
+  border: 2.5px solid white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; color: white;
+  position: relative; z-index: 2;
+  animation: v1Pop .5s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes v1Pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.v1-crown {
+  position: absolute; top: -12px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px; z-index: 3;
+  animation: v1CrownBounce 2s ease-in-out infinite;
+  animation-delay: .5s;
+}
+@keyframes v1CrownBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(-3px); }
+}
+.v1-name-big {
+  font-size: 15px; font-weight: 800; color: white;
+  letter-spacing: -0.01em; text-align: center;
+  animation: v1FadeUp .5s ease .2s both;
+}
+@keyframes v1FadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.v1-supporting {
+  display: flex; align-items: center; gap: -4px;
+  justify-content: center;
+}
+.v1-mini {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 1.5px solid rgba(255,255,255,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700; color: white;
+  margin-left: -5px;
+}
+.v1-mini:first-child { margin-left: 0; }
+.v1-more-count {
+  font-size: 9px; color: rgba(255,255,255,.65);
+  font-weight: 600; margin-left: 6px;
+}
+
+/* Confetti particles */
+.v1-confetti-wrap {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  z-index: 1;
+}
+.conf-dot {
+  position: absolute;
+  width: 5px; height: 5px; border-radius: 2px;
+  opacity: 0;
+  animation: confFall linear infinite;
+}
+@keyframes confFall {
+  0%   { opacity: 0; transform: translateY(-20px) rotate(0deg); }
+  10%  { opacity: .8; }
+  90%  { opacity: .5; }
+  100% { opacity: 0; transform: translateY(60px) rotate(360deg); }
+}
+
+/* ─── VARIANT 2: Your-Turn Tracker ─── */
+.v2-tracker {
+  display: flex; flex-direction: column; gap: 7px;
+}
+.v2-track-row {
+  position: relative;
+  display: flex; align-items: center;
+  gap: 0;
+}
+.v2-connector {
+  position: absolute; top: 50%; left: 11px; right: 11px;
+  height: 2px;
+  background: rgba(255,255,255,.2);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+.v2-connector-fill {
+  position: absolute; top: 0; left: 0;
+  height: 100%; width: 50%;
+  background: rgba(255,255,255,.7);
+  border-radius: 99px;
+}
+.v2-nodes {
+  position: relative; z-index: 1;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.v2-node {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  border: 1.5px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6.5px; font-weight: 800; color: rgba(255,255,255,.7);
+  flex-shrink: 0;
+}
+.v2-node.past {
+  background: rgba(255,255,255,.38);
+  border-color: rgba(255,255,255,.55);
+  color: white;
+}
+.v2-node.current {
+  width: 34px; height: 34px;
+  background: rgba(255,255,255,.32);
+  border: 2.5px solid white;
+  color: white;
+  font-size: 9px;
+  box-shadow: 0 0 0 5px rgba(255,255,255,.18);
+  animation: v2CurrentPulse 2s ease-in-out infinite;
+}
+@keyframes v2CurrentPulse {
+  0%, 100% { box-shadow: 0 0 0 5px rgba(255,255,255,.18); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,255,255,.1); }
+}
+.v2-node.you {
+  border: 2px dashed rgba(255,255,255,.65);
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.8);
+  position: relative;
+}
+.v2-you-badge {
+  position: absolute; top: -14px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 7px; font-weight: 800; color: white;
+  background: rgba(16,185,129,.8); padding: 1px 5px;
+  border-radius: 99px; white-space: nowrap;
+  letter-spacing: .03em;
+}
+.v2-caption {
+  font-size: 9.5px; color: rgba(255,255,255,.78);
+  font-weight: 600; line-height: 1.4;
+}
+.v2-caption strong { color: white; }
+.v2-prog-mini {
+  height: 3px; border-radius: 99px;
+  background: rgba(255,255,255,.2); overflow: hidden;
+}
+.v2-prog-mini-fill {
+  height: 100%; width: 50%; border-radius: 99px;
+  background: rgba(255,255,255,.75);
+}
+
+/* ─── VARIANT 3: Lucky-Draw Reveal ─── */
+.v3-draw {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+}
+.v3-arc-wrap {
+  position: relative;
+  width: 180px; height: 76px;
+}
+.v3-arc-member {
+  position: absolute;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 1.5px solid rgba(255,255,255,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 800; color: rgba(255,255,255,.8);
+  transform-origin: 90px 90px; /* arc pivot */
+}
+.v3-arc-member.winner {
+  background: rgba(255,255,255,.32);
+  border: 2.5px solid white;
+  color: white;
+  width: 42px; height: 42px;
+  font-size: 11px;
+}
+/* Spinning ring that "lands" on winner */
+.v3-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,.0);
+  pointer-events: none;
+}
+.v3-winner-ring {
+  width: 50px; height: 50px;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%) translate(0,0);
+  border-color: rgba(255,255,255,.9);
+  box-shadow: 0 0 10px rgba(52,211,153,.7), 0 0 20px rgba(52,211,153,.3);
+  animation: v3RingAppear .6s cubic-bezier(.34,1.4,.64,1) .4s both;
+}
+@keyframes v3RingAppear {
+  from { transform: translate(-50%,-50%) scale(1.8); opacity: 0; border-color: rgba(255,255,255,0); }
+  to   { transform: translate(-50%,-50%) scale(1); opacity: 1; border-color: rgba(255,255,255,.9); }
+}
+.v3-gift-badge {
+  position: absolute;
+  top: -8px; right: -8px;
+  font-size: 14px;
+  animation: v3GiftPop .4s cubic-bezier(.34,1.4,.64,1) .8s both;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+}
+@keyframes v3GiftPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.v3-sweep-ring {
+  width: 160px; height: 160px;
+  border: 2px solid rgba(255,255,255,.5);
+  top: 50%; left: 50%;
+  transform-origin: center;
+  opacity: 0;
+  animation: v3Sweep .5s linear both;
+}
+@keyframes v3Sweep {
+  0%   { opacity: .8; transform: translate(-50%,-50%) scale(.4) rotate(0deg); }
+  100% { opacity: 0;  transform: translate(-50%,-50%) scale(1.1) rotate(270deg); }
+}
+.v3-caption {
+  font-size: 10px; color: rgba(255,255,255,.82);
+  font-weight: 700; text-align: center; letter-spacing: -.01em;
+}
+.v3-caption span { color: white; }
+
+/* position each arc member manually */
+.v3-m0 { left: 0px;   top: 38px; }
+.v3-m1 { left: 20px;  top: 10px; }
+.v3-m2 { left: 65px;  top: 0px;  }   /* winner — center top */
+.v3-m3 { left: 112px; top: 10px; }
+.v3-m4 { left: 138px; top: 38px; }
+
+/* Winner ring overlays v3-m2 */
+.v3-winner-ring-pos {
+  position: absolute;
+  left: 65px; top: 0px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 2.5px solid white;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.22), 0 0 18px rgba(52,211,153,.7);
+  animation: v3RingLand .55s cubic-bezier(.34,1.4,.64,1) .4s both;
+  pointer-events: none;
+}
+@keyframes v3RingLand {
+  from { transform: scale(1.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* ─── VARIANT 4: Gift-Badge Stack ─── */
+.v4-stack {
+  display: flex; align-items: center; margin-bottom: 0;
+}
+.v4-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  border: 2px solid rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: white;
+  margin-left: -8px; flex-shrink: 0;
+  position: relative;
+}
+.v4-avatar:first-child { margin-left: 0; }
+.v4-avatar.giliran {
+  background: rgba(255,255,255,.35);
+  border: 2px solid white;
+  animation: v4Bounce 1.6s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes v4Bounce {
+  0%, 100% { transform: translateY(0); }
+  40%       { transform: translateY(-5px); }
+  60%       { transform: translateY(-3px); }
+}
+.v4-avatar-more {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,.25); border: 2px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: rgba(255,255,255,.85);
+  margin-left: -8px; flex-shrink: 0;
+}
+.v4-gift-badge {
+  position: absolute; top: -8px; right: -6px;
+  font-size: 13px; line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
+}
+.v4-info {
+  display: flex; flex-direction: column; margin-left: 10px;
+}
+.v4-label {
+  font-size: 9px; color: rgba(255,255,255,.65); font-weight: 600;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.v4-name {
+  font-size: 12px; font-weight: 800; color: white;
+  letter-spacing: -0.01em;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-eyebrow">Desain Arisan Digital</div>
+  <div class="page-title">Pilih gaya "Giliran" — Arisan card</div>
+  <div class="page-sub">
+    Empat opsi untuk mengganti elemen avatar stack + "GILIRAN → Budi S." di kartu Arisan.
+    Hanya elemen tersebut yang berbeda — chrome kartu lainnya identik. Pilih nomor 1, 2, 3, atau 4.
+  </div>
+</div>
+
+<div class="variants-row">
+
+  <!-- ══ VARIANT 1 ══ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number rec">1</div>
+      <div class="variant-name">
+        Spotlight the Winner
+        <span class="rec-pill">Rekomendasi</span>
+      </div>
+      <div class="variant-desc">
+        Budi jadi bintang utama: avatar besar dengan glow ring + mahkota, konfeti halus, anggota lain jadi pendukung kecil.
+        Paling emosional dan celebratory.
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="em-card" id="card-v1">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <!-- confetti -->
+        <div class="v1-confetti-wrap" id="confetti-v1"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V1 -->
+        <div class="giliran-zone">
+          <div class="v1-spotlight">
+            <div class="v1-label">Bulan ini giliran</div>
+            <div class="v1-winner-wrap">
+              <div class="v1-glow"></div>
+              <div class="v1-avatar-main">
+                BS
+                <div class="v1-crown">👑</div>
+              </div>
+            </div>
+            <div class="v1-name-big">Budi S. 🎉</div>
+            <div class="v1-supporting">
+              <div class="v1-mini">RA</div>
+              <div class="v1-mini">DK</div>
+              <div class="v1-mini">KM</div>
+              <div class="v1-mini">LB</div>
+              <div class="v1-mini">AS</div>
+              <span class="v1-more-count">+7 anggota</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 10 Jun · 8 dari 12 sudah bayar</div>
+
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:67%"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah bayar</span><span>Putaran 6/12</span></div>
+
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VARIANT 2 ══ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">2</div>
+      <div class="variant-name">Your-Turn Tracker</div>
+      <div class="variant-desc">
+        Jalur rotasi horizontal: semua anggota sebagai node, Budi di-highlight, "Kamu" ditandai dengan badge lebih jauh.
+        Paling informatif dan personal.
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V2 -->
+        <div class="giliran-zone">
+          <div class="v2-tracker">
+            <div class="v2-track-row">
+              <div class="v2-connector">
+                <div class="v2-connector-fill"></div>
+              </div>
+              <div class="v2-nodes">
+                <div class="v2-node past">AS</div>
+                <div class="v2-node past">LB</div>
+                <div class="v2-node past">KM</div>
+                <div class="v2-node past">DK</div>
+                <div class="v2-node past">RA</div>
+                <div class="v2-node current">BS</div>
+                <div class="v2-node you" style="position:relative;">
+                  RF
+                  <div class="v2-you-badge">Kamu</div>
+                </div>
+                <div class="v2-node">HW</div>
+                <div class="v2-node">SM</div>
+                <div class="v2-node">TN</div>
+              </div>
+            </div>
+            <div class="v2-prog-mini"><div class="v2-prog-mini-fill"></div></div>
+            <div class="v2-caption">
+              Giliran <strong>Budi S.</strong> bulan ini &nbsp;·&nbsp;
+              Giliranmu ke-7 dari 12 · ~1 bulan lagi
+            </div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 10 Jun · 8 dari 12 sudah bayar</div>
+
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:67%"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah bayar</span><span>Putaran 6/12</span></div>
+
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VARIANT 3 ══ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">3</div>
+      <div class="variant-name">Lucky-Draw Reveal</div>
+      <div class="variant-desc">
+        Arc anggota + ring animasi yang "mendarat" di Budi dengan pop. Badge hadiah muncul setelah ring berhenti.
+        Paling gamified — cocok untuk nuansa undian.
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V3 -->
+        <div class="giliran-zone">
+          <div class="v3-draw">
+            <div class="v3-arc-wrap">
+              <!-- sweep ring (plays on load) -->
+              <div class="v3-ring v3-sweep-ring"></div>
+              <!-- members on arc -->
+              <div class="v3-arc-member v3-m0">RA</div>
+              <div class="v3-arc-member v3-m1">DK</div>
+              <!-- winner at top center -->
+              <div class="v3-arc-member winner v3-m2" style="position:absolute;">
+                BS
+                <div class="v3-gift-badge">🎁</div>
+              </div>
+              <div class="v3-arc-member v3-m3">KM</div>
+              <div class="v3-arc-member v3-m4">LB</div>
+              <!-- landing ring on winner -->
+              <div class="v3-winner-ring-pos"></div>
+            </div>
+            <div class="v3-caption">Pemenang bulan ini: <span>Budi S.</span> 🎉</div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 10 Jun · 8 dari 12 sudah bayar</div>
+
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:67%"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah bayar</span><span>Putaran 6/12</span></div>
+
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VARIANT 4 ══ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">4</div>
+      <div class="variant-name">Gift-Badge Stack</div>
+      <div class="variant-desc">
+        Avatar stack asli dipertahankan, avatar Budi dapat badge 🎁 dan bounce halus yang terus berulang.
+        Perubahan paling minimal dari desain saat ini.
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V4 -->
+        <div class="giliran-zone">
+          <div class="v4-stack">
+            <div class="v4-avatar giliran" style="z-index:5;">
+              BS
+              <div class="v4-gift-badge">🎁</div>
+            </div>
+            <div class="v4-avatar" style="z-index:4;">RA</div>
+            <div class="v4-avatar" style="z-index:3;">DK</div>
+            <div class="v4-avatar-more">+9</div>
+            <div class="v4-info">
+              <span class="v4-label">Giliran</span>
+              <span class="v4-name">Budi dapat arisan bulan ini 🎁</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 10 Jun · 8 dari 12 sudah bayar</div>
+
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:67%"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah bayar</span><span>Putaran 6/12</span></div>
+
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /variants-row -->
+
+<script>
+// ── Variant 1: generate confetti dots ──
+(function () {
+  const wrap = document.getElementById('confetti-v1');
+  if (!wrap) return;
+  const colors = [
+    'rgba(255,255,255,.7)', 'rgba(52,211,153,.8)',
+    'rgba(167,243,208,.9)', 'rgba(255,255,255,.5)',
+    'rgba(110,231,183,.8)'
+  ];
+  for (let i = 0; i < 18; i++) {
+    const d = document.createElement('div');
+    d.className = 'conf-dot';
+    d.style.cssText = [
+      'left:' + (10 + Math.random() * 80) + '%',
+      'top:' + (Math.random() * 30) + '%',
+      'background:' + colors[Math.floor(Math.random() * colors.length)],
+      'width:' + (3 + Math.random() * 4) + 'px',
+      'height:' + (3 + Math.random() * 4) + 'px',
+      'border-radius:' + (Math.random() > .5 ? '50%' : '2px'),
+      'animation-duration:' + (1.8 + Math.random() * 2.4) + 's',
+      'animation-delay:' + (Math.random() * 3) + 's',
+    ].join(';');
+    wrap.appendChild(d);
+  }
+})();
+</script>
+</body>
+</html>

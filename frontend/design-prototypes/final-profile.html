@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── Hero gradient ── */
+.hero {
+  position: relative;
+  background: linear-gradient(165deg, #059669 0%, #10b981 45%, #a78bfa 100%);
+  padding: 0 20px 56px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Decorative circles — same language as wallet cards */
+.hero-blob1 {
+  position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,.08); pointer-events: none;
+}
+.hero-blob2 {
+  position: absolute; bottom: 20px; left: -50px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,.05); pointer-events: none;
+}
+.hero-blob3 {
+  position: absolute; top: 50px; right: 60px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.06); pointer-events: none;
+}
+
+/* Status bar sits on hero */
+.hero .status-bar {
+  background: transparent;
+  position: relative;
+  z-index: 10;
+}
+.hero .status-time { color: white; }
+.hero .status-icons { color: white; }
+
+/* Back button on hero */
+.hero-topbar {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0 20px;
+}
+.hero-back-btn {
+  width: 40px; height: 40px; border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  border: none; display: grid; place-items: center;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  text-decoration: none;
+  transition: background .15s;
+}
+.hero-back-btn:active { background: rgba(255,255,255,.30); }
+.hero-edit-btn {
+  padding: 8px 16px; border-radius: var(--r-pill);
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.28);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  font-family: inherit; font-size: 12px; font-weight: 700; color: white;
+  cursor: pointer; letter-spacing: .01em;
+  transition: background .15s;
+}
+.hero-edit-btn:active { background: rgba(255,255,255,.30); }
+
+/* Avatar + identity */
+.hero-body {
+  position: relative; z-index: 5;
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 4px;
+}
+.hero-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  border: 3px solid rgba(255,255,255,.55);
+  display: grid; place-items: center;
+  font-size: 28px; font-weight: 800; color: white;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+.hero-name {
+  font-size: 22px; font-weight: 800; color: white;
+  letter-spacing: -.03em; line-height: 1;
+  margin-bottom: 6px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.hero-phone {
+  font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85);
+  margin-bottom: 5px;
+}
+.hero-since {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: var(--r-pill);
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.2);
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,.9);
+  letter-spacing: .01em;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+
+/* ── Stats floating card ── */
+.stats-float-wrap {
+  position: relative; z-index: 20;
+  padding: 0 20px;
+  margin-top: -36px;
+  margin-bottom: 20px;
+}
+.stats-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: 0 8px 32px rgba(17,24,39,.12), 0 1px 3px rgba(17,24,39,.06);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+  overflow: hidden;
+}
+.stat-item {
+  padding: 16px 8px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.stat-item + .stat-item { border-left: 1px solid var(--line-soft); }
+.stat-num {
+  font-size: 24px; font-weight: 800; letter-spacing: -.03em; line-height: 1;
+}
+.stat-num.em { color: var(--emerald-dark); }
+.stat-num.lv { color: var(--lavender-dark); }
+.stat-num.neutral { color: var(--ink-1); }
+.stat-lbl {
+  font-size: 10px; font-weight: 700; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+
+/* ── Menu sections ── */
+.sections-wrap {
+  padding: 0 20px;
+  display: flex; flex-direction: column; gap: 20px;
+  padding-bottom: 32px;
+}
+.section-group-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 8px;
+}
+.menu-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2);
+  overflow: hidden;
+}
+.menu-row {
+  min-height: 56px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  cursor: pointer; transition: background .1s;
+  text-decoration: none;
+  border: none; background-color: transparent;
+  font-family: inherit; width: 100%; text-align: left;
+}
+.menu-row:hover { background: var(--gray-soft); }
+.menu-row + .menu-row { border-top: 1px solid var(--line-soft); }
+
+/* Icon tile */
+.menu-icon-tile {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.menu-icon-tile.em { background: var(--emerald-soft); color: var(--emerald-dark); }
+.menu-icon-tile.lv { background: var(--lavender-soft); color: var(--lavender-dark); }
+.menu-icon-tile.gray { background: var(--gray-soft); color: var(--ink-2); }
+.menu-icon-tile.warn { background: #fff7ed; color: #c2410c; }
+
+.menu-row-body { flex: 1; }
+.menu-row-label {
+  font-size: 14px; font-weight: 600; color: var(--ink-1);
+  line-height: 1.2;
+}
+.menu-row-sub {
+  font-size: 11px; font-weight: 500; color: var(--ink-3);
+  margin-top: 2px; line-height: 1.3;
+}
+.menu-arrow { color: var(--ink-3); flex-shrink: 0; }
+
+/* Danger row override */
+.menu-row.danger .menu-row-label { color: var(--danger); }
+.menu-row.danger .menu-icon-tile { background: #fee2e2; color: var(--danger); }
+
+/* Version footer */
+.version-footer {
+  text-align: center;
+  font-size: 11px; font-weight: 500; color: var(--ink-3);
+  padding-bottom: 8px;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" style="position:relative;">
+
+  <!-- Hero gradient header (status bar + back + avatar + identity) -->
+  <div class="hero">
+    <div class="hero-blob1"></div>
+    <div class="hero-blob2"></div>
+    <div class="hero-blob3"></div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="white"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".45"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <!-- Top bar: back arrow left, edit button right -->
+    <div class="hero-topbar">
+      <a href="final-home.html" class="hero-back-btn" aria-label="Kembali">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
+      <button type="button" class="hero-edit-btn">Edit Profil</button>
+    </div>
+
+    <!-- Avatar + identity -->
+    <div class="hero-body">
+      <div class="hero-avatar">RF</div>
+      <div class="hero-name">Ricky Felix</div>
+      <div class="hero-phone">+62 812 3456 7890</div>
+      <div class="hero-since">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Bergabung sejak Januari 2024
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats floating card — overlaps hero bottom; kept as a sibling of .hero so .screen's
+       overflow clipping can't cut off the numbers (the previous bug) -->
+  <div class="stats-float-wrap">
+    <div class="stats-card">
+      <div class="stat-item">
+        <div class="stat-num em">3</div>
+        <div class="stat-lbl">Arisan</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num lv">3</div>
+        <div class="stat-lbl">Patungan</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num neutral">18</div>
+        <div class="stat-lbl">Transaksi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable content below hero -->
+  <div class="screen">
+
+    <!-- Menu sections -->
+    <div class="sections-wrap">
+
+      <!-- Akun -->
+      <div>
+        <div class="section-group-label">Akun</div>
+        <div class="menu-card">
+
+          <!-- Edit profil -->
+          <a href="#" class="menu-row">
+            <div class="menu-icon-tile em">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Edit Profil</div>
+              <div class="menu-row-sub">Nama, foto, nomor HP</div>
+            </div>
+            <svg class="menu-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <!-- Metode pembayaran -->
+          <a href="#" class="menu-row">
+            <div class="menu-icon-tile lv">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Metode Pembayaran</div>
+              <div class="menu-row-sub">Dompet grup &amp; transfer langsung</div>
+            </div>
+            <svg class="menu-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <!-- Keamanan / PIN -->
+          <a href="#" class="menu-row">
+            <div class="menu-icon-tile em">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Keamanan &amp; PIN</div>
+              <div class="menu-row-sub">Ubah PIN, sidik jari</div>
+            </div>
+            <svg class="menu-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Aplikasi -->
+      <div>
+        <div class="section-group-label">Aplikasi</div>
+        <div class="menu-card">
+
+          <!-- Notifikasi -->
+          <a href="#" class="menu-row">
+            <div class="menu-icon-tile lv">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Notifikasi</div>
+              <div class="menu-row-sub">Pengingat iuran &amp; tagihan</div>
+            </div>
+            <svg class="menu-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <!-- Bahasa -->
+          <a href="#" class="menu-row">
+            <div class="menu-icon-tile gray">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Bahasa</div>
+              <div class="menu-row-sub">Bahasa Indonesia</div>
+            </div>
+            <svg class="menu-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+          <!-- Bantuan -->
+          <a href="#" class="menu-row">
+            <div class="menu-icon-tile gray">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Bantuan</div>
+              <div class="menu-row-sub">FAQ &amp; hubungi kami</div>
+            </div>
+            <svg class="menu-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Keluar (danger) -->
+      <div>
+        <div class="menu-card">
+          <button type="button" class="menu-row danger" onclick="alert('Keluar dari akun?')">
+            <div class="menu-icon-tile">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+            <div class="menu-row-body">
+              <div class="menu-row-label">Keluar</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Version -->
+      <div class="version-footer">Arisan Digital v1.0.0</div>
+
+    </div><!-- /sections-wrap -->
+
+  </div><!-- /screen -->
+
+</div>
+</div>
+</body>
+</html>

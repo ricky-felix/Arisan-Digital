@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home — Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── Full-bleed frame background ── */
+.phone-frame { background: #065f46; }
+
+/* ── Story progress segments (Snapchat/Instagram-style) ── */
+.story-bar {
+  position: absolute;
+  z-index: 30;
+  left: 16px; right: 16px;
+  display: flex; align-items: center; gap: 4px;
+  top: 48px; /* Snapchat-style: at the very top, just below the status bar */
+  pointer-events: none;
+}
+.story-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255,255,255,.28);
+  flex-shrink: 1;
+  transition: background .2s;
+  min-width: 0;
+}
+.story-seg.active {
+  background: white;
+}
+.story-seg.past {
+  background: rgba(255,255,255,.65);
+}
+
+/* ── Top overlay bar (list icon left; bell + avatar right) ── */
+.story-topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 31;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 62px 16px 10px; /* pushed down to clear the top story lines */
+  /* min tap target row height = 44px effective after status bar */
+}
+.story-topbar-right { display: flex; gap: 8px; align-items: center; }
+/* shared button base — 44px tap target, 36px visual */
+.story-icon-btn {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  border: none; display: grid; place-items: center;
+  cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  position: relative; text-decoration: none;
+  transition: background .15s;
+}
+.story-icon-btn:active { background: rgba(255,255,255,.30); }
+.story-notif-dot {
+  position: absolute; top: 8px; right: 8px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #fbbf24; border: 1.5px solid rgba(255,255,255,.4);
+}
+.story-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  border: 2px solid rgba(255,255,255,.5);
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 800; color: white;
+  cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  text-decoration: none;
+  transition: background .15s;
+}
+.story-avatar:active { background: rgba(255,255,255,.35); }
+.story-list-btn {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  border: none; display: grid; place-items: center;
+  cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  text-decoration: none;
+  transition: background .15s;
+}
+.story-list-btn:active { background: rgba(255,255,255,.30); }
+
+/* ── Segmented control — own row, full breathing room ── */
+.seg-row {
+  position: absolute;
+  left: 0; right: 0;
+  top: 116px; /* below status lines + topbar (62+44+10pb) */
+  z-index: 32;
+  display: flex; justify-content: center;
+  padding: 0 16px;
+}
+.seg-wrap {
+  background: rgba(0,0,0,.28);
+  border-radius: 10px;
+  padding: 3px;
+  display: flex; gap: 2px;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.15);
+}
+.seg-btn {
+  padding: 6px 18px;
+  border: none; border-radius: 8px;
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,.7);
+  background: transparent;
+  cursor: pointer; transition: all .2s;
+  letter-spacing: -.01em; white-space: nowrap;
+}
+.seg-btn.active {
+  background: rgba(255,255,255,.22);
+  color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+
+/* Deck container fills the full frame (including behind compose pill) */
+.deck-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Cards fill the whole frame */
+.story-card {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px 22px 100px; /* leave space so text clears the compose pill */
+  transition: transform .38s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+  user-select: none;
+}
+.story-card.active { transform: translateX(0); opacity: 1; z-index: 2; }
+.story-card.prev   { transform: translateX(-100%); opacity: 0; z-index: 1; }
+.story-card.next   { transform: translateX(100%); opacity: 0; z-index: 1; }
+.story-card.hidden { transform: translateX(100%); opacity: 0; z-index: 0; }
+
+.card-arisan  { background: linear-gradient(165deg, #064e3b 0%, #065f46 30%, #059669 65%, #10b981 85%, #34d399 100%); }
+.card-patungan { background: linear-gradient(165deg, #3b0764 0%, #4c1d95 30%, #6d28d9 60%, #8b5cf6 80%, #a78bfa 100%); }
+.card-settled { background: linear-gradient(165deg, #374151 0%, #4b5563 40%, #6b7280 80%); }
+
+.card-blob1 {
+  position: absolute; top: -40px; right: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,.07); pointer-events: none;
+}
+.card-blob2 {
+  position: absolute; bottom: 60px; left: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none;
+}
+
+/* ── Card chip stack: alert on top, feature badge below ── */
+.card-chips {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  margin-bottom: 14px;
+}
+.card-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 99px;
+  background: rgba(255,255,255,.2);
+  font-size: 10px; font-weight: 800; color: white;
+  letter-spacing: .06em; text-transform: uppercase;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.2);
+  align-self: flex-start;
+}
+.urgent-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 99px;
+  background: rgba(239,68,68,.85);
+  font-size: 10px; font-weight: 800; color: white;
+  letter-spacing: .04em;
+}
+
+/* ── Amount-hero card hierarchy ── */
+/* Eyebrow: small secondary context line above the money hero */
+.card-eyebrow {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,.62);
+  letter-spacing: .03em;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* Money hero: dominant oversized focal point */
+.card-hero-amount {
+  font-size: 44px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 12px rgba(0,0,0,.15);
+}
+
+/* Jatuh-tempo / status sub-line below the money */
+.card-due-line {
+  font-size: 12px; color: rgba(255,255,255,.7);
+  font-weight: 500; margin-bottom: 14px; line-height: 1.45;
+}
+
+.progress-track {
+  height: 8px; border-radius: 99px;
+  background: rgba(255,255,255,.2); overflow: hidden; margin-bottom: 6px;
+}
+.progress-fill-white {
+  height: 100%; border-radius: 99px;
+  background: rgba(255,255,255,.9);
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+.progress-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: rgba(255,255,255,.7); font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* CTA button — action-in-place (not a navigation link) */
+.card-cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: white; border-radius: 14px; border: none;
+  padding: 14px 20px;
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  transition: transform .1s, box-shadow .1s;
+  width: 100%; letter-spacing: -.01em;
+}
+.card-cta:active { transform: scale(.97); }
+.card-cta.arisan-cta { color: #065f46; }
+.card-cta.patungan-cta { color: #4c1d95; }
+.card-cta.settled-cta { color: #374151; opacity: .7; cursor: default; }
+
+/* ── New-bill sheet: amount + note field rows ── */
+.nb-field-wrap { margin-bottom: 12px; }
+.nb-field-wrap.last { margin-bottom: 20px; }
+.nb-field-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--ink-2); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.nb-amount-row {
+  background: var(--gray-soft); border-radius: 14px;
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: text;
+}
+.nb-amount-placeholder {
+  font-size: 22px; font-weight: 800;
+  color: var(--ink-3); letter-spacing: -.03em;
+}
+.nb-amount-hint {
+  font-size: 12px; font-weight: 600;
+  color: var(--emerald-dark);
+}
+.nb-note-row {
+  background: var(--gray-soft); border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 14px; color: var(--ink-3); font-weight: 500;
+  cursor: text;
+}
+/* icon colour variants inside nb sheet dest row */
+.nb-sheet-icon.lv { background: var(--lavender-soft); color: var(--lavender-dark); }
+.nb-sheet-icon.em { background: var(--emerald-soft); color: var(--emerald-dark); }
+
+/* ── Settled card: status chip + follow-up CTA ── */
+.settled-status-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 99px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,.8);
+  letter-spacing: .01em;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.settled-cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 14px; border: none;
+  padding: 14px 20px;
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  transition: transform .1s, box-shadow .1s, opacity .15s;
+  width: 100%; letter-spacing: -.01em;
+  color: white;
+}
+.settled-cta:active { transform: scale(.97); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+/* Lavender variant — Patungan follow-up */
+.settled-cta.lv {
+  background: var(--lavender-dark);
+}
+.settled-cta.lv:hover { background: #7c3aed; }
+/* Emerald variant — Arisan follow-up */
+.settled-cta.em {
+  background: var(--emerald-dark);
+}
+.settled-cta.em:hover { background: #047857; }
+/* Sub-hint text inside button */
+.settled-cta-hint {
+  display: block;
+  font-size: 10px; font-weight: 500;
+  color: rgba(255,255,255,.7);
+  letter-spacing: 0;
+  margin-top: 1px;
+}
+
+/* Tap-to-detail zone (card body only, not the button) */
+.card-tap-detail {
+  position: absolute; top: 0; left: 0; right: 0;
+  bottom: 156px; /* above the button */
+  z-index: 5; cursor: pointer; text-decoration: none;
+}
+
+/* Nav tap zones */
+.nav-prev, .nav-next {
+  position: absolute; top: 140px; bottom: 160px;
+  width: 36%; z-index: 10; cursor: pointer;
+}
+.nav-prev { left: 0; }
+.nav-next { right: 0; }
+
+/* Swipe hint */
+.swipe-hint {
+  position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+  z-index: 30;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: rgba(255,255,255,.55); font-weight: 600;
+  pointer-events: none;
+  animation: hintFade 3s ease 2s forwards; opacity: 1;
+}
+@keyframes hintFade { 0%{opacity:1;} 80%{opacity:.4;} 100%{opacity:0;} }
+
+/* Empty filter state */
+.empty-state {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 0;
+  background: linear-gradient(165deg, #1f2937 0%, #374151 100%);
+}
+.empty-state.hidden { display: none; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-text { font-size: 15px; font-weight: 700; color: rgba(255,255,255,.7); }
+
+/* ── Compose Pill ── */
+.compose-outer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 8px 16px 22px; z-index: 40; pointer-events: none;
+}
+.compose-pill {
+  background: white; border: 1.5px solid var(--line); border-radius: 999px;
+  box-shadow: 0 4px 24px rgba(17,24,39,.14), 0 1px 3px rgba(17,24,39,.06);
+  overflow: hidden; pointer-events: auto;
+  transition: border-radius .3s cubic-bezier(.4,0,.2,1), border-color .3s, box-shadow .3s;
+}
+.compose-pill.open { border-radius: 20px; border-color: transparent; box-shadow: 0 8px 40px rgba(17,24,39,.2); }
+.pill-collapsed {
+  height: 50px; display: flex; align-items: center;
+  padding: 0 16px; gap: 10px; cursor: pointer;
+}
+.compose-pill.open .pill-collapsed { display: none; }
+.pill-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--emerald), var(--lavender));
+  display: grid; place-items: center; flex-shrink: 0; transition: transform .2s;
+}
+.compose-pill:not(.open):hover .pill-icon { transform: rotate(90deg); }
+.pill-label { flex: 1; font-size: 14px; color: var(--ink-3); font-weight: 500; }
+.pill-dots { display: flex; gap: 4px; }
+.pill-dot { width: 8px; height: 8px; border-radius: 50%; }
+.pill-dot.em { background: var(--emerald); }
+.pill-dot.lv { background: var(--lavender); }
+.pill-expanded { display: none; }
+.compose-pill.open .pill-expanded { display: block; }
+/* ── Sheet header row (title + close button) ── */
+.pill-header-row {
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px 16px 12px; position: relative;
+}
+.pill-sheet-title {
+  font-size: 10px; font-weight: 800; color: var(--ink-3);
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.pill-close-btn {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; color: var(--ink-2);
+  transition: background .15s;
+}
+.pill-close-btn:hover { background: var(--line); }
+
+/* ── Actions area (lanes + join row, evenly spaced) ── */
+.pill-actions {
+  display: flex; flex-direction: column;
+  justify-content: space-evenly;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+/* ── Lane cards ── */
+.pill-lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pill-lane {
+  border-radius: 16px; border: none; padding: 14px 12px;
+  font-family: inherit; cursor: pointer; transition: transform .1s, box-shadow .15s; text-align: left;
+}
+.pill-lane:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(17,24,39,.1); }
+.pill-lane:active { transform: scale(.97); box-shadow: none; }
+.pill-lane.em { background: linear-gradient(135deg, var(--emerald-tint) 0%, var(--emerald-soft) 100%); }
+.pill-lane.lv { background: linear-gradient(135deg, var(--lavender-tint) 0%, var(--lavender-soft) 100%); }
+.lane-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 10px; flex-shrink: 0; }
+.lane-icon.em { background: var(--emerald); }
+.lane-icon.lv { background: var(--lavender-dark); }
+.lane-title { font-size: 14px; font-weight: 800; letter-spacing: -.01em; line-height: 1; margin-bottom: 4px; }
+.lane-title.em { color: var(--emerald-dark); }
+.lane-title.lv { color: var(--lavender-dark); }
+.lane-sub { font-size: 10px; font-weight: 500; color: var(--ink-3); line-height: 1.4; }
+
+/* ── Join row ── */
+.pill-join-row {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--line);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: inherit;
+  transition: border-color .15s, color .15s, background .15s;
+  text-align: center;
+  width: 100%;
+}
+.pill-join-row:hover { border-color: var(--ink-3); color: var(--ink-1); background: var(--gray-soft); }
+.pill-join-main { font-size: 12px; font-weight: 800; color: inherit; letter-spacing: -.01em; line-height: 1.2; }
+.pill-join-sub  { font-size: 10px; font-weight: 500; color: var(--ink-3); line-height: 1.3; margin-top: 1px; }
+.pill-join-qr-icon { flex-shrink: 0; }
+
+.dimmer {
+  position: absolute; inset: 0; z-index: 35;
+  background: rgba(17,24,39,.3); opacity: 0; pointer-events: none;
+  transition: opacity .25s; -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px);
+}
+.dimmer.active { opacity: 1; pointer-events: auto; }
+
+/* ── Quick-pay bottom sheet ── */
+.pay-sheet-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(17,24,39,.5);
+  z-index: 60;
+  display: flex; align-items: flex-end;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.pay-sheet-backdrop.show { opacity: 1; pointer-events: auto; }
+.pay-sheet {
+  background: white;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  padding: 0 20px 32px;
+  transform: translateY(40px);
+  transition: transform .3s cubic-bezier(.34,1.1,.64,1);
+}
+.pay-sheet-backdrop.show .pay-sheet { transform: translateY(0); }
+.sheet-grabber {
+  width: 36px; height: 4px; border-radius: 99px;
+  background: var(--line); margin: 12px auto 20px;
+}
+.sheet-title { font-size: 17px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; margin-bottom: 4px; }
+.sheet-sub { font-size: 12px; color: var(--ink-2); font-weight: 500; margin-bottom: 20px; }
+.sheet-amount-row {
+  background: var(--emerald-tint); border-radius: 14px;
+  padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.sheet-amount-label { font-size: 12px; font-weight: 700; color: var(--emerald-dark); }
+.sheet-amount-val { font-size: 22px; font-weight: 800; color: var(--emerald-dark); letter-spacing: -.03em; }
+/* Destination row */
+.sheet-dest-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--line-soft); border-radius: 14px;
+  padding: 12px 16px; margin-bottom: 12px;
+}
+.sheet-dest-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.sheet-dest-icon.arisan { background: var(--emerald-soft); color: var(--emerald-dark); }
+.sheet-dest-icon.patungan { background: var(--lavender-soft); color: var(--lavender-dark); }
+.sheet-dest-label { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.sheet-dest-val { font-size: 14px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; }
+
+.sheet-method-row {
+  background: var(--gray-soft); border-radius: 14px;
+  padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; cursor: pointer;
+}
+.sheet-method-label { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.sheet-method-val { font-size: 14px; font-weight: 800; color: var(--ink-1); }
+.sheet-change { font-size: 11px; font-weight: 700; color: var(--emerald-dark); }
+.sheet-confirm-btn {
+  width: 100%; padding: 15px;
+  background: var(--emerald); border: none; border-radius: 14px;
+  font-family: inherit; font-size: 16px; font-weight: 800; color: white;
+  cursor: pointer; transition: transform .1s, background .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.sheet-confirm-btn:active { transform: scale(.98); }
+
+/* ── Paid state overlay on card ── */
+.paid-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: inherit;
+  z-index: 8;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.paid-overlay.show { opacity: 1; pointer-events: auto; }
+.paid-check {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,.2); border: 3px solid white;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  animation: checkPop .4s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes checkPop { from{transform:scale(0);opacity:0;} to{transform:scale(1);opacity:1;} }
+.paid-label { font-size: 20px; font-weight: 800; color: white; letter-spacing: -.03em; margin-bottom: 6px; }
+.paid-sub { font-size: 13px; color: rgba(255,255,255,.8); font-weight: 600; }
+
+/* ── Reminder toast ── */
+.toast {
+  position: absolute; bottom: 100px; left: 16px; right: 16px;
+  background: #111827; color: white;
+  border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700;
+  z-index: 70;
+  transform: translateY(20px); opacity: 0;
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-check {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: var(--emerald); display: grid; place-items: center;
+}
+
+/* ── Settled card auto-dismiss ── */
+@keyframes settledDismiss {
+  0%   { opacity: 1; transform: translateX(0) scale(1); }
+  60%  { opacity: 1; transform: translateX(0) scale(1.02); }
+  100% { opacity: 0; transform: translateX(-120%) scale(.92); }
+}
+.story-card.dismissing { animation: settledDismiss .6s cubic-bezier(.4,0,.2,1) forwards; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" id="phoneFrame" style="position:relative;">
+
+  <!-- Status Bar -->
+  <div class="status-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:50;">
+    <span class="status-time" style="color:white;">9:41</span>
+    <div class="status-icons" style="color:white;">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".5"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".5"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Top bar: list-icon LEFT, bell + avatar RIGHT — no title, no filter here -->
+  <div class="story-topbar">
+    <a href="final-overview.html" class="story-list-btn" aria-label="Lihat semua">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </a>
+    <div class="story-topbar-right">
+      <a href="final-notifications.html" class="story-icon-btn" aria-label="Notifikasi">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="story-notif-dot"></span>
+      </a>
+      <a href="final-profile.html" class="story-avatar" aria-label="Profil">RF</a>
+    </div>
+  </div>
+
+  <!-- Segmented filter — own row, centered, below the top icons -->
+  <div class="seg-row">
+    <div class="seg-wrap">
+      <button class="seg-btn active" onclick="setFilter('semua')">Semua</button>
+      <button class="seg-btn" onclick="setFilter('arisan')">Arisan</button>
+      <button class="seg-btn" onclick="setFilter('patungan')">Patungan</button>
+    </div>
+  </div>
+
+  <!-- Story progress segments (Snapchat-style, below seg-row) -->
+  <div class="story-bar" id="storyBar"></div>
+
+  <!-- Deck (full-bleed, behind compose pill) -->
+  <div class="deck-container" id="deckContainer">
+    <div class="nav-prev" id="navPrev" onclick="prevCard()"></div>
+    <div class="nav-next" id="navNext" onclick="nextCard()"></div>
+
+    <!-- CARD 0: Arisan Keluarga Sari — URGENT -->
+    <div class="story-card card-arisan active" id="card0" data-type="arisan" data-pay-amount="Rp 200.000" data-pay-label="Iuran Keluarga Sari">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+      <a class="card-tap-detail" href="final-group-detail.html"></a>
+
+      <!-- Paid overlay -->
+      <div class="paid-overlay" id="paid0">
+        <div class="paid-check">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="paid-label">Iuran Lunas!</div>
+        <div class="paid-sub">Rp 200.000 via GoPay</div>
+      </div>
+
+      <div class="card-chips">
+        <span class="urgent-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          2 hari lagi
+        </span>
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Arisan
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Iuran · Keluarga Sari · Giliran Budi S.</div>
+      <div class="card-hero-amount">Rp 200.000</div>
+      <div class="card-due-line">Jatuh tempo 10 Jun</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:67%"></div></div>
+      <div class="progress-labels"><span>8/12 setor</span><span>Putaran 6/12</span></div>
+
+      <button class="card-cta arisan-cta" onclick="openPaySheet(0)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Bayar Sekarang
+      </button>
+    </div>
+
+    <!-- CARD 1: Arisan Kantor -->
+    <div class="story-card card-arisan next" id="card1" data-type="arisan" data-pay-amount="Rp 150.000" data-pay-label="Iuran Arisan Kantor">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+      <a class="card-tap-detail" href="final-group-detail.html"></a>
+
+      <div class="paid-overlay" id="paid1">
+        <div class="paid-check">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="paid-label">Iuran Lunas!</div>
+        <div class="paid-sub">Rp 150.000 via Transfer BCA</div>
+      </div>
+
+      <div class="card-chips">
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          Arisan
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Iuran · Arisan Kantor · Giliran Ana N.</div>
+      <div class="card-hero-amount">Rp 150.000</div>
+      <div class="card-due-line">Jatuh tempo 15 Jun</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:25%"></div></div>
+      <div class="progress-labels"><span>2/8 setor</span><span>Putaran 2/8</span></div>
+
+      <button class="card-cta arisan-cta" onclick="openPaySheet(1)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Bayar Sekarang
+      </button>
+    </div>
+
+    <!-- CARD 2: Arisan RT 05 -->
+    <div class="story-card card-arisan hidden" id="card2" data-type="arisan" data-pay-amount="Rp 50.000" data-pay-label="Iuran Arisan RT 05">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+      <a class="card-tap-detail" href="final-group-detail.html"></a>
+
+      <div class="paid-overlay" id="paid2">
+        <div class="paid-check">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="paid-label">Iuran Lunas!</div>
+        <div class="paid-sub">Rp 50.000 via GoPay</div>
+      </div>
+
+      <div class="card-chips">
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Arisan
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Iuran · Arisan RT 05 · Giliran Pak Joko</div>
+      <div class="card-hero-amount">Rp 50.000</div>
+      <div class="card-due-line">Jatuh tempo minggu ini</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:15%"></div></div>
+      <div class="progress-labels"><span>3/20 setor</span><span>Putaran 3/20</span></div>
+
+      <button class="card-cta arisan-cta" onclick="openPaySheet(2)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Bayar Sekarang
+      </button>
+    </div>
+
+    <!-- CARD 3: Patungan Makan Bali -->
+    <div class="story-card card-patungan hidden" id="card3" data-type="patungan">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+      <a class="card-tap-detail" href="final-bill-detail.html"></a>
+
+      <div class="card-chips">
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Patungan
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Patungan · Makan Bali · 3 belum bayar</div>
+      <div class="card-hero-amount">Rp 270.000</div>
+      <div class="card-due-line">belum masuk dari 3 orang</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:60%"></div></div>
+      <div class="progress-labels"><span>3/6 sudah bayar</span><span>60% lunas</span></div>
+
+      <button class="card-cta patungan-cta" onclick="fireReminder(3, 3)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Ingatkan 3 Teman
+      </button>
+    </div>
+
+    <!-- CARD 4: Patungan Hotel Bromo -->
+    <div class="story-card card-patungan hidden" id="card4" data-type="patungan">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+      <a class="card-tap-detail" href="final-bill-detail.html"></a>
+
+      <div class="card-chips">
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Patungan
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Patungan · Hotel Bromo · deadline 3 hari lagi</div>
+      <div class="card-hero-amount">Rp 900.000</div>
+      <div class="card-due-line">kurang · 3 dari 4 belum bayar</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:25%"></div></div>
+      <div class="progress-labels"><span>1/4 sudah bayar</span><span>25% lunas</span></div>
+
+      <button class="card-cta patungan-cta" onclick="fireReminder(4, 3)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Tagih Sekarang
+      </button>
+    </div>
+
+    <!-- CARD 5: Tiket Konser — settled Patungan (lavender follow-up CTA) -->
+    <div class="story-card card-settled hidden" id="card5" data-type="patungan" data-settled="true">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+
+      <div class="card-chips">
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Selesai
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Patungan · Tiket Konser · 4 orang</div>
+      <div class="card-hero-amount">Rp 800.000</div>
+      <div class="card-due-line">Semua sudah bayar</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:100%"></div></div>
+      <div class="progress-labels"><span>4/4 lunas</span><span>Patungan</span></div>
+
+      <!-- Follow-up CTA: LAVENDER — Patungan "send proof of transfer" → proof page -->
+      <button type="button" class="settled-cta lv" onclick="location.href='final-proof.html'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>
+          Kirim Bukti Transfer
+          <span class="settled-cta-hint">bagikan ke grup</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- CARD 6: Arisan Kompleks — settled Arisan (emerald follow-up CTA) -->
+    <!--
+      EMERALD VARIANT MARKUP REFERENCE — settled Arisan card:
+      Use class="settled-cta em" on the follow-up button.
+      Label: "Tagih Iuran Berikutnya" (or "Mulai Putaran Baru" after a full round).
+      Icon: people/bell. Action: openNewBillSheet('arisan', '<group-name>', <participant-count>)
+
+      <div class="settled-status-chip">
+        <svg ...checkmark...></svg>
+        Selesai
+      </div>
+      <button type="button" class="settled-cta em" onclick="openNewBillSheet('arisan', 'Nama Grup', 12)">
+        <svg ...bell-icon...></svg>
+        <span>
+          Tagih Iuran Berikutnya
+          <span class="settled-cta-hint">ke 12 anggota yang sama</span>
+        </span>
+      </button>
+    -->
+    <div class="story-card card-settled hidden" id="card6" data-type="arisan" data-settled="true">
+      <div class="card-blob1"></div><div class="card-blob2"></div>
+
+      <div class="card-chips">
+        <div class="card-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Selesai
+        </div>
+      </div>
+
+      <div class="card-eyebrow">Arisan · Arisan Kompleks · 12 anggota</div>
+      <div class="card-hero-amount">Rp 2.400.000</div>
+      <div class="card-due-line">Putaran 3 selesai · semua lunas</div>
+
+      <div class="progress-track"><div class="progress-fill-white" style="width:100%"></div></div>
+      <div class="progress-labels"><span>12/12 lunas</span><span>Putaran 3/12</span></div>
+
+      <!-- Follow-up CTA: EMERALD — Arisan "send proof of transfer" → proof page (arisan variant) -->
+      <button type="button" class="settled-cta em" onclick="location.href='final-proof.html?type=arisan'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>
+          Kirim Bukti Transfer
+          <span class="settled-cta-hint">ke Dompet Grup</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state hidden" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-text">Tidak ada item di filter ini</div>
+    </div>
+
+  </div><!-- /deck-container -->
+
+  <!-- Swipe hint -->
+  <div class="swipe-hint">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    geser untuk berpindah
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+
+  <!-- Quick-pay sheet -->
+  <div class="pay-sheet-backdrop" id="paySheetBackdrop" onclick="closePaySheet(event)">
+    <div class="pay-sheet" id="paySheet">
+      <div class="sheet-grabber"></div>
+      <div class="sheet-title" id="sheetTitle">Konfirmasi Pembayaran</div>
+      <div class="sheet-sub" id="sheetSub">Iuran Arisan Keluarga Sari</div>
+      <!-- Destination row -->
+      <div class="sheet-dest-row" id="sheetDestRow">
+        <div class="sheet-dest-icon" id="sheetDestIcon">
+          <!-- icon injected by JS -->
+        </div>
+        <div class="sheet-dest-text">
+          <div class="sheet-dest-label" id="sheetDestLabel">Bayar ke</div>
+          <div class="sheet-dest-val" id="sheetDestVal">Dompet Grup Keluarga Sari</div>
+        </div>
+      </div>
+      <div class="sheet-method-row">
+        <div>
+          <div class="sheet-method-label">Sumber dana</div>
+          <div class="sheet-method-val">GoPay</div>
+        </div>
+        <span class="sheet-change">Ganti</span>
+      </div>
+      <div class="sheet-amount-row">
+        <span class="sheet-amount-label" id="sheetAmountLabel">Jumlah iuran</span>
+        <span class="sheet-amount-val" id="sheetAmount">Rp 200.000</span>
+      </div>
+      <button class="sheet-confirm-btn" id="sheetConfirmBtn" onclick="confirmPay()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Konfirmasi Bayar
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <div class="toast-check">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <span id="toastMsg">Pengingat terkirim</span>
+  </div>
+
+  <!-- New-bill follow-up sheet -->
+  <div class="pay-sheet-backdrop" id="newBillSheetBackdrop" onclick="closeNewBillSheet(event)">
+    <div class="pay-sheet" id="newBillSheet">
+      <div class="sheet-grabber"></div>
+      <div class="sheet-title" id="nbSheetTitle">Kirim Tagihan Baru</div>
+      <div class="sheet-sub" id="nbSheetSub">Tiket Konser</div>
+
+      <!-- Group icon + participants hint -->
+      <div class="sheet-dest-row">
+        <div class="sheet-dest-icon nb-sheet-icon lv" id="nbSheetIcon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="sheet-dest-label">Peserta</div>
+          <div class="sheet-dest-val" id="nbParticipantsHint">Peserta sebelumnya sudah dipilih</div>
+        </div>
+      </div>
+
+      <!-- Amount input row (prototype: static placeholder) -->
+      <div class="nb-field-wrap">
+        <div class="nb-field-label">Jumlah tagihan</div>
+        <div class="nb-amount-row">
+          <span class="nb-amount-placeholder">Rp 0</span>
+          <span class="nb-amount-hint">Ketuk untuk isi</span>
+        </div>
+      </div>
+
+      <!-- Note row -->
+      <div class="nb-field-wrap last">
+        <div class="nb-field-label">Keterangan</div>
+        <div class="nb-note-row">Tulis keterangan tagihan…</div>
+      </div>
+
+      <button type="button" class="sheet-confirm-btn" id="nbSheetConfirmBtn" onclick="confirmNewBill()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Kirim Tagihan
+      </button>
+    </div>
+  </div>
+
+  <!-- Dimmer -->
+  <div class="dimmer" id="dimmer" onclick="closePill()"></div>
+
+  <!-- Compose Pill -->
+  <div class="compose-outer">
+    <div class="compose-pill" id="composePill">
+      <div class="pill-collapsed" onclick="openPill()">
+        <div class="pill-icon">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <span class="pill-label">Mulai sesuatu baru…</span>
+        <div class="pill-dots">
+          <div class="pill-dot em"></div>
+          <div class="pill-dot lv"></div>
+        </div>
+      </div>
+      <div class="pill-expanded">
+        <!-- Sheet header: centered small-caps label + circular close top-right -->
+        <div class="pill-header-row">
+          <span class="pill-sheet-title">Mulai dengan apa?</span>
+          <button class="pill-close-btn" onclick="closePill()" aria-label="Tutup">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <!-- Actions: two cards + join row, evenly spaced -->
+        <div class="pill-actions">
+          <div class="pill-lanes">
+            <button type="button" class="pill-lane em" onclick="alert('Buat Arisan baru')">
+              <div class="lane-icon em">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="lane-title em">Arisan</div>
+              <div class="lane-sub">Tabungan bergilir bersama teman &amp; keluarga</div>
+            </button>
+            <button type="button" class="pill-lane lv" onclick="alert('Buat Patungan baru')">
+              <div class="lane-icon lv">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="lane-title lv">Patungan</div>
+              <div class="lane-sub">Bagi tagihan &amp; lacak siapa yang sudah bayar</div>
+            </button>
+          </div>
+          <!-- Dashed join row -->
+          <button type="button" class="pill-join-row" onclick="alert('Gabung: scan QR atau buka link undangan')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pill-join-qr-icon">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+              <line x1="14" y1="14" x2="14" y2="14.01"/><line x1="18" y1="14" x2="18" y2="14.01"/>
+              <line x1="21" y1="14" x2="21" y2="17"/><line x1="14" y1="17" x2="17" y2="17"/>
+              <line x1="17" y1="20" x2="21" y2="20"/><line x1="21" y1="17" x2="21" y2="20"/>
+              <line x1="5" y1="5" x2="5" y2="5.01"/><line x1="19" y1="5" x2="19" y2="5.01"/><line x1="5" y1="19" x2="5" y2="19.01"/>
+            </svg>
+            <div>
+              <div class="pill-join-main">Gabung Arisan / Patungan</div>
+              <div class="pill-join-sub">Scan QR atau buka link undangan</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /phone-frame -->
+</div>
+
+<script>
+// ─── Card data ───────────────────────────────────────────────────────────────
+const ALL_CARDS = [
+  { id: 'card0', type: 'arisan' },
+  { id: 'card1', type: 'arisan' },
+  { id: 'card2', type: 'arisan' },
+  { id: 'card3', type: 'patungan' },
+  { id: 'card4', type: 'patungan' },
+  { id: 'card5', type: 'patungan' },
+  { id: 'card6', type: 'arisan' },
+];
+
+let currentFilter = 'semua';
+let visibleCards = [];
+let current = 0;
+
+const storyBar  = document.getElementById('storyBar');
+const emptyState = document.getElementById('emptyState');
+
+// ─── Story-bar segments (Snapchat-style) ─────────────────────────────────────
+function buildDots(count) {
+  storyBar.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const seg = document.createElement('div');
+    seg.className = 'story-seg' + (i === 0 ? ' active' : '');
+    storyBar.appendChild(seg);
+  }
+}
+
+// ─── Deck rendering ───────────────────────────────────────────────────────────
+function getVisible() {
+  return currentFilter === 'semua' ? ALL_CARDS : ALL_CARDS.filter(c => c.type === currentFilter);
+}
+
+function renderDeck() {
+  visibleCards = getVisible();
+  current = 0;
+  ALL_CARDS.forEach(c => {
+    const el = document.getElementById(c.id);
+    el.className = el.className.replace(/\b(active|prev|next|hidden)\b/g, '').trim();
+    el.classList.add('hidden');
+  });
+  emptyState.classList.add('hidden');
+  if (visibleCards.length === 0) { emptyState.classList.remove('hidden'); buildDots(0); return; }
+  buildDots(visibleCards.length);
+  applyPositions(0);
+}
+
+function applyPositions(nextIdx) {
+  const segs = storyBar.querySelectorAll('.story-seg');
+  visibleCards.forEach((c, i) => {
+    const el = document.getElementById(c.id);
+    el.className = el.className.replace(/\b(active|prev|next|hidden)\b/g, '').trim();
+    if (i < nextIdx) {
+      el.classList.add('prev');
+      if (segs[i]) { segs[i].className = 'story-seg past'; }
+    } else if (i === nextIdx) {
+      el.classList.add('active');
+      if (segs[i]) { segs[i].className = 'story-seg active'; }
+      // Settled cards with a follow-up CTA stay put — user swipes away manually.
+      // (Auto-dismiss removed: dismissSettled() is intentionally not called here.)
+    } else {
+      el.classList.add('next');
+      if (segs[i]) { segs[i].className = 'story-seg'; }
+    }
+  });
+  ALL_CARDS.forEach(c => {
+    if (!visibleCards.find(v => v.id === c.id)) {
+      const el = document.getElementById(c.id);
+      el.className = el.className.replace(/\b(active|prev|next|hidden)\b/g,'').trim();
+      el.classList.add('hidden');
+    }
+  });
+  current = nextIdx;
+  // Update phone frame background color to match active card
+  updateBg();
+}
+
+function updateBg() {
+  const frame = document.getElementById('phoneFrame');
+  if (!visibleCards[current]) return;
+  const type = visibleCards[current].type;
+  const el = document.getElementById(visibleCards[current].id);
+  const isSettled = el.dataset.settled === 'true';
+  if (isSettled) frame.style.background = '#374151';
+  else if (type === 'arisan') frame.style.background = '#065f46';
+  else frame.style.background = '#3b0764';
+}
+
+function nextCard() { if (current < visibleCards.length - 1) applyPositions(current + 1); }
+function prevCard() { if (current > 0) applyPositions(current - 1); }
+
+function dismissSettled(idx) {
+  if (current !== idx) return; // user already moved away
+  const el = document.getElementById(visibleCards[idx].id);
+  el.classList.add('dismissing');
+  setTimeout(() => {
+    if (current < visibleCards.length - 1) applyPositions(current + 1);
+    else applyPositions(0);
+  }, 620);
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.seg-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['semua','arisan','patungan'][i] === f);
+  });
+  renderDeck();
+}
+
+// ─── Touch swipe ─────────────────────────────────────────────────────────────
+let startX = 0, startY = 0;
+const deck = document.getElementById('deckContainer');
+deck.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, { passive: true });
+deck.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  const dy = e.changedTouches[0].clientY - startY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) { if (dx < 0) nextCard(); else prevCard(); }
+});
+
+// ─── Compose pill ─────────────────────────────────────────────────────────────
+function openPill() {
+  document.getElementById('composePill').classList.add('open');
+  document.getElementById('dimmer').classList.add('active');
+}
+function closePill() {
+  document.getElementById('composePill').classList.remove('open');
+  document.getElementById('dimmer').classList.remove('active');
+}
+
+// ─── Quick-pay sheet ─────────────────────────────────────────────────────────
+let activePayCard = null;
+const METHODS = ['GoPay', 'Transfer BCA', 'OVO', 'DANA', 'Transfer Mandiri'];
+let activeMethod = METHODS[0];
+
+// Per-card destination info (index matches card ids)
+const CARD_DEST = {
+  0: { type: 'arisan', destLabel: 'Bayar ke', destVal: 'Dompet Grup Keluarga Sari', amountLabel: 'Jumlah iuran' },
+  1: { type: 'arisan', destLabel: 'Bayar ke', destVal: 'Dompet Grup Arisan Kantor', amountLabel: 'Jumlah iuran' },
+  2: { type: 'arisan', destLabel: 'Bayar ke', destVal: 'Dompet Grup Arisan RT 05', amountLabel: 'Jumlah iuran' },
+  3: { type: 'patungan', destLabel: 'Transfer langsung ke', destVal: 'Ricky F. (Anda)', amountLabel: 'Bagian kamu' },
+  4: { type: 'patungan', destLabel: 'Transfer langsung ke', destVal: 'Ricky F. (Anda)', amountLabel: 'Bagian kamu' },
+};
+
+const ARISAN_WALLET_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="5" width="22" height="14" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`;
+const PATUNGAN_PERSON_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+function openPaySheet(cardIdx) {
+  activePayCard = cardIdx;
+  const el = document.getElementById('card' + cardIdx);
+  const dest = CARD_DEST[cardIdx] || CARD_DEST[0];
+
+  document.getElementById('sheetAmount').textContent = el.dataset.payAmount || 'Rp 200.000';
+  document.getElementById('sheetSub').textContent = el.dataset.payLabel || 'Iuran Arisan';
+  document.getElementById('sheetAmountLabel').textContent = dest.amountLabel;
+  document.getElementById('sheetDestLabel').textContent = dest.destLabel;
+  document.getElementById('sheetDestVal').textContent = dest.destVal;
+
+  const iconEl = document.getElementById('sheetDestIcon');
+  iconEl.className = 'sheet-dest-icon ' + dest.type;
+  iconEl.innerHTML = dest.type === 'arisan' ? ARISAN_WALLET_ICON : PATUNGAN_PERSON_ICON;
+
+  // Tint confirm button for patungan
+  const confirmBtn = document.getElementById('sheetConfirmBtn');
+  confirmBtn.style.background = dest.type === 'patungan' ? 'var(--lavender-dark)' : '';
+
+  document.getElementById('paySheetBackdrop').classList.add('show');
+}
+
+function closePaySheet(e) {
+  if (e && e.target !== document.getElementById('paySheetBackdrop')) return;
+  document.getElementById('paySheetBackdrop').classList.remove('show');
+}
+
+function confirmPay() {
+  const btn = document.getElementById('sheetConfirmBtn');
+  const dest = CARD_DEST[activePayCard] || CARD_DEST[0];
+  const processingColor = dest.type === 'patungan' ? '#6d28d9' : '#059669';
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Memproses…';
+  btn.style.background = processingColor;
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('paySheetBackdrop').classList.remove('show');
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Konfirmasi Bayar';
+    btn.style.background = '';
+    btn.disabled = false;
+    // Show paid overlay on the card
+    const overlay = document.getElementById('paid' + activePayCard);
+    if (overlay) overlay.classList.add('show');
+    // Advance to next after a moment
+    setTimeout(() => {
+      if (overlay) overlay.classList.remove('show');
+      if (current < visibleCards.length - 1) applyPositions(current + 1);
+    }, 1800);
+  }, 900);
+}
+
+// ─── Reminder/tagih toast ─────────────────────────────────────────────────────
+let toastTimer = null;
+function fireReminder(cardIdx, count) {
+  const cardEl = document.getElementById('card' + cardIdx);
+  const isTagih = cardEl && cardEl.querySelector('.card-cta') && cardEl.querySelector('.card-cta').textContent.includes('Tagih');
+  showToast(isTagih
+    ? 'Tagihan dikirim ke ' + count + ' orang'
+    : 'Pengingat terkirim ke ' + count + ' orang');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg + ' ✓';
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ─── New-bill follow-up sheet ────────────────────────────────────────────────
+function openNewBillSheet(featureType, groupName, participantCount) {
+  const sheet = document.getElementById('newBillSheetBackdrop');
+  const title = document.getElementById('nbSheetTitle');
+  const subline = document.getElementById('nbSheetSub');
+  const icon = document.getElementById('nbSheetIcon');
+  const confirmBtn = document.getElementById('nbSheetConfirmBtn');
+  const participantsHint = document.getElementById('nbParticipantsHint');
+
+  if (featureType === 'patungan') {
+    title.textContent = 'Kirim Tagihan Baru';
+    subline.textContent = groupName;
+    participantsHint.textContent = 'Peserta dari Patungan sebelumnya (' + participantCount + ' orang) sudah dipilih';
+    confirmBtn.style.background = 'var(--lavender-dark)';
+    icon.className = 'nb-sheet-icon lv';
+    icon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`;
+  } else {
+    title.textContent = 'Tagih Iuran Berikutnya';
+    subline.textContent = groupName;
+    participantsHint.textContent = 'Semua anggota (' + participantCount + ' orang) akan ditagih iuran putaran berikutnya';
+    confirmBtn.style.background = 'var(--emerald-dark)';
+    icon.className = 'nb-sheet-icon em';
+    icon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+  }
+
+  sheet.classList.add('show');
+}
+
+function closeNewBillSheet(e) {
+  if (e && e.target !== document.getElementById('newBillSheetBackdrop')) return;
+  document.getElementById('newBillSheetBackdrop').classList.remove('show');
+}
+
+function confirmNewBill() {
+  const btn = document.getElementById('nbSheetConfirmBtn');
+  const origBg = btn.style.background;
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Membuat…';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('newBillSheetBackdrop').classList.remove('show');
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Kirim Tagihan';
+    btn.style.background = origBg;
+    btn.disabled = false;
+    showToast('Tagihan baru dibuat dan dikirim');
+  }, 800);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+renderDeck();
+</script>
+</body>
+</html>

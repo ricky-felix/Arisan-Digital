@@ -13,6 +13,7 @@ import {
   buttonHover,
   buttonTap,
 } from "../utils/animations";
+import { Reveal } from "./Reveal";
 
 const splitCards = [
   {
@@ -42,13 +43,7 @@ export function BillSplitting() {
       className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28"
       aria-labelledby="bill-splitting-heading"
     >
-      <motion.div
-        className="container mx-auto"
-        variants={staggerContainer}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <Reveal className="container mx-auto">
         <div className="mb-12 grid grid-cols-1 items-start gap-x-12 gap-y-8 md:mb-16 md:grid-cols-2 lg:mb-20 lg:gap-x-20">
           <motion.div variants={staggerItemLeft}>
             <span className="mb-4 inline-block rounded-full bg-[#7c5cfc] px-4 py-1 text-sm font-semibold text-white">
@@ -125,7 +120,7 @@ export function BillSplitting() {
             ))}
           </ul>
         </motion.div>
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anggota Orbit — Keluarga Sari</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+.screen-inner { padding-bottom: 32px; }
+
+/* Header */
+.orbit-header {
+  background: var(--surface);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky; top: 0; z-index: 10;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none;
+}
+.orbit-title { font-size: 16px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; flex: 1; }
+.orbit-sub { font-size: 11px; color: var(--ink-2); font-weight: 500; }
+
+/* Putar toggle */
+.rotate-toggle-row {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 10px 20px 0;
+  gap: 8px;
+}
+.rotate-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-2);
+  letter-spacing: .01em;
+}
+.toggle-switch {
+  position: relative; width: 36px; height: 20px;
+  cursor: pointer; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--line); border-radius: 99px;
+  transition: background .2s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--emerald); }
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: white; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  transition: transform .2s cubic-bezier(.4,0,.2,1);
+}
+.toggle-switch input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
+/* Orbit stage */
+.orbit-stage {
+  position: relative;
+  width: 100%;
+  height: 330px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* Background rings */
+.ring {
+  position: absolute; border-radius: 50%;
+  border: 1.5px dashed rgba(16,185,129,.15);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.ring-1 { width: 200px; height: 200px; }
+.ring-2 { width: 290px; height: 290px; border-color: rgba(16,185,129,.08); }
+
+/* Spinning ring overlay — only the rings rotate, not the avatars */
+.ring-spinner {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.ring-spinner .ring { position: relative; top: auto; left: auto; transform: none; margin: auto; }
+
+/* Center pot */
+.center-pot {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 88px; height: 88px; border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 4px var(--emerald-soft), 0 6px 24px rgba(16,185,129,.2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 5;
+  overflow: hidden;
+}
+/* Pot fill animation — plays once on load */
+.pot-fill {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, var(--emerald) 0%, #34d399 100%);
+  opacity: .3; border-radius: 50%;
+  height: 0%;
+  animation: potFill 1.2s cubic-bezier(.4,0,.2,1) .6s forwards;
+}
+@keyframes potFill {
+  from { height: 0%; }
+  to   { height: 67%; }
+}
+.pot-emoji { font-size: 26px; position: relative; z-index: 1; }
+.pot-pct { font-size: 11px; font-weight: 800; color: var(--emerald-dark); position: relative; z-index: 1; line-height: 1; }
+
+/* ── Orbit ring container (holds all orbit-members; rotates when toggle ON) ── */
+.orbit-ring {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; /* re-enabled on children */
+}
+
+/* Orbit members */
+.orbit-member {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 4;
+  /* Entrance animation — each member eases in from its final position */
+  opacity: 0;
+  transform: translate(var(--final-x), var(--final-y)) scale(.4);
+}
+.orbit-member.entered {
+  opacity: 1;
+  transform: translate(var(--final-x), var(--final-y)) scale(1);
+  transition: opacity .4s ease, transform .5s cubic-bezier(.34,1.2,.64,1);
+}
+
+/* ── Inner wrapper: handles dance float + counter-rotation when revolving ── */
+.orbit-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  /* idle dance — runs by default, plays forever */
+  animation: memberDance var(--dance-dur, 3.2s) ease-in-out var(--dance-delay, 0s) infinite;
+}
+
+/* Idle dance: gentle float (translateY) + very slight scale */
+@keyframes memberDance {
+  0%   { transform: translateY(0px)   scale(1); }
+  35%  { transform: translateY(-3.5px) scale(1.03); }
+  65%  { transform: translateY(-2px)  scale(1.015); }
+  100% { transform: translateY(0px)   scale(1); }
+}
+
+/* ── Counter-rotation (overridden by JS as a CSS animation on .orbit-inner) ── */
+/* When the orbit-ring container spins, .orbit-inner gets a reverse keyframe  */
+@keyframes counterRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+.orbit-av {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: box-shadow .2s;
+}
+.orbit-av.paid    { box-shadow: 0 0 0 3px var(--emerald), 0 2px 8px rgba(16,185,129,.3); }
+.orbit-av.unpaid  { box-shadow: 0 0 0 3px #ef4444, 0 2px 8px rgba(239,68,68,.25); }
+.orbit-av.giliran {
+  box-shadow: 0 0 0 3px #f59e0b, 0 0 16px rgba(245,158,11,.4);
+  animation: glowPulse 2.4s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { box-shadow: 0 0 0 3px #f59e0b, 0 0 16px rgba(245,158,11,.4); }
+  50%     { box-shadow: 0 0 0 5px #f59e0b, 0 0 28px rgba(245,158,11,.6); }
+}
+.orbit-name { font-size: 8px; font-weight: 700; color: var(--ink-2); text-align: center; max-width: 50px; line-height: 1.2; }
+
+/* ── Continuous ring rotation — applied via JS when toggle is on ── */
+.ring-rotate-1 { animation: ringRotate 18s linear infinite; transform-origin: center center; }
+.ring-rotate-2 { animation: ringRotate 26s linear infinite reverse; transform-origin: center center; }
+@keyframes ringRotate {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to   { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+/* ── Planet orbit: the whole ring of avatars revolves ── */
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.orbit-ring.revolving {
+  animation: orbitSpin var(--orbit-dur, 32s) linear infinite;
+  transform-origin: center center;
+}
+/* When revolving, each .orbit-inner counter-rotates so avatars stay upright */
+.orbit-ring.revolving .orbit-inner {
+  animation: counterRotate var(--orbit-dur, 32s) linear infinite;
+  transform-origin: center center;
+}
+
+/* ── Reduced motion: freeze continuous animations ── */
+@media (prefers-reduced-motion: reduce) {
+  .orbit-inner { animation: none !important; }
+  .orbit-ring.revolving { animation: none !important; }
+  .ring-rotate-1, .ring-rotate-2 { animation: none !important; }
+  .orbit-av.giliran { animation: none !important; }
+}
+
+/* Member tooltip */
+.member-tooltip {
+  position: absolute;
+  background: white;
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 20px rgba(17,24,39,.15);
+  z-index: 20;
+  min-width: 160px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .2s, transform .2s;
+  border: 1px solid var(--line-soft);
+}
+.member-tooltip.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.mt-name { font-size: 13px; font-weight: 800; color: var(--ink-1); margin-bottom: 3px; }
+.mt-status { font-size: 11px; font-weight: 600; }
+.mt-status.paid    { color: var(--emerald-dark); }
+.mt-status.unpaid  { color: var(--danger); }
+.mt-status.giliran { color: #92400e; }
+.mt-sub { font-size: 10px; color: var(--ink-3); font-weight: 500; margin-top: 2px; }
+
+/* Legend */
+.legend-row {
+  display: flex; gap: 12px; align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+}
+.lg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--ink-2); }
+.lg-dot { width: 10px; height: 10px; border-radius: 50%; }
+.lg-dot.paid    { background: var(--emerald); }
+.lg-dot.unpaid  { background: var(--danger); }
+.lg-dot.giliran { background: #f59e0b; }
+
+/* Summary strip */
+.summary-strip {
+  margin: 0 20px;
+  background: var(--surface); border-radius: 14px;
+  box-shadow: var(--sh-1), var(--sh-2);
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+}
+.ss-item { padding: 12px 8px; }
+.ss-item + .ss-item { border-left: 1px solid var(--line-soft); }
+.ss-val { font-size: 18px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; }
+.ss-lbl { font-size: 9px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+
+/* Full member list */
+.full-list-section { padding: 16px 20px 0; }
+.fl-title { font-size: 13px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; margin-bottom: 10px; }
+.member-card {
+  background: var(--surface); border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2); overflow: hidden;
+}
+.mem-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 14px; cursor: pointer; transition: background .1s;
+}
+.mem-row:hover { background: var(--gray-soft); }
+.mem-row + .mem-row { border-top: 1px solid var(--line-soft); }
+.mem-av-s {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 800; color: white; flex-shrink: 0;
+}
+.mem-info { flex: 1; }
+.mem-name { font-size: 13px; font-weight: 700; color: var(--ink-1); }
+.mem-sub { font-size: 10px; color: var(--ink-3); font-weight: 500; margin-top: 1px; }
+.mem-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 800;
+}
+.mem-badge.paid    { background: var(--emerald-soft); color: var(--emerald-dark); }
+.mem-badge.unpaid  { background: #fee2e2; color: var(--danger); }
+.mem-badge.giliran { background: #fef3c7; color: #92400e; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" style="position:relative;">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Header -->
+      <div class="orbit-header">
+        <a href="final-group-detail.html" class="back-btn" aria-label="Kembali">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <div>
+          <div class="orbit-title">Keluarga Sari</div>
+          <div class="orbit-sub">12 anggota · orbit bayar/belum</div>
+        </div>
+      </div>
+
+      <!-- Putar toggle -->
+      <div class="rotate-toggle-row">
+        <span class="rotate-label">Putar orbit</span>
+        <label class="toggle-switch" aria-label="Aktifkan rotasi orbit">
+          <input type="checkbox" id="rotateToggle" onchange="toggleRotate(this.checked)">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+
+      <!-- Orbit stage -->
+      <div class="orbit-stage" id="orbitStage">
+        <!-- Rings (these get the rotation class applied via JS) -->
+        <div class="ring ring-1" id="ring1"></div>
+        <div class="ring ring-2" id="ring2"></div>
+
+        <!-- Center pot -->
+        <div class="center-pot">
+          <div class="pot-fill"></div>
+          <div class="pot-emoji">🏺</div>
+          <div class="pot-pct">67%</div>
+        </div>
+
+        <!-- Orbit members: positioned by JS, wrapped in .orbit-ring for planet-revolve -->
+        <div class="orbit-ring" id="orbitRing">
+          <div class="orbit-member" id="om0" onclick="showTooltip(0)">
+            <div class="orbit-inner">
+              <div class="orbit-av giliran" style="background:#f59e0b;">BS</div>
+              <div class="orbit-name">Budi S.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om1" onclick="showTooltip(1)">
+            <div class="orbit-inner">
+              <div class="orbit-av unpaid" style="background:#3b82f6;">RF</div>
+              <div class="orbit-name">Kamu</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om2" onclick="showTooltip(2)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#8b5cf6;">RA</div>
+              <div class="orbit-name">Rina A.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om3" onclick="showTooltip(3)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#f59e0b;">DK</div>
+              <div class="orbit-name">Dian K.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om4" onclick="showTooltip(4)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#ec4899;">SN</div>
+              <div class="orbit-name">Siti N.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om5" onclick="showTooltip(5)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#6366f1;">MH</div>
+              <div class="orbit-name">M. Haikal</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om6" onclick="showTooltip(6)">
+            <div class="orbit-inner">
+              <div class="orbit-av unpaid" style="background:#ef4444;">AP</div>
+              <div class="orbit-name">Anggi P.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om7" onclick="showTooltip(7)">
+            <div class="orbit-inner">
+              <div class="orbit-av unpaid" style="background:#14b8a6;">YP</div>
+              <div class="orbit-name">Yuni P.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om8" onclick="showTooltip(8)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#0891b2;">TR</div>
+              <div class="orbit-name">Teguh R.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om9" onclick="showTooltip(9)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#d97706;">LB</div>
+              <div class="orbit-name">Lina B.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om10" onclick="showTooltip(10)">
+            <div class="orbit-inner">
+              <div class="orbit-av unpaid" style="background:#7c3aed;">KM</div>
+              <div class="orbit-name">Karni M.</div>
+            </div>
+          </div>
+          <div class="orbit-member" id="om11" onclick="showTooltip(11)">
+            <div class="orbit-inner">
+              <div class="orbit-av paid" style="background:#dc2626;">NR</div>
+              <div class="orbit-name">Nana R.</div>
+            </div>
+          </div>
+        </div><!-- /.orbit-ring -->
+
+        <!-- Tooltip -->
+        <div class="member-tooltip" id="tooltip">
+          <div class="mt-name" id="tt-name">Budi Setiawan</div>
+          <div class="mt-status" id="tt-status">Giliran bulan ini!</div>
+          <div class="mt-sub" id="tt-sub">Penerima putaran ke-6</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-row">
+        <div class="lg-item"><div class="lg-dot giliran"></div> Giliran</div>
+        <div class="lg-item"><div class="lg-dot paid"></div> Sudah bayar</div>
+        <div class="lg-item"><div class="lg-dot unpaid"></div> Belum bayar</div>
+      </div>
+
+      <!-- Summary strip -->
+      <div class="summary-strip">
+        <div class="ss-item">
+          <div class="ss-val" style="color:var(--emerald-dark);">8</div>
+          <div class="ss-lbl">Lunas</div>
+        </div>
+        <div class="ss-item">
+          <div class="ss-val" style="color:var(--danger);">4</div>
+          <div class="ss-lbl">Belum</div>
+        </div>
+        <div class="ss-item">
+          <div class="ss-val">Rp 1,6jt</div>
+          <div class="ss-lbl">Terkumpul</div>
+        </div>
+      </div>
+
+      <!-- Full member list -->
+      <div class="full-list-section">
+        <div class="fl-title">Semua Anggota</div>
+        <div class="member-card">
+          <div class="mem-row" onclick="showTooltip(0)">
+            <div class="mem-av-s" style="background:#f59e0b;">BS</div>
+            <div class="mem-info"><div class="mem-name">Budi Setiawan</div><div class="mem-sub">Penerima putaran ke-6</div></div>
+            <span class="mem-badge giliran">Giliran</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(1)">
+            <div class="mem-av-s" style="background:#3b82f6;">RF</div>
+            <div class="mem-info"><div class="mem-name">Ricky Felix (Kamu)</div><div class="mem-sub">Belum bayar — jatuh tempo 2 hari</div></div>
+            <span class="mem-badge unpaid">Belum</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(2)">
+            <div class="mem-av-s" style="background:#8b5cf6;">RA</div>
+            <div class="mem-info"><div class="mem-name">Rina Amalia</div><div class="mem-sub">Bayar 8 Jun · Transfer BCA</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(3)">
+            <div class="mem-av-s" style="background:#f59e0b;">DK</div>
+            <div class="mem-info"><div class="mem-name">Dian Kusuma</div><div class="mem-sub">Bayar 7 Jun · GoPay</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(4)">
+            <div class="mem-av-s" style="background:#ec4899;">SN</div>
+            <div class="mem-info"><div class="mem-name">Siti Nuraini</div><div class="mem-sub">Bayar 7 Jun · Transfer Mandiri</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(5)">
+            <div class="mem-av-s" style="background:#6366f1;">MH</div>
+            <div class="mem-info"><div class="mem-name">Muhammad Haikal</div><div class="mem-sub">Bayar 6 Jun · DANA</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(6)">
+            <div class="mem-av-s" style="background:#ef4444;">AP</div>
+            <div class="mem-info"><div class="mem-name">Anggi Pratama</div><div class="mem-sub">Belum bayar</div></div>
+            <span class="mem-badge unpaid">Belum</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(7)">
+            <div class="mem-av-s" style="background:#14b8a6;">YP</div>
+            <div class="mem-info"><div class="mem-name">Yuni Permata</div><div class="mem-sub">Belum bayar</div></div>
+            <span class="mem-badge unpaid">Belum</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(8)">
+            <div class="mem-av-s" style="background:#0891b2;">TR</div>
+            <div class="mem-info"><div class="mem-name">Teguh Raharjo</div><div class="mem-sub">Bayar 5 Jun · OVO</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(9)">
+            <div class="mem-av-s" style="background:#d97706;">LB</div>
+            <div class="mem-info"><div class="mem-name">Lina Budiman</div><div class="mem-sub">Bayar 5 Jun · Transfer BNI</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(10)">
+            <div class="mem-av-s" style="background:#7c3aed;">KM</div>
+            <div class="mem-info"><div class="mem-name">Karni Maharani</div><div class="mem-sub">Belum bayar</div></div>
+            <span class="mem-badge unpaid">Belum</span>
+          </div>
+          <div class="mem-row" onclick="showTooltip(11)">
+            <div class="mem-av-s" style="background:#dc2626;">NR</div>
+            <div class="mem-info"><div class="mem-name">Nana Rahayu</div><div class="mem-sub">Bayar 4 Jun · GoPay</div></div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ─── Member data ──────────────────────────────────────────────────────────────
+const MEMBERS = [
+  { name: 'Budi Setiawan',       status: 'giliran', statusText: 'Giliran bulan ini!',              sub: 'Penerima putaran ke-6 · Rp 200.000' },
+  { name: 'Ricky Felix (Kamu)',  status: 'unpaid',  statusText: 'Belum bayar — jatuh tempo 2 hari', sub: 'Rp 200.000 harus dibayar' },
+  { name: 'Rina Amalia',         status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 8 Jun · Transfer BCA' },
+  { name: 'Dian Kusuma',         status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 7 Jun · GoPay' },
+  { name: 'Siti Nuraini',        status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 7 Jun · Transfer Mandiri' },
+  { name: 'Muhammad Haikal',     status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 6 Jun · DANA' },
+  { name: 'Anggi Pratama',       status: 'unpaid',  statusText: 'Belum bayar',                     sub: 'Ingatkan?' },
+  { name: 'Yuni Permata',        status: 'unpaid',  statusText: 'Belum bayar',                     sub: 'Ingatkan?' },
+  { name: 'Teguh Raharjo',       status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 5 Jun · OVO' },
+  { name: 'Lina Budiman',        status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 5 Jun · Transfer BNI' },
+  { name: 'Karni Maharani',      status: 'unpaid',  statusText: 'Belum bayar',                     sub: 'Ingatkan?' },
+  { name: 'Nana Rahayu',         status: 'paid',    statusText: 'Sudah lunas',                     sub: 'Bayar 4 Jun · GoPay' },
+];
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const stage   = document.getElementById('orbitStage');
+const orbitRing = document.getElementById('orbitRing');
+const stageW  = 390;
+const stageH  = 330;
+const cx      = stageW / 2;
+const cy      = stageH / 2;
+const RADIUS  = 118;
+const COUNT   = 12;
+const ORBIT_DUR = 32; // seconds per full revolution
+
+// Dance timing per avatar — staggered durations + delays so movement is organic
+// duration varies 2.8s–3.8s; delay varies 0–2.4s across the 12 members
+const DANCE_PARAMS = [
+  { dur: 3.2, delay: 0.0  },
+  { dur: 3.6, delay: 0.55 },
+  { dur: 2.9, delay: 1.1  },
+  { dur: 3.8, delay: 1.65 },
+  { dur: 3.1, delay: 0.3  },
+  { dur: 3.5, delay: 1.9  },
+  { dur: 2.8, delay: 0.8  },
+  { dur: 3.3, delay: 2.2  },
+  { dur: 3.7, delay: 0.45 },
+  { dur: 3.0, delay: 1.35 },
+  { dur: 3.4, delay: 2.4  },
+  { dur: 2.85,delay: 0.95 },
+];
+
+// ─── Position members in a circle + assign dance params ───────────────────────
+for (let i = 0; i < COUNT; i++) {
+  const angle = (i / COUNT) * 2 * Math.PI - Math.PI / 2;
+  const ox    = Math.round(Math.cos(angle) * RADIUS);
+  const oy    = Math.round(Math.sin(angle) * RADIUS);
+  const el    = document.getElementById('om' + i);
+  if (!el) continue;
+
+  // Centre the element on the ring (half of 42px avatar = 21px)
+  el.style.left = (cx - 21) + 'px';
+  el.style.top  = (cy - 21) + 'px';
+  // CSS custom props drive the positioning transform
+  el.style.setProperty('--final-x', ox + 'px');
+  el.style.setProperty('--final-y', oy + 'px');
+
+  // Assign per-avatar dance timing to the inner wrapper
+  const inner = el.querySelector('.orbit-inner');
+  if (inner) {
+    const p = DANCE_PARAMS[i];
+    inner.style.setProperty('--dance-dur',   p.dur   + 's');
+    inner.style.setProperty('--dance-delay', p.delay + 's');
+  }
+}
+
+// ─── Staggered entrance animation on load ────────────────────────────────────
+window.addEventListener('load', () => {
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.getElementById('om' + i);
+    if (!el) continue;
+    setTimeout(() => el.classList.add('entered'), 80 + i * 55);
+  }
+});
+
+// ─── Tooltip ─────────────────────────────────────────────────────────────────
+let activeTooltip = -1;
+function showTooltip(idx) {
+  const m  = MEMBERS[idx];
+  const tt = document.getElementById('tooltip');
+  document.getElementById('tt-name').textContent   = m.name;
+  document.getElementById('tt-status').textContent = m.statusText;
+  document.getElementById('tt-status').className   = 'mt-status ' + m.status;
+  document.getElementById('tt-sub').textContent    = m.sub;
+
+  // Position tooltip: top half → bottom-right; bottom half → top-left
+  if (idx < 6) {
+    tt.style.left = '200px'; tt.style.top = '60px'; tt.style.right = 'auto';
+  } else {
+    tt.style.left = '20px';  tt.style.top = '180px'; tt.style.right = 'auto';
+  }
+
+  if (activeTooltip === idx) {
+    tt.classList.remove('show');
+    activeTooltip = -1;
+  } else {
+    tt.classList.add('show');
+    activeTooltip = idx;
+  }
+}
+
+// Close tooltip on bare stage click
+stage.addEventListener('click', e => {
+  if (!e.target.closest('.orbit-member') && !e.target.closest('.member-tooltip')) {
+    document.getElementById('tooltip').classList.remove('show');
+    activeTooltip = -1;
+  }
+});
+
+// ─── Putar orbit toggle ───────────────────────────────────────────────────────
+// OFF (default) → idle dance on each .orbit-inner
+// ON            → .orbit-ring revolves; .orbit-inner counter-rotates to stay upright
+function toggleRotate(on) {
+  const r1 = document.getElementById('ring1');
+  const r2 = document.getElementById('ring2');
+
+  // Rings always spin when toggle is on
+  r1.classList.toggle('ring-rotate-1', on);
+  r2.classList.toggle('ring-rotate-2', on);
+
+  if (on) {
+    // Set the shared orbit duration as a CSS var on the ring container
+    orbitRing.style.setProperty('--orbit-dur', ORBIT_DUR + 's');
+    orbitRing.classList.add('revolving');
+    // Disable the dance animation on each inner wrapper while revolving
+    // (counter-rotation keyframe is applied via CSS .revolving .orbit-inner)
+    document.querySelectorAll('.orbit-inner').forEach(inner => {
+      inner.style.animationName = 'none';
+    });
+  } else {
+    orbitRing.classList.remove('revolving');
+    // Re-enable per-avatar dance animations
+    document.querySelectorAll('.orbit-inner').forEach(inner => {
+      inner.style.animationName = '';
+    });
+  }
+}
+</script>
+</body>
+</html>

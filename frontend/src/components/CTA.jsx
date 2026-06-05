@@ -4,7 +4,7 @@ import { Button } from "./Button";
 import { motion } from "framer-motion";
 import React from "react";
 import { routes } from "../config";
-import { staggerContainer } from "../utils/animations";
+import { Reveal } from "./Reveal";
 
 const slideFromLeft = {
   initial: { x: "-50%", opacity: 0 },
@@ -28,27 +28,21 @@ export function CTA() {
   return (
     <section id="tentang-kami" className="bg-[#10b981] px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="cta-heading">
       <div className="container mx-auto">
-        <motion.div
-          className="mx-auto w-full max-w-3xl text-center"
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, amount: 0.2 }}
-        >
+        <Reveal className="mx-auto w-full max-w-3xl text-center">
           <h2 id="cta-heading" className="overflow-hidden">
             <motion.span
               variants={slideFromLeft}
               className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
             >
-              Mulai gunakan Arisan Digital
+              Mulai gunakan
             </motion.span>
           </h2>
-          <h2 className="overflow-hidden">
+          <h2 id="cta-heading" className="overflow-hidden">
             <motion.span
-              variants={slideFromRight}
-              className="mb-5 block text-4xl font-bold leading-tight text-white md:mb-6 md:text-6xl lg:text-7xl"
+              variants={slideFromLeft}
+              className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
             >
-              Bergabunglah sekarang
+              Arisan Digital
             </motion.span>
           </h2>
           <p className="text-base text-white md:text-lg">
@@ -70,7 +64,7 @@ export function CTA() {
               Daftar
             </Button> */}
           </div>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );

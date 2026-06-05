@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home v2 — Bold Hero | Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* =====================================================
+   HOME V2 — BOLD HERO
+   Cash App / Gojek energy: ONE dominant message in a
+   vivid full-bleed hero. Then two compact color streams.
+   ===================================================== */
+
+.screen-inner { padding: 0 0 96px; }
+
+/* ---- HERO BLOCK: full-bleed gradient ---- */
+.hero-block {
+  background: linear-gradient(145deg, #065f46 0%, #059669 40%, #10b981 75%, #34d399 100%);
+  padding: 22px 20px 28px;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Decorative blobs */
+.hero-block::before {
+  content: '';
+  position: absolute; right: -30px; top: -30px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.hero-block::after {
+  content: '';
+  position: absolute; left: -40px; bottom: -40px;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+
+/* Top row in hero: greeting + avatar */
+.hero-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; position: relative; z-index: 1;
+}
+.hero-greeting { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); }
+.hero-right { display: flex; align-items: center; gap: 9px; }
+.hero-notif-btn {
+  width: 36px; height: 36px; border-radius: 11px;
+  background: rgba(255,255,255,.15); border: none;
+  display: grid; place-items: center; cursor: pointer;
+  position: relative;
+  backdrop-filter: blur(4px);
+}
+.hero-notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #fbbf24; border: 1.5px solid rgba(255,255,255,.3);
+}
+.hero-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.25); border: 2px solid rgba(255,255,255,.4);
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white;
+  backdrop-filter: blur(4px);
+}
+
+/* Main hero message */
+.hero-message { position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.7);
+  letter-spacing: .04em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.hero-headline {
+  font-size: 30px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1.1;
+  margin-bottom: 6px;
+}
+.hero-sub {
+  font-size: 12px; color: rgba(255,255,255,.75); font-weight: 500;
+  margin-bottom: 18px;
+}
+
+/* CTA button in hero */
+.hero-cta-row { display: flex; gap: 8px; }
+.hero-cta-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: white; color: #065f46;
+  border: none; border-radius: 12px;
+  padding: 10px 18px;
+  font-family: inherit; font-size: 13px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  transition: transform .1s, box-shadow .1s;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+}
+.hero-cta-btn:active { transform: scale(.97); }
+.hero-cta-btn.ghost {
+  background: rgba(255,255,255,.15);
+  color: white;
+  box-shadow: none;
+  border: 1.5px solid rgba(255,255,255,.3);
+}
+
+/* Floating stats strip inside hero */
+.hero-stats-strip {
+  margin-top: 20px;
+  display: flex; gap: 0;
+  background: rgba(255,255,255,.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.15);
+  position: relative; z-index: 1;
+}
+.hero-stat { flex: 1; }
+.hero-stat + .hero-stat {
+  padding-left: 12px; margin-left: 12px;
+  border-left: 1px solid rgba(255,255,255,.2);
+}
+.hstat-label { font-size: 9px; font-weight: 700; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .06em; }
+.hstat-val { font-size: 18px; font-weight: 800; color: white; letter-spacing: -0.03em; margin-top: 2px; }
+.hstat-sub { font-size: 9px; color: rgba(255,255,255,.6); margin-top: 1px; }
+
+/* ---- TWO-STREAM SECTION ---- */
+.streams-wrap { padding: 14px 16px 0; }
+
+.stream-section { margin-bottom: 14px; }
+
+.stream-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.stream-title-row { display: flex; align-items: center; gap: 8px; }
+.stream-icon-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px;
+  border-radius: 99px;
+  font-size: 11px; font-weight: 800; letter-spacing: -.01em;
+}
+.stream-icon-pill.em { background: var(--emerald-soft); color: var(--emerald-dark); }
+.stream-icon-pill.lv { background: var(--lavender-soft); color: var(--lavender-dark); }
+.stream-see-all { font-size: 11px; font-weight: 600; color: var(--ink-3); }
+
+/* Stream cards: compact horizontal scroll or list */
+.stream-cards {
+  display: flex; gap: 10px;
+  overflow-x: auto; scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.stream-cards::-webkit-scrollbar { display: none; }
+
+/* Arisan compact card */
+.arisan-card {
+  flex-shrink: 0;
+  width: 160px;
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 13px 13px;
+  box-shadow: var(--sh-1), 0 3px 10px rgba(17,24,39,.06);
+  border-left: 3px solid var(--emerald);
+  cursor: pointer; transition: transform .1s;
+}
+.arisan-card:active { transform: scale(.97); }
+
+/* Due card: highlighted border */
+.arisan-card.due-soon { border-left-color: var(--warn); background: #fffbf0; }
+
+.ac-name { font-size: 12px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+.ac-anggota { font-size: 10px; color: var(--ink-3); font-weight: 500; margin-bottom: 8px; }
+.ac-amount { font-size: 16px; font-weight: 800; color: var(--emerald-dark); letter-spacing: -.02em; }
+.ac-due { font-size: 10px; font-weight: 600; margin-top: 2px; }
+.ac-due.urgent { color: #b45309; }
+.ac-due.normal { color: var(--ink-3); }
+.ac-progress-wrap { margin-top: 8px; }
+.ac-progress-bar { height: 4px; border-radius: 99px; background: var(--line-soft); overflow: hidden; }
+.ac-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--emerald-dark), var(--emerald)); }
+.ac-progress-label { font-size: 9px; color: var(--ink-3); margin-top: 3px; font-weight: 600; }
+
+/* Patungan compact card */
+.patungan-card {
+  flex-shrink: 0;
+  width: 160px;
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 13px 13px;
+  box-shadow: var(--sh-1), 0 3px 10px rgba(17,24,39,.06);
+  border-left: 3px solid var(--lavender);
+  cursor: pointer; transition: transform .1s;
+}
+.patungan-card:active { transform: scale(.97); }
+.patungan-card.needs-action { border-left-color: #f97316; }
+
+.pc-emoji { font-size: 18px; margin-bottom: 4px; }
+.pc-name { font-size: 12px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.pc-people { font-size: 10px; color: var(--ink-3); font-weight: 500; margin-bottom: 7px; }
+.pc-amount { font-size: 16px; font-weight: 800; color: var(--lavender-dark); letter-spacing: -.02em; }
+.pc-status { font-size: 10px; font-weight: 600; margin-top: 2px; color: var(--ink-3); }
+.pc-progress-wrap { margin-top: 8px; }
+.pc-progress-bar { height: 4px; border-radius: 99px; background: var(--line-soft); overflow: hidden; }
+.pc-progress-fill { height: 100%; border-radius: 99px; }
+.pc-progress-fill.lv { background: linear-gradient(90deg, var(--lavender-dark), var(--lavender)); }
+.pc-progress-fill.warn { background: linear-gradient(90deg, #ea580c, #f97316); }
+.pc-progress-label { font-size: 9px; color: var(--ink-3); margin-top: 3px; font-weight: 600; }
+
+/* ---- QUICK ACTION ROW ---- */
+.quick-row {
+  display: flex; gap: 8px;
+  padding: 0 16px 2px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.quick-row::-webkit-scrollbar { display: none; }
+.quick-chip {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  cursor: pointer; transition: all .15s;
+  color: var(--ink-1);
+}
+.quick-chip.em:hover { background: var(--emerald-tint); border-color: var(--emerald-soft); color: var(--emerald-dark); }
+.quick-chip.lv:hover { background: var(--lavender-tint); border-color: var(--lavender-soft); color: var(--lavender-dark); }
+
+/* ---- SPEED DIAL FAB ---- */
+.speed-dial {
+  position: absolute;
+  bottom: 28px;
+  left: 50%; transform: translateX(-50%);
+  z-index: 20;
+  width: 220px;
+  display: flex; justify-content: center;
+}
+
+.sd-main {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(145deg, var(--emerald) 0%, var(--lavender) 100%);
+  border: none; cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: 0 6px 24px rgba(16,185,129,.4), 0 2px 8px rgba(167,139,250,.3);
+  position: relative; z-index: 2;
+  transition: transform .15s;
+}
+.sd-main:active { transform: scale(.95); }
+.sd-main svg { transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
+.sd-main.open svg { transform: rotate(45deg); }
+
+/* Pulse ring */
+.sd-pulse {
+  position: absolute; inset: -8px; border-radius: 50%;
+  border: 2px solid rgba(16,185,129,.3);
+  animation: sdPulse 2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes sdPulse {
+  0% { transform: scale(1); opacity: .7; }
+  70% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Fan items */
+.sd-item {
+  position: absolute;
+  bottom: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  opacity: 0; pointer-events: none;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  transform: translateY(0) translateX(0) scale(.6);
+}
+.sd-item.open { opacity: 1; pointer-events: auto; }
+.sd-item.arisan.open {
+  transform: translateX(-85px) translateY(-60px) scale(1);
+  transition-delay: .05s;
+}
+.sd-item.join.open {
+  transform: translateX(0px) translateY(-80px) scale(1);
+  transition-delay: .08s;
+}
+.sd-item.patungan.open {
+  transform: translateX(85px) translateY(-60px) scale(1);
+  transition-delay: .05s;
+}
+
+.sd-btn {
+  width: 50px; height: 50px; border-radius: 50%;
+  border: none; cursor: pointer;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 800;
+  box-shadow: 0 4px 14px rgba(17,24,39,.2);
+  transition: transform .1s;
+}
+.sd-btn:active { transform: scale(.92); }
+.sd-btn.em { background: var(--emerald); }
+.sd-btn.join { background: var(--surface); border: 2px solid var(--line); }
+.sd-btn.lv { background: var(--lavender); }
+
+.sd-label {
+  font-size: 10px; font-weight: 800; letter-spacing: -.01em;
+  white-space: nowrap;
+  padding: 3px 8px; border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(17,24,39,.12);
+}
+.sd-label.em { background: var(--emerald); color: white; }
+.sd-label.join { background: var(--ink-1); color: white; }
+.sd-label.lv { background: var(--lavender); color: white; }
+
+/* Dimmer */
+.dimmer {
+  position: absolute; inset: 0; z-index: 9;
+  background: rgba(17,24,39,.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+  backdrop-filter: blur(1.5px);
+}
+.dimmer.active { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame">
+
+  <!-- Status Bar (white on green) -->
+  <div class="status-bar" style="background:linear-gradient(145deg,#065f46,#059669);">
+    <span class="status-time" style="color:white;">9:41</span>
+    <div class="status-icons" style="color:white;">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".5"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".5"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Dimmer -->
+  <div class="dimmer" id="dimmer" onclick="closeDial()"></div>
+
+  <!-- Scrollable Screen -->
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- BOLD HERO -->
+      <div class="hero-block">
+        <!-- Top row: greeting + notif + avatar -->
+        <div class="hero-top">
+          <div class="hero-greeting">Selamat pagi, Ricky 👋</div>
+          <div class="hero-right">
+            <button class="hero-notif-btn" aria-label="Notifikasi">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="hero-notif-dot"></span>
+            </button>
+            <div class="hero-avatar">RF</div>
+          </div>
+        </div>
+
+        <!-- Main message: what matters NOW -->
+        <div class="hero-message">
+          <div class="hero-eyebrow">Arisan kamu</div>
+          <div class="hero-headline">Rp 200.000<br>jatuh tempo<br>5 hari lagi ⏰</div>
+          <div class="hero-sub">Arisan Keluarga Sari · Giliran Budi bulan ini 🎉</div>
+          <div class="hero-cta-row">
+            <button class="hero-cta-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Bayar Sekarang
+            </button>
+            <button class="hero-cta-btn ghost">
+              Lihat Detail
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="hero-stats-strip">
+          <div class="hero-stat">
+            <div class="hstat-label">Arisan Aktif</div>
+            <div class="hstat-val">3</div>
+            <div class="hstat-sub">grup</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hstat-label">Patungan Open</div>
+            <div class="hstat-val">2</div>
+            <div class="hstat-sub">tagihan</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hstat-label">Kamu Ditagih</div>
+            <div class="hstat-val" style="color:#fbbf24;">Rp 450rb</div>
+            <div class="hstat-sub">dari 3 orang</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTION ROW -->
+      <div style="padding: 14px 16px 0;">
+        <div class="quick-row" style="padding:0;">
+          <button class="quick-chip em">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            Buat Arisan
+          </button>
+          <button class="quick-chip lv">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--lavender-dark)" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Buat Tagihan
+          </button>
+          <button class="quick-chip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Gabung
+          </button>
+        </div>
+      </div>
+
+      <!-- ARISAN STREAM -->
+      <div class="streams-wrap" style="padding-top:16px;">
+        <div class="stream-section">
+          <div class="stream-header">
+            <div class="stream-title-row">
+              <span class="stream-icon-pill em">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+                Arisan
+              </span>
+            </div>
+            <span class="stream-see-all">Semua →</span>
+          </div>
+
+          <div class="stream-cards">
+            <!-- Card 1: Keluarga Sari — urgent -->
+            <div class="arisan-card due-soon">
+              <div class="ac-name">Keluarga Sari</div>
+              <div class="ac-anggota">12 anggota · Rp 200.000/bln</div>
+              <div class="ac-amount">Rp 200.000</div>
+              <div class="ac-due urgent">⚡ 5 hari lagi · 10 Jun</div>
+              <div class="ac-progress-wrap">
+                <div class="ac-progress-bar"><div class="ac-progress-fill" style="width:50%; background:linear-gradient(90deg,#b45309,#f59e0b);"></div></div>
+                <div class="ac-progress-label">6/12 putaran · giliran Budi</div>
+              </div>
+            </div>
+            <!-- Card 2: Kantor -->
+            <div class="arisan-card">
+              <div class="ac-name">Arisan Kantor</div>
+              <div class="ac-anggota">8 anggota · Rp 150.000/bln</div>
+              <div class="ac-amount">Rp 150.000</div>
+              <div class="ac-due normal">15 Jun</div>
+              <div class="ac-progress-wrap">
+                <div class="ac-progress-bar"><div class="ac-progress-fill" style="width:25%"></div></div>
+                <div class="ac-progress-label">2/8 putaran</div>
+              </div>
+            </div>
+            <!-- Card 3: RT 05 -->
+            <div class="arisan-card">
+              <div class="ac-name">Arisan RT 05</div>
+              <div class="ac-anggota">20 anggota · Rp 50.000/mgg</div>
+              <div class="ac-amount">Rp 50.000</div>
+              <div class="ac-due normal">Minggu ini</div>
+              <div class="ac-progress-wrap">
+                <div class="ac-progress-bar"><div class="ac-progress-fill" style="width:15%"></div></div>
+                <div class="ac-progress-label">3/20 putaran</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PATUNGAN STREAM -->
+        <div class="stream-section">
+          <div class="stream-header">
+            <div class="stream-title-row">
+              <span class="stream-icon-pill lv">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Patungan
+              </span>
+              <!-- Owe callout -->
+              <span style="font-size:11px;font-weight:700;color:#b45309;background:#fef3c7;padding:3px 9px;border-radius:99px;margin-left:6px;">
+                Rp 450rb nunggu kamu 👀
+              </span>
+            </div>
+            <span class="stream-see-all">Semua →</span>
+          </div>
+
+          <div class="stream-cards">
+            <!-- Makan Bali -->
+            <div class="patungan-card">
+              <div class="pc-emoji">🍽</div>
+              <div class="pc-name">Makan malam Bali</div>
+              <div class="pc-people">6 orang</div>
+              <div class="pc-amount" style="color:var(--emerald-dark);">Rp 540.000</div>
+              <div class="pc-status">60% lunas · 3 belum bayar</div>
+              <div class="pc-progress-wrap">
+                <div class="pc-progress-bar"><div class="pc-progress-fill lv" style="width:60%"></div></div>
+                <div class="pc-progress-label">Rp 324rb sudah masuk</div>
+              </div>
+            </div>
+            <!-- Hotel Bromo — needs action -->
+            <div class="patungan-card needs-action">
+              <div class="pc-emoji">🏨</div>
+              <div class="pc-name">Hotel Bromo</div>
+              <div class="pc-people">4 orang</div>
+              <div class="pc-amount">Rp 1.200.000</div>
+              <div class="pc-status" style="color:#b45309;">⚡ 3 hari lagi · 3 belum bayar</div>
+              <div class="pc-progress-wrap">
+                <div class="pc-progress-bar"><div class="pc-progress-fill warn" style="width:25%"></div></div>
+                <div class="pc-progress-label">25% lunas · Rp 900rb kurang</div>
+              </div>
+            </div>
+            <!-- Tiket Konser settled -->
+            <div class="patungan-card" style="opacity:.5;">
+              <div class="pc-emoji">🎬</div>
+              <div class="pc-name">Tiket konser</div>
+              <div class="pc-people">3 orang</div>
+              <div class="pc-amount" style="color:var(--emerald-dark);">Rp 800.000</div>
+              <div class="pc-status" style="color:var(--emerald-dark);">✅ Lunas</div>
+              <div class="pc-progress-wrap">
+                <div class="pc-progress-bar"><div class="pc-progress-fill" style="width:100%;background:var(--emerald);"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /screen-inner -->
+  </div><!-- /screen -->
+
+  <!-- Speed Dial FAB -->
+  <div class="speed-dial">
+    <!-- Fan items -->
+    <div class="sd-item arisan" id="sdArisan">
+      <div class="sd-label em">Arisan</div>
+      <button class="sd-btn em" onclick="alert('Buat Arisan baru')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      </button>
+    </div>
+    <div class="sd-item join" id="sdJoin">
+      <div class="sd-label join">Gabung</div>
+      <button class="sd-btn join" onclick="alert('Gabung Arisan')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      </button>
+    </div>
+    <div class="sd-item patungan" id="sdPatungan">
+      <div class="sd-label lv">Patungan</div>
+      <button class="sd-btn lv" onclick="alert('Buat Patungan baru')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </button>
+    </div>
+
+    <!-- Main trigger -->
+    <button class="sd-main" id="sdMain" onclick="toggleDial()" aria-label="Buat baru">
+      <div class="sd-pulse"></div>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
+</div><!-- /phone-frame -->
+</div>
+
+<script>
+let dialOpen = false;
+function toggleDial() {
+  dialOpen = !dialOpen;
+  const main = document.getElementById('sdMain');
+  const dimmer = document.getElementById('dimmer');
+  ['sdArisan','sdJoin','sdPatungan'].forEach(id => {
+    document.getElementById(id).classList.toggle('open', dialOpen);
+  });
+  main.classList.toggle('open', dialOpen);
+  dimmer.classList.toggle('active', dialOpen);
+}
+function closeDial() {
+  dialOpen = false;
+  document.getElementById('sdMain').classList.remove('open');
+  document.getElementById('dimmer').classList.remove('active');
+  ['sdArisan','sdJoin','sdPatungan'].forEach(id => {
+    document.getElementById(id).classList.remove('open');
+  });
+}
+</script>
+</body>
+</html>

@@ -10,18 +10,129 @@ import { Button } from "./Button";
 import React from "react";
 import { motion } from "framer-motion";
 import { RxPlus } from "react-icons/rx";
-import { staggerContainer, staggerItem } from "../utils/animations";
+import { staggerItem } from "../utils/animations";
+import { Reveal } from "./Reveal";
+
+const faqs = [
+  {
+    q: "Apa itu Arisan Digital dan bagaimana cara kerjanya?",
+    a: (
+      <>
+        Arisan Digital adalah aplikasi untuk mengoordinasi <strong>arisan</strong>{" "}
+        (tabungan bergilir) dan <strong>patungan</strong> (bagi tagihan) bersama
+        teman, keluarga, atau rekan. Kamu membuat grup atau tagihan, mengundang
+        anggota lewat link, dan aplikasi mencatat siapa yang sudah bayar,
+        menghitung giliran, serta mengirim pengingat otomatis — menggantikan grup
+        WhatsApp dan catatan manual yang berantakan. Berbasis web, jadi tidak
+        perlu unduh aplikasi atau daftar akun untuk mulai.
+      </>
+    ),
+  },
+  {
+    q: "Apa bedanya Arisan dan Patungan?",
+    a: (
+      <>
+        <strong>Arisan</strong> adalah tabungan bergilir: setiap anggota menyetor
+        iuran tetap tiap putaran, dan setiap putaran satu orang mendapat giliran
+        menerima seluruh dana — berputar sampai semua kebagian.{" "}
+        <strong>Patungan</strong> adalah membagi satu tagihan bersama (misalnya
+        trip, hotel, atau tiket konser) ke beberapa orang dan melacak siapa yang
+        sudah membayar bagiannya.
+      </>
+    ),
+  },
+  {
+    q: "Bagaimana cara memulai dan mengundang anggota?",
+    a: (
+      <>
+        Buat grup arisan atau tagihan patungan, atur nominal iuran/total, lalu
+        bagikan <strong>link undangan</strong> atau QR ke anggotamu. Mereka cukup
+        membuka link, memasukkan nama, dan langsung bergabung — tanpa perlu
+        mendaftar akun. Grup siap berjalan dalam hitungan menit.
+      </>
+    ),
+  },
+  {
+    q: "Apakah aplikasi menyimpan uang saya — dan apakah aman?",
+    a: (
+      <>
+        Tidak. Arisan Digital adalah <strong>lapisan koordinasi & kepercayaan</strong>,
+        bukan dompet digital. Uangmu tidak pernah mampir di aplikasi — pembayaran
+        dilakukan langsung antar anggota lewat transfer bank atau e-wallet (GoPay,
+        OVO, DANA, dan lainnya). Kami hanya mencatat, mengingatkan, dan menjaga
+        transparansi. Data dan catatan pembayaran dienkripsi dan tidak bisa diubah
+        setelah dikonfirmasi, sehingga semua anggota punya catatan yang jelas.
+      </>
+    ),
+  },
+  {
+    q: "Apa itu Bukti Transfer dan bagaimana mengonfirmasi pembayaran?",
+    a: (
+      <>
+        Setelah mentransfer, anggota menandai pembayaran sebagai lunas dan dapat
+        membuat <strong>Bukti Transfer</strong> — struk digital rapi berisi
+        pengirim, penerima, jumlah, dan status — yang langsung bisa dibagikan ke
+        grup atau disimpan sebagai gambar. Semua tercatat dan terlihat oleh seluruh
+        anggota, jadi tidak ada lagi tangkapan layar yang tersebar di mana-mana.
+      </>
+    ),
+  },
+  {
+    q: "Bagaimana giliran ditentukan agar adil?",
+    a: (
+      <>
+        Saat membuat arisan kamu bisa memilih <strong>undian acak</strong> yang
+        transparan atau <strong>urutan giliran</strong> yang sudah disepakati
+        bersama. Hasilnya tercatat dan dapat dilihat semua anggota, sehingga
+        prosesnya jujur, terbuka, dan bebas dari kecurangan.
+      </>
+    ),
+  },
+  {
+    q: "Bagaimana jika ada anggota yang telat bayar?",
+    a: (
+      <>
+        Aplikasi mengirim pengingat otomatis sebelum jatuh tempo. Admin grup dapat
+        memantau status pembayaran secara langsung dan mengingatkan anggota yang
+        belum membayar hanya dengan satu ketukan, sehingga putaran tetap berjalan
+        lancar tanpa harus menagih satu per satu.
+      </>
+    ),
+  },
+  {
+    q: "Berapa biaya penggunaannya?",
+    a: (
+      <>
+        Arisan Digital gratis untuk mulai dan untuk kebutuhan sehari-hari. Karena
+        uang ditransfer langsung antar anggota, kami <strong>tidak pernah memotong
+        komisi</strong> dari dana grupmu. Ke depan akan ada paket premium opsional
+        untuk grup yang lebih besar dan butuh fitur lanjutan, namun fitur inti
+        tetap bisa dipakai gratis.
+      </>
+    ),
+  },
+  {
+    q: "Bagaimana cara menghubungi tim dukungan?",
+    a: (
+      <>
+        Tim dukungan kami siap membantu melalui email di{" "}
+        <a
+          href="mailto:arisandigital@outlook.com"
+          className="font-semibold underline underline-offset-2"
+        >
+          arisandigital@outlook.com
+        </a>
+        . Kami biasanya merespons dalam waktu kurang dari 24 jam. Layanan dukungan
+        via telepon belum tersedia untuk saat ini.
+      </>
+    ),
+  },
+];
 
 export function FAQs() {
   return (
     <section id="faq" className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="faq-heading">
-      <motion.div
-        className="container mx-auto"
-        variants={staggerContainer}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <Reveal className="container mx-auto">
         <motion.div className="mb-12 md:mb-16 lg:mb-20" variants={staggerItem}>
           <div className="mx-auto w-full max-w-lg text-center">
             <h2 id="faq-heading" className="mb-5 text-5xl font-bold leading-tight text-text-primary md:mb-6 md:text-7xl lg:text-8xl">
@@ -38,164 +149,25 @@ export function FAQs() {
           type="multiple"
           className="grid w-full grid-cols-1 items-start gap-x-8 gap-y-4 md:grid-cols-2"
         >
-          <AccordionItem
-            value="item-faq-1"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
+          {faqs.map((faq, index) => (
+            <AccordionItem
+              key={index}
+              value={`item-faq-${index + 1}`}
+              className="border border-border-primary bg-background-primary px-5 md:px-6"
             >
-              Apa itu Arisan Digital dan bagaimana cara kerjanya?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Arisan Digital adalah aplikasi untuk mengelola arisan secara online.
-              Anda membuat grup, mengundang anggota, dan menentukan jumlah iuran
-              serta jadwal putaran. Setiap periode aplikasi mencatat pembayaran,
-              menentukan pemenang giliran, dan menyalurkan dana secara otomatis,
-              jadi tidak perlu lagi catatan manual atau uang tunai.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-2"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Bagaimana cara memulai grup arisan?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Cukup unduh aplikasi, buat grup baru, lalu atur nominal iuran,
-              periode putaran, dan metode pemilihan giliran. Setelah itu bagikan
-              tautan undangan ke anggota Anda. Grup siap berjalan dalam hitungan
-              menit tanpa proses yang rumit.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-3"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Bagaimana giliran ditentukan agar adil?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Anda bisa memilih undian acak yang transparan atau urutan giliran
-              yang sudah disepakati bersama. Setiap hasil undian tercatat dan dapat
-              dilihat semua anggota, sehingga prosesnya jujur, terbuka, dan bebas
-              dari kecurangan.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-4"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Apakah data dan uang saya aman?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Kami mengenkripsi semua transaksi dan data pribadi dengan standar
-              keamanan perbankan. Setiap pembayaran tercatat dan tidak bisa diubah
-              setelah dikonfirmasi, memberikan catatan permanen yang jelas dan
-              transparan untuk semua anggota.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-5"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Bagaimana jika ada anggota yang menunggak?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Aplikasi mengirim pengingat otomatis sebelum tenggat pembayaran.
-              Admin grup dapat memantau status pembayaran secara real-time dan
-              menghubungi anggota yang belum membayar langsung melalui chat dalam
-              aplikasi, sehingga putaran tetap berjalan lancar.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-6"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Bagaimana cara menerima dana saat giliran saya?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Ketika giliran Anda tiba, dana akan otomatis tersedia di aplikasi
-              dan dapat dicairkan ke rekening bank atau e-wallet Anda. Prosesnya
-              cepat, dan Anda akan menerima notifikasi di setiap tahap pencairan.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-7"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Berapa biaya penggunaan?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Untuk saat ini, Arisan Digital sepenuhnya gratis untuk diunduh dan
-              digunakan. Tidak ada biaya sama sekali, tidak ada biaya tersembunyi,
-              dan kami tidak mengambil komisi atau potongan apa pun dari uang yang
-              beredar dalam grup Anda.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem
-            value="item-faq-8"
-            className="border border-border-primary bg-background-primary px-5 md:px-6"
-          >
-            <AccordionTrigger
-              className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
-              icon={
-                <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
-              }
-            >
-              Bagaimana cara menghubungi tim dukungan?
-            </AccordionTrigger>
-            <AccordionContent className="text-text-primary md:pb-6">
-              Tim dukungan kami siap membantu kapan saja melalui email di{" "}
-              <a
-                href="mailto:arisandigital@outlook.com"
-                className="font-semibold underline underline-offset-2"
+              <AccordionTrigger
+                className="text-text-primary md:py-5 md:text-lg [&[data-state=open]>svg]:rotate-45"
+                icon={
+                  <RxPlus className="size-7 shrink-0 text-text-primary transition-transform duration-300 md:size-8" />
+                }
               >
-                arisandigital@outlook.com
-              </a>
-              . Kami biasanya merespons dalam waktu kurang dari 24 jam untuk
-              membantu menyelesaikan kendala Anda. Layanan dukungan via telepon
-              belum tersedia untuk saat ini.
-            </AccordionContent>
-          </AccordionItem>
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-text-primary md:pb-6">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
         </Accordion>
         </motion.div>
         <motion.div
@@ -219,7 +191,7 @@ export function FAQs() {
             </Button>
           </div>
         </motion.div>
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

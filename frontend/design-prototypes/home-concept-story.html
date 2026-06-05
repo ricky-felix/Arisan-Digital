@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept A — Story Deck | Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* =====================================================
+   CONCEPT A — STORY DECK
+   Full-screen swipeable cards, one per group/bill.
+   TikTok / Instagram Stories energy.
+   Each card is colored by feature (emerald/lavender).
+   Compose Pill at bottom — quiet when browsing,
+   always accessible without interrupting immersion.
+   ===================================================== */
+
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ---- Story progress dots ---- */
+.story-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 30;
+  padding: 52px 16px 0;
+  display: flex; gap: 4px;
+}
+.story-dot {
+  flex: 1; height: 3px; border-radius: 99px;
+  background: rgba(255,255,255,.35);
+  overflow: hidden;
+  transition: background .2s;
+}
+.story-dot-fill {
+  height: 100%; border-radius: 99px;
+  background: white;
+  width: 0%;
+  transition: width .3s ease;
+}
+.story-dot.active .story-dot-fill { width: 100%; }
+.story-dot.past .story-dot-fill { width: 100%; }
+.story-dot.past { background: rgba(255,255,255,.7); }
+
+/* ---- Top overlay (notif + avatar) ---- */
+.story-topbar {
+  position: absolute;
+  top: 62px; left: 0; right: 0;
+  z-index: 31;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 0;
+}
+.story-app-name {
+  font-size: 16px; font-weight: 800; color: white;
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.story-topbar-right { display: flex; gap: 8px; align-items: center; }
+.story-icon-btn {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: rgba(255,255,255,.18);
+  border: none; display: grid; place-items: center;
+  cursor: pointer; backdrop-filter: blur(4px);
+  position: relative;
+}
+.story-notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #fbbf24; border: 1.5px solid rgba(255,255,255,.4);
+}
+.story-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  border: 2px solid rgba(255,255,255,.5);
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white;
+  cursor: pointer; backdrop-filter: blur(4px);
+}
+
+/* ---- Deck container ---- */
+.deck-container {
+  position: absolute;
+  inset: 0;
+  bottom: 100px; /* space for compose pill */
+  overflow: hidden;
+}
+
+/* ---- Card ---- */
+.story-card {
+  position: absolute;
+  inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px 20px 28px;
+  transition: transform .38s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Slide states */
+.story-card.active  { transform: translateX(0); opacity: 1; z-index: 2; }
+.story-card.prev    { transform: translateX(-100%); opacity: 0; z-index: 1; }
+.story-card.next    { transform: translateX(100%); opacity: 0; z-index: 1; }
+.story-card.hidden  { transform: translateX(100%); opacity: 0; z-index: 0; }
+
+/* EMERALD card — Arisan */
+.card-arisan {
+  background: linear-gradient(165deg, #064e3b 0%, #065f46 30%, #059669 65%, #10b981 85%, #34d399 100%);
+}
+/* LAVENDER card — Patungan */
+.card-patungan {
+  background: linear-gradient(165deg, #3b0764 0%, #4c1d95 30%, #6d28d9 60%, #8b5cf6 80%, #a78bfa 100%);
+}
+
+/* Decorative blobs */
+.card-blob1 {
+  position: absolute; top: -40px; right: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,.07); pointer-events: none;
+}
+.card-blob2 {
+  position: absolute; bottom: 60px; left: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none;
+}
+
+/* Feature badge top of card content */
+.card-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px;
+  border-radius: 99px;
+  background: rgba(255,255,255,.2);
+  font-size: 10px; font-weight: 800;
+  color: white; letter-spacing: .06em; text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  margin-bottom: 16px;
+  border: 1px solid rgba(255,255,255,.2);
+  align-self: flex-start;
+}
+
+/* Avatar row */
+.card-avatars {
+  display: flex; align-items: center;
+  margin-bottom: 14px;
+}
+.card-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  border: 2px solid rgba(255,255,255,.5);
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white;
+  margin-left: -8px;
+  flex-shrink: 0;
+}
+.card-avatar:first-child { margin-left: 0; }
+.card-avatar-more {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(0,0,0,.25);
+  border: 2px solid rgba(255,255,255,.3);
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,.85);
+  margin-left: -8px;
+  flex-shrink: 0;
+}
+.card-recipient-arrow {
+  margin: 0 8px;
+  font-size: 14px; color: rgba(255,255,255,.7);
+}
+.card-recipient {
+  display: flex; flex-direction: column;
+  margin-left: 4px;
+}
+.card-recipient-label { font-size: 9px; color: rgba(255,255,255,.65); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.card-recipient-name { font-size: 12px; font-weight: 800; color: white; }
+
+/* Main headline */
+.card-group-name {
+  font-size: 28px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1.05;
+  margin-bottom: 6px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.card-status-line {
+  font-size: 14px; color: rgba(255,255,255,.85);
+  font-weight: 600; margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+/* Big progress visual */
+.card-progress-visual {
+  margin-bottom: 20px;
+}
+.progress-track {
+  height: 8px; border-radius: 99px;
+  background: rgba(255,255,255,.2);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.progress-fill-white {
+  height: 100%; border-radius: 99px;
+  background: rgba(255,255,255,.9);
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+.progress-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: rgba(255,255,255,.7); font-weight: 600;
+}
+
+/* Primary action button */
+.card-cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: white;
+  border-radius: 14px; border: none;
+  padding: 14px 20px;
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  transition: transform .1s, box-shadow .1s;
+  width: 100%;
+  letter-spacing: -.01em;
+}
+.card-cta:active { transform: scale(.97); box-shadow: 0 2px 10px rgba(0,0,0,.15); }
+.card-cta.arisan-cta { color: #065f46; }
+.card-cta.patungan-cta { color: #4c1d95; }
+
+/* Swipe hint */
+.swipe-hint {
+  position: absolute;
+  bottom: 108px; left: 50%; transform: translateX(-50%);
+  z-index: 30;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: rgba(255,255,255,.6); font-weight: 600;
+  letter-spacing: .02em;
+  pointer-events: none;
+  animation: swipeHintFade 3s ease 1.5s forwards;
+  opacity: 1;
+}
+@keyframes swipeHintFade {
+  0% { opacity: 1; }
+  80% { opacity: .5; }
+  100% { opacity: 0; }
+}
+
+/* ---- Compose Pill (bottom) ---- */
+.compose-outer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 10px 16px 28px;
+  z-index: 40;
+  pointer-events: none;
+}
+.compose-pill {
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 4px 24px rgba(17,24,39,.14), 0 1px 3px rgba(17,24,39,.06);
+  overflow: hidden;
+  pointer-events: auto;
+  transition: border-radius .3s cubic-bezier(.4,0,.2,1), border-color .3s ease, box-shadow .3s ease;
+}
+.compose-pill.open {
+  border-radius: 20px;
+  border-color: transparent;
+  box-shadow: 0 8px 40px rgba(17,24,39,.2);
+}
+.pill-collapsed {
+  height: 50px;
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 10px;
+  cursor: pointer;
+}
+.compose-pill.open .pill-collapsed { display: none; }
+.pill-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--emerald) 0%, var(--lavender) 100%);
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: transform .2s;
+}
+.compose-pill:not(.open):hover .pill-icon { transform: rotate(90deg); }
+.pill-label { flex: 1; font-size: 14px; color: var(--ink-3); font-weight: 500; }
+.pill-dots { display: flex; gap: 4px; }
+.pill-dot { width: 8px; height: 8px; border-radius: 50%; }
+.pill-dot.em { background: var(--emerald); }
+.pill-dot.lv { background: var(--lavender); }
+
+/* Expanded lanes */
+.pill-expanded { display: none; }
+.compose-pill.open .pill-expanded { display: block; }
+.pill-close-row {
+  padding: 12px 16px 8px;
+  display: flex; justify-content: flex-end;
+}
+.pill-close-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center;
+  cursor: pointer; color: var(--ink-2);
+}
+.pill-lanes {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; padding: 0 14px 14px;
+}
+.pill-lane {
+  border-radius: 14px; border: none;
+  padding: 14px 12px;
+  font-family: inherit; cursor: pointer;
+  transition: transform .1s;
+  text-align: left;
+}
+.pill-lane:active { transform: scale(.97); }
+.pill-lane.em { background: var(--emerald-tint); border: 1.5px solid var(--emerald-soft); }
+.pill-lane.lv { background: var(--lavender-tint); border: 1.5px solid var(--lavender-soft); }
+.lane-icon { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 8px; }
+.lane-icon.em { background: var(--emerald-soft); }
+.lane-icon.lv { background: var(--lavender-soft); }
+.lane-title { font-size: 14px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 2px; }
+.lane-title.em { color: var(--emerald-dark); }
+.lane-title.lv { color: var(--lavender-dark); }
+.lane-sub { font-size: 10px; font-weight: 500; color: var(--ink-3); }
+
+/* Dimmer */
+.dimmer {
+  position: absolute; inset: 0; z-index: 35;
+  background: rgba(17,24,39,.3);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+  backdrop-filter: blur(1px);
+}
+.dimmer.active { opacity: 1; pointer-events: auto; }
+
+/* Card detail link — tap area on top half */
+.card-tap-detail {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 120px;
+  z-index: 5;
+  cursor: pointer;
+}
+
+/* Nav tap zones */
+.nav-prev, .nav-next {
+  position: absolute;
+  top: 120px; bottom: 120px;
+  width: 40%; z-index: 10;
+  cursor: pointer;
+}
+.nav-prev { left: 0; }
+.nav-next { right: 0; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" style="background:#065f46;position:relative;">
+
+  <!-- Status Bar -->
+  <div class="status-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:50;">
+    <span class="status-time" style="color:white;">9:41</span>
+    <div class="status-icons" style="color:white;">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".5"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".5"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Story progress bar -->
+  <div class="story-bar" id="storyBar">
+    <!-- Dots generated by JS -->
+  </div>
+
+  <!-- Top bar (app name + notif + avatar) -->
+  <div class="story-topbar">
+    <span class="story-app-name">Arisan Digital</span>
+    <div class="story-topbar-right">
+      <button class="story-icon-btn" aria-label="Notifikasi">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="story-notif-dot"></span>
+      </button>
+      <div class="story-avatar">RF</div>
+    </div>
+  </div>
+
+  <!-- Deck -->
+  <div class="deck-container" id="deckContainer">
+
+    <!-- Left/right nav zones -->
+    <div class="nav-prev" id="navPrev" onclick="prevCard()"></div>
+    <div class="nav-next" id="navNext" onclick="nextCard()"></div>
+
+    <!-- CARD 0: Arisan Keluarga Sari (ACTIVE) -->
+    <div class="story-card card-arisan active" id="card0">
+      <div class="card-blob1"></div>
+      <div class="card-blob2"></div>
+
+      <!-- Tap top half to drill in -->
+      <a class="card-tap-detail" href="story-detail-arisan.html" style="text-decoration:none;"></a>
+
+      <div class="card-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Arisan
+      </div>
+
+      <!-- Avatars + recipient arrow -->
+      <div class="card-avatars">
+        <div class="card-avatar" style="background:rgba(255,255,255,.3);">BS</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.22);">RA</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.18);">DK</div>
+        <div class="card-avatar-more">+9</div>
+        <div class="card-recipient-arrow">→</div>
+        <div class="card-recipient">
+          <span class="card-recipient-label">Giliran</span>
+          <span class="card-recipient-name">Budi S. 🎉</span>
+        </div>
+      </div>
+
+      <div class="card-group-name">Keluarga<br>Sari</div>
+      <div class="card-status-line">8 dari 12 sudah bayar iuran bulan ini</div>
+
+      <div class="card-progress-visual">
+        <div class="progress-track">
+          <div class="progress-fill-white" style="width:67%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>8/12 sudah bayar</span>
+          <span>Putaran 6/12</span>
+        </div>
+      </div>
+
+      <button class="card-cta arisan-cta" onclick="alert('Bayar iuran Rp 200.000')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Bayar Iuran Rp 200.000
+      </button>
+    </div>
+
+    <!-- CARD 1: Arisan Kantor -->
+    <div class="story-card card-arisan next" id="card1">
+      <div class="card-blob1"></div>
+      <div class="card-blob2"></div>
+
+      <div class="card-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        Arisan
+      </div>
+
+      <div class="card-avatars">
+        <div class="card-avatar" style="background:rgba(255,255,255,.3);">AN</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.22);">SB</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.18);">MF</div>
+        <div class="card-avatar-more">+5</div>
+      </div>
+
+      <div class="card-group-name">Arisan<br>Kantor</div>
+      <div class="card-status-line">Iuran berikutnya Rp 150.000 · 15 Jun</div>
+
+      <div class="card-progress-visual">
+        <div class="progress-track">
+          <div class="progress-fill-white" style="width:25%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>2/8 putaran</span>
+          <span>Rp 150.000/bln</span>
+        </div>
+      </div>
+
+      <button class="card-cta arisan-cta" onclick="alert('Bayar iuran Rp 150.000')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Bayar Iuran Rp 150.000
+      </button>
+    </div>
+
+    <!-- CARD 2: Arisan RT 05 -->
+    <div class="story-card card-arisan hidden" id="card2">
+      <div class="card-blob1"></div>
+      <div class="card-blob2"></div>
+
+      <div class="card-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Arisan
+      </div>
+
+      <div class="card-avatars">
+        <div class="card-avatar" style="background:rgba(255,255,255,.3);">PJ</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.22);">TK</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.18);">LM</div>
+        <div class="card-avatar-more">+17</div>
+      </div>
+
+      <div class="card-group-name">Arisan<br>RT 05</div>
+      <div class="card-status-line">Iuran mingguan Rp 50.000 · minggu ini</div>
+
+      <div class="card-progress-visual">
+        <div class="progress-track">
+          <div class="progress-fill-white" style="width:15%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>3/20 putaran</span>
+          <span>Rp 50.000/mgg</span>
+        </div>
+      </div>
+
+      <button class="card-cta arisan-cta" onclick="alert('Bayar iuran Rp 50.000')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Bayar Iuran Rp 50.000
+      </button>
+    </div>
+
+    <!-- CARD 3: Patungan Makan Bali (LAVENDER) -->
+    <div class="story-card card-patungan hidden" id="card3">
+      <div class="card-blob1"></div>
+      <div class="card-blob2"></div>
+
+      <div class="card-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Patungan
+      </div>
+
+      <div class="card-avatars">
+        <div class="card-avatar" style="background:rgba(255,255,255,.3);">RF</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.22);">AN</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.18);">DW</div>
+        <div class="card-avatar-more">+3</div>
+      </div>
+
+      <div class="card-group-name">🍽 Makan<br>malam Bali</div>
+      <div class="card-status-line">3 teman belum balik uang kamu</div>
+
+      <div class="card-progress-visual">
+        <div class="progress-track">
+          <div class="progress-fill-white" style="width:60%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>Rp 324rb sudah masuk</span>
+          <span>60% lunas</span>
+        </div>
+      </div>
+
+      <button class="card-cta patungan-cta" onclick="alert('Kirim tagihan')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Ingatkan 3 Teman
+      </button>
+    </div>
+
+    <!-- CARD 4: Patungan Hotel Bromo (LAVENDER) -->
+    <div class="story-card card-patungan hidden" id="card4">
+      <div class="card-blob1"></div>
+      <div class="card-blob2"></div>
+
+      <div class="card-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Patungan
+      </div>
+
+      <div class="card-avatars">
+        <div class="card-avatar" style="background:rgba(255,255,255,.3);">RF</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.22);">BS</div>
+        <div class="card-avatar" style="background:rgba(255,255,255,.18);">IR</div>
+        <div class="card-avatar-more">+1</div>
+      </div>
+
+      <div class="card-group-name">🏨 Hotel<br>Bromo</div>
+      <div class="card-status-line">⚡ Butuh lunas 3 hari lagi — 75% belum bayar</div>
+
+      <div class="card-progress-visual">
+        <div class="progress-track">
+          <div class="progress-fill-white" style="width:25%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>25% lunas</span>
+          <span>Rp 900rb kurang</span>
+        </div>
+      </div>
+
+      <button class="card-cta patungan-cta" onclick="alert('Tagih sekarang')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Tagih Sekarang — Urgent!
+      </button>
+    </div>
+
+  </div><!-- /deck-container -->
+
+  <!-- Swipe hint -->
+  <div class="swipe-hint">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    geser untuk berpindah
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+
+  <!-- Dimmer -->
+  <div class="dimmer" id="dimmer" onclick="closePill()"></div>
+
+  <!-- Compose Pill -->
+  <div class="compose-outer">
+    <div class="compose-pill" id="composePill">
+
+      <!-- Collapsed -->
+      <div class="pill-collapsed" onclick="openPill()">
+        <div class="pill-icon">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <span class="pill-label">Mulai sesuatu baru…</span>
+        <div class="pill-dots">
+          <div class="pill-dot em"></div>
+          <div class="pill-dot lv"></div>
+        </div>
+      </div>
+
+      <!-- Expanded -->
+      <div class="pill-expanded">
+        <div class="pill-close-row">
+          <button class="pill-close-btn" onclick="closePill()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="pill-lanes">
+          <button class="pill-lane em" onclick="alert('Buat Arisan baru')">
+            <div class="lane-icon em">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            </div>
+            <div class="lane-title em">Arisan</div>
+            <div class="lane-sub">Buat grup baru</div>
+          </button>
+          <button class="pill-lane lv" onclick="alert('Buat Patungan baru')">
+            <div class="lane-icon lv">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--lavender-dark)" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="lane-title lv">Patungan</div>
+            <div class="lane-sub">Bagi tagihan</div>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /phone-frame -->
+</div>
+
+<script>
+const CARDS = ['card0','card1','card2','card3','card4'];
+let current = 0;
+const storyBar = document.getElementById('storyBar');
+
+// Build progress dots
+CARDS.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'story-dot' + (i === 0 ? ' active' : '');
+  dot.innerHTML = '<div class="story-dot-fill"></div>';
+  storyBar.appendChild(dot);
+});
+
+function updateCards(prev, next) {
+  const dots = storyBar.querySelectorAll('.story-dot');
+  CARDS.forEach((id, i) => {
+    const el = document.getElementById(id);
+    const dot = dots[i];
+    el.className = el.className.replace(/\b(active|prev|next|hidden)\b/g, '').trim();
+    dot.className = dot.className.replace(/\b(active|past)\b/g, '').trim();
+    if (i < next) {
+      el.className += ' prev';
+      dot.className += ' past';
+    } else if (i === next) {
+      el.className += ' active';
+      dot.className += ' active';
+    } else {
+      el.className += ' next';
+    }
+  });
+  current = next;
+}
+
+function nextCard() {
+  if (current < CARDS.length - 1) updateCards(current, current + 1);
+}
+function prevCard() {
+  if (current > 0) updateCards(current, current - 1);
+}
+
+// Touch / swipe support
+let startX = 0, startY = 0;
+const deck = document.getElementById('deckContainer');
+deck.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+}, { passive: true });
+deck.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  const dy = e.changedTouches[0].clientY - startY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    if (dx < 0) nextCard(); else prevCard();
+  }
+});
+
+// Compose pill
+function openPill() {
+  document.getElementById('composePill').classList.add('open');
+  document.getElementById('dimmer').classList.add('active');
+}
+function closePill() {
+  document.getElementById('composePill').classList.remove('open');
+  document.getElementById('dimmer').classList.remove('active');
+}
+</script>
+</body>
+</html>

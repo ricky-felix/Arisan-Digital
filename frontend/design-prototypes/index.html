@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arisan Digital — Galeri Desain Prototipe</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ===== GALLERY SPECIFIC STYLES ===== */
+
+body { background: #dde2e9; }
+
+.gallery-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+/* Masthead */
+.masthead {
+  margin-bottom: 52px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #c5cdd6;
+}
+.masthead-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px;
+  background: var(--emerald);
+  color: white;
+  border-radius: var(--r-pill);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.masthead-title {
+  font-size: 36px; font-weight: 800;
+  color: var(--ink-1); letter-spacing: -0.04em;
+  line-height: 1.1; margin-bottom: 10px;
+}
+.masthead-sub {
+  font-size: 15px; color: var(--ink-2);
+  max-width: 620px; line-height: 1.6; margin-bottom: 20px;
+}
+.masthead-legend {
+  display: flex; gap: 20px; flex-wrap: wrap;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 600; color: var(--ink-2);
+}
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.legend-dot.em { background: var(--emerald); }
+.legend-dot.lv { background: var(--lavender); }
+
+/* Section */
+.proto-section {
+  margin-bottom: 56px;
+}
+.section-eyebrow {
+  font-size: 10px; font-weight: 700;
+  color: var(--ink-3); letter-spacing: .1em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.section-heading {
+  font-size: 22px; font-weight: 800;
+  color: var(--ink-1); letter-spacing: -0.03em;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+}
+.section-desc {
+  font-size: 13px; color: var(--ink-2); line-height: 1.6;
+  max-width: 680px; margin-bottom: 28px;
+}
+.rec-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px;
+  background: var(--emerald); color: white;
+  border-radius: var(--r-pill);
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; vertical-align: middle;
+}
+
+/* Phone display grid */
+.phones-row {
+  display: flex; gap: 28px;
+  flex-wrap: wrap; align-items: flex-start;
+}
+.phone-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.phone-label {
+  font-size: 13px; font-weight: 700; color: var(--ink-1); text-align: center;
+}
+.phone-tradeoff {
+  font-size: 11px; color: var(--ink-2);
+  text-align: center; max-width: 260px; line-height: 1.5;
+}
+.phone-actions { display: flex; gap: 8px; }
+
+/* Phone-in-page embed frame */
+.phone-embed-wrap {
+  border-radius: 44px;
+  overflow: hidden;
+  box-shadow: 0 0 0 8px #1a1a1a, 0 0 0 10px #333, 0 16px 48px rgba(17,24,39,.22);
+  width: 280px; /* scaled down for gallery view */
+  height: 607px; /* 844 * (280/390) */
+  position: relative;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+.phone-embed-wrap iframe {
+  width: 390px; height: 844px;
+  border: none; display: block;
+  transform-origin: top left;
+  transform: scale(0.7179);
+  pointer-events: none; /* gallery is view-only; use "open" link to interact */
+}
+.phone-embed-wrap.interactive iframe { pointer-events: auto; }
+
+/* Open link button */
+.open-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  background: var(--ink-1); color: white;
+  font-size: 12px; font-weight: 600;
+  text-decoration: none;
+  transition: background .15s;
+}
+.open-btn:hover { background: #374151; }
+.open-btn.em { background: var(--emerald-dark); }
+.open-btn.em:hover { background: var(--emerald); }
+.open-btn.lv { background: var(--lavender-dark); }
+.open-btn.lv:hover { background: var(--lavender); }
+
+/* Pro/con lists */
+.compare-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-top: 10px;
+}
+.compare-box {
+  background: var(--surface); border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(17,24,39,.05);
+}
+.compare-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.compare-label.pro { color: var(--emerald-dark); }
+.compare-label.con { color: var(--danger); }
+.compare-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.compare-list li {
+  font-size: 12px; color: var(--ink-2); line-height: 1.4;
+  display: flex; align-items: flex-start; gap: 6px;
+}
+.compare-list li::before { content: ''; flex-shrink: 0; margin-top: 5px; }
+.compare-list.pro li::before { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); }
+.compare-list.con li::before { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); }
+
+/* Recommendation box */
+.rec-box {
+  background: var(--surface);
+  border: 1.5px solid var(--emerald-soft);
+  border-radius: var(--r-card);
+  padding: 20px 22px;
+  margin-top: 48px;
+  box-shadow: var(--sh-1), 0 0 0 4px var(--emerald-tint);
+}
+.rec-box-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 16px; font-weight: 800; color: var(--ink-1);
+  letter-spacing: -0.02em; margin-bottom: 10px;
+}
+.rec-box-body {
+  font-size: 13px; color: var(--ink-2); line-height: 1.7;
+}
+.rec-box-body strong { color: var(--ink-1); }
+
+/* Divider */
+.section-divider {
+  height: 1px; background: #c5cdd6; margin: 48px 0;
+}
+
+/* ---- Gallery v2 additions ---- */
+.legend-accent { color: var(--emerald-dark); }
+
+/* Section heading muted (for rejected/v1 sections) */
+.section-heading-muted { color: var(--ink-2); }
+.section-desc-muted { color: var(--ink-3); }
+
+/* Rejected badge */
+.badge-rejected {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px;
+  background: #fee2e2; color: var(--danger);
+  border-radius: var(--r-pill);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase;
+  margin-left: 6px; vertical-align: middle;
+}
+
+/* rec-pill dark variant */
+.rec-pill-dark {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px;
+  background: var(--emerald-dark); color: white;
+  border-radius: var(--r-pill);
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; vertical-align: middle;
+  margin-left: 6px;
+}
+
+/* Recommendation box bottom spacing variant */
+.rec-box-v2 { margin-bottom: 56px; }
+
+/* Earlier-rounds collapsible */
+.earlier-rounds {
+  margin-bottom: 48px;
+}
+.earlier-rounds summary {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid #c5cdd6;
+  border-bottom: 1px solid #c5cdd6;
+  list-style: none; /* remove default triangle in Safari */
+}
+.earlier-rounds summary::-webkit-details-marker { display: none; }
+.earlier-summary-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: .02em;
+}
+.earlier-summary-badge-gap { margin-left: 4px; }
+.earlier-rounds-body { padding-top: 32px; }
+
+/* Compare row fixed width for gallery phones */
+.compare-row-phone { width: 280px; }
+
+/* Faded / rejected phone frame */
+.phone-embed-wrap-faded { opacity: .55; filter: grayscale(.3); }
+
+/* Phone label muted */
+.phone-label-muted { color: var(--ink-3); }
+
+/* Open button muted (greyed) */
+.open-btn-muted { background: var(--ink-3); }
+.open-btn-muted:hover { background: var(--ink-2); }
+
+/* Hidden old section placeholder */
+.section-hidden { display: none; }
+
+/* rec-pill with left indent (for phone-label inline use) */
+.rec-pill-indent { margin-left: 6px; }
+
+@media (max-width: 900px) {
+  .masthead-title { font-size: 26px; }
+  .phones-row { gap: 20px; }
+  .phone-embed-wrap { width: 220px; height: 476px; }
+  .phone-embed-wrap iframe { transform: scale(0.5641); }
+}
+</style>
+</head>
+<style>
+/* ---- Final Flow section additions ---- */
+.final-hero {
+  background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #6d28d9 100%);
+  border-radius: 20px; padding: 28px 28px 24px;
+  margin-bottom: 36px; position: relative; overflow: hidden;
+}
+.final-hero::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.final-hero-eyebrow {
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,.75);
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px;
+}
+.final-hero-title {
+  font-size: 26px; font-weight: 800; color: white;
+  letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 8px;
+}
+.final-hero-sub {
+  font-size: 13px; color: rgba(255,255,255,.8); line-height: 1.6;
+  max-width: 600px; margin-bottom: 20px;
+}
+.arch-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.arch-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.15);
+  color: white; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.arch-pill.em { background: rgba(16,185,129,.3); border-color: rgba(16,185,129,.5); }
+.arch-pill.lv { background: rgba(139,92,246,.3); border-color: rgba(139,92,246,.5); }
+.arch-pill.gray { background: rgba(255,255,255,.1); }
+.start-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white; color: #065f46;
+  padding: 13px 24px; border-radius: 14px;
+  font-size: 15px; font-weight: 800; letter-spacing: -.01em;
+  text-decoration: none; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  transition: transform .1s, box-shadow .1s;
+}
+.start-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+
+.final-phones-row {
+  display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
+}
+.final-phone-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.final-phone-label {
+  font-size: 12px; font-weight: 700; color: var(--ink-1); text-align: center;
+}
+.final-phone-desc {
+  font-size: 11px; color: var(--ink-2); text-align: center; max-width: 200px; line-height: 1.4;
+}
+</style>
+<body>
+<div class="gallery-wrap">
+
+  <!-- ===================================================
+       FINAL FLOW — WALKABLE PROTOTYPE (TOP SECTION)
+       =================================================== -->
+  <div class="proto-section">
+
+    <div class="final-hero">
+      <div class="final-hero-eyebrow">Arsitektur Final · Walkable Prototype</div>
+      <h2 class="final-hero-title">Arisan Digital — Final Flow</h2>
+      <p class="final-hero-sub">Satu app tanpa tab, tiga paradigma masing-masing di tempat terkuatnya. Story Deck untuk home, Conversational Chat untuk notifikasi, Money Circle untuk anggota grup. Semua layar terhubung dengan navigasi nyata — tidak ada dead end.</p>
+
+      <div class="arch-pills">
+        <span class="arch-pill em">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Home = Story Deck
+        </span>
+        <span class="arch-pill lv">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Notifikasi = Chat Bubbles
+        </span>
+        <span class="arch-pill gray">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+          Anggota = Money Circle Orbit
+        </span>
+      </div>
+
+      <a class="start-btn" href="final-home.html" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Mulai dari Home
+      </a>
+    </div>
+
+    <!-- Screen previews -->
+    <div class="final-phones-row">
+
+      <div class="final-phone-slot">
+        <div class="final-phone-label">Home — Story Deck</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="final-home.html" title="Final Home" loading="lazy"></iframe>
+        </div>
+        <div class="final-phone-desc">Filter Semua/Arisan/Patungan, swipe deck, compose pill, notif + avatar links</div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="final-home.html" target="_blank">Buka Home</a>
+          <a class="open-btn" href="final-overview.html" target="_blank">Overview</a>
+        </div>
+      </div>
+
+      <div class="final-phone-slot">
+        <div class="final-phone-label">Notifikasi — Chat Bubbles</div>
+        <div class="phone-embed-wrap">
+          <iframe src="final-notifications.html" title="Final Notifications" loading="lazy"></iframe>
+        </div>
+        <div class="final-phone-desc">Bubble-thread dengan grup hari/kemarin, tag emerald/lavender, inline actions</div>
+        <div class="phone-actions">
+          <a class="open-btn" href="final-notifications.html" target="_blank">Buka Notif</a>
+        </div>
+      </div>
+
+      <div class="final-phone-slot">
+        <div class="final-phone-label">Detail Grup Arisan</div>
+        <div class="phone-embed-wrap">
+          <iframe src="final-group-detail.html" title="Final Group Detail" loading="lazy"></iframe>
+        </div>
+        <div class="final-phone-desc">Summary hero, putaran timeline, preview anggota, tombol "Lihat orbit"</div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="final-group-detail.html" target="_blank">Buka Detail</a>
+          <a class="open-btn" href="final-members-orbit.html" target="_blank">Orbit</a>
+        </div>
+      </div>
+
+      <div class="final-phone-slot">
+        <div class="final-phone-label">Anggota — Money Circle Orbit</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="final-members-orbit.html" title="Final Orbit" loading="lazy"></iframe>
+        </div>
+        <div class="final-phone-desc">Avatar orbit pot yang terisi, ring paid/unpaid/giliran, tap avatar buka tooltip</div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="final-members-orbit.html" target="_blank">Buka Orbit</a>
+        </div>
+      </div>
+
+      <div class="final-phone-slot">
+        <div class="final-phone-label">Detail Patungan</div>
+        <div class="phone-embed-wrap">
+          <iframe src="final-bill-detail.html" title="Final Bill Detail" loading="lazy"></iframe>
+        </div>
+        <div class="final-phone-desc">Hero lavender, peserta + status bayar, tombol ingatkan, lavender theming</div>
+        <div class="phone-actions">
+          <a class="open-btn lv" href="final-bill-detail.html" target="_blank">Buka Tagihan</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation map -->
+    <div style="background:var(--surface);border-radius:var(--r-card);padding:20px 22px;margin-top:32px;box-shadow:var(--sh-1),var(--sh-2);">
+      <div style="font-size:13px;font-weight:800;color:var(--ink-1);margin-bottom:10px;letter-spacing:-.01em;">Peta Navigasi — Semua Link Bekerja</div>
+      <div style="font-size:12px;color:var(--ink-2);line-height:2;">
+        <strong style="color:var(--ink-1);">Home</strong> → bell → <strong>Notifikasi</strong> → back → Home<br>
+        Home → tap Arisan card → <strong>Detail Grup</strong> → "Lihat orbit" → <strong>Orbit Anggota</strong> → back → back → Home<br>
+        Home (filter Patungan) → tap bill → <strong>Detail Patungan</strong> → back → Home<br>
+        Home → list icon → <strong>Overview</strong> → tap row → detail<br>
+        Home → avatar → <strong>Profil</strong> → back → Home<br>
+        Notifikasi → inline action → detail screen → back
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div class="masthead-eyebrow">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      Desain Prototipe · Round 3
+    </div>
+    <h1 class="masthead-title">Arisan Digital — Redesign</h1>
+    <p class="masthead-sub">Galeri perbandingan arah desain untuk review produk. Semua prototipe bersifat statis, tidak perlu build step, langsung bisa dibuka di browser. Klik "Buka &amp; Interaksi" untuk mencoba animasi dan interaksi setiap opsi.</p>
+    <div class="masthead-legend">
+      <div class="legend-item"><span class="legend-dot em"></span> Arisan — Emerald green</div>
+      <div class="legend-item"><span class="legend-dot lv"></span> Patungan — Lavender violet</div>
+      <div class="legend-item">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        <span class="legend-accent">Rekomendasi desainer</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================
+       SECTION R3 — HOME CONCEPTS (NON-DASHBOARD, ROUND 3)
+       ================================================ -->
+  <div class="proto-section">
+    <div class="section-eyebrow">Round 3 — Konsep Home Non-Dashboard</div>
+    <h2 class="section-heading">
+      Home concepts — non-dashboard (pilih salah satu untuk diiterasikan)
+      <span class="rec-pill">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        Baru
+      </span>
+    </h2>
+    <p class="section-desc">Tiga paradigma berbeda yang menghilangkan pola "dashboard" (summary card di atas + list di bawah). Masing-masing menampilkan ONE focused thing at a time, dengan navigasi layered yang jelas. Setiap konsep disertai satu layar drill-down agar alur navigasi bisa dinilai. Emerald = Arisan, Lavender = Patungan — selalu dibedakan secara visual.</p>
+
+    <div class="phones-row">
+
+      <!-- Concept A: Story Deck -->
+      <div class="phone-slot">
+        <div class="phone-label">
+          Concept A — Story Deck
+        </div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="home-concept-story.html" title="Concept A Story Deck" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Full-screen swipeable cards, one per Arisan group or Patungan bill. TikTok / Stories energy. Story-progress dots at top. Compose Pill at bottom. Emerald cards for Arisan, lavender for Patungan. Tap top of card → drill-down detail.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="home-concept-story.html" target="_blank">Buka Home</a>
+          <a class="open-btn" href="story-detail-arisan.html" target="_blank">Lihat Detail</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling lean — satu item, satu aksi</li>
+              <li>Feature color instantly separates Arisan vs Patungan</li>
+              <li>Gesture-native: swipe = browse, tap = drill in</li>
+              <li>Compose Pill: quiet + familiar</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>User tidak tahu ada 5 item sampai geser</li>
+              <li>Urutan prioritas tidak terlihat sekaligus</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concept B: Conversational Today -->
+      <div class="phone-slot">
+        <div class="phone-label">
+          Concept B — Conversational Today
+          <span class="rec-pill-dark">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            Rekomendasi
+          </span>
+        </div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="home-concept-today.html" title="Concept B Conversational Today" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          App "berbicara" ke pengguna: narasi singkat hari ini dalam chat-bubble, masing-masing dengan aksi inline. Hanya 2–4 item relevan hari ini. Warna stripe kiri biru = Arisan, lavender = Patungan. Compose Pill di bawah.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="home-concept-today.html" target="_blank">Buka Home</a>
+          <a class="open-btn lv" href="today-detail-arisan.html" target="_blank">Lihat List</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling low-literacy-friendly — teks human seperti teman</li>
+              <li>Inline action per bubble = minimal tap</li>
+              <li>Bubble metaphor familiar (semua orang pakai WA)</li>
+              <li>Compose Pill selaras: bubble + input = bahasa chat</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Jika banyak notif, layar bisa terasa panjang</li>
+              <li>Copy harus selalu segar dan bervariasi agar tidak terasa repetitif</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concept C: Living Money Circle -->
+      <div class="phone-slot">
+        <div class="phone-label">Concept C — Living Money Circle</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="home-concept-circle.html" title="Concept C Living Money Circle" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Visual orbit: avatar teman mengelilingi "pot" yang terisi saat anggota bayar. Toggle flip ke Patungan: teman sebagai gelembung bayar/belum. Tap pot → drill detail. Speed Dial FAB — radial orbit + radial fan = visual grammar yang sama.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn" href="home-concept-circle.html" target="_blank">Buka Home</a>
+          <a class="open-btn em" href="circle-detail-arisan.html" target="_blank">Lihat Detail</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling original — benar-benar bukan dashboard</li>
+              <li>Status bayar/belum terlihat seketika (warna circle)</li>
+              <li>Spatial + game-like = memorable dan shareable</li>
+              <li>Speed Dial secara visual koheren dengan orbit</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Paling high learning-curve dari tiga konsep</li>
+              <li>Ukuran layar kecil bisa membuat orbit padat</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Recommendation box for R3 -->
+  <div class="rec-box rec-box-v2">
+    <div class="rec-box-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--emerald)" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      Rekomendasi — Round 3 Non-Dashboard Concepts
+    </div>
+    <div class="rec-box-body">
+      <strong>Concept B (Conversational Today) adalah rekomendasi terkuat.</strong> Satu-satunya dari tiga yang secara natural familiar bagi pengguna next-billion tanpa butuh discovery — semua orang Indonesia sudah hidup di WhatsApp chat. App "berbicara" ke pengguna dalam bahasa manusia, bukan bahasa UI, langsung menjawab keluhan "generic dashboard." Bubble chat dengan inline action per item = minimum tap, maximum clarity. Compose Pill di bawah memperkuat metafora: bubble pesan di atas, input kirim di bawah — satu grammar yang koherens.<br><br>
+      <strong>Concept A (Story Deck)</strong> adalah runner-up untuk pengguna yang lebih Gen-Z / TikTok-native. Paling lean dan immersive, tapi butuh gesture discovery. Cocok bila owner ingin feel yang paling "social-native."<br><br>
+      <strong>Concept C (Living Money Circle)</strong> paling original dan paling tidak mirip dashboard apapun — tapi learning curve lebih tinggi. Rekomendasikan untuk iterasi berikutnya setelah Concept B divalidasi, atau sebagai Easter egg / "group view" yang bisa di-toggle dari detail screen.
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ====================================================
+       EARLIER ROUNDS — REJECTED / REFERENCE
+       ==================================================== -->
+  <details class="earlier-rounds">
+    <summary>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      <span class="earlier-summary-label">Putaran sebelumnya (ditolak) — klik untuk buka sebagai referensi</span>
+      <span class="badge-rejected earlier-summary-badge-gap">Ditolak</span>
+    </summary>
+    <div class="earlier-rounds-body">
+
+  <!-- ================================================
+       SECTION A2 — HOME V2 (GEN-Z / NEXT BILLION)
+       ================================================ -->
+  <div class="proto-section">
+    <div class="section-eyebrow">Bagian A · Round 2 — Home Screen Baru</div>
+    <h2 class="section-heading">
+      Home v2 — For the Next Billion
+      <span class="rec-pill">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        Versi Baru
+      </span>
+    </h2>
+    <p class="section-desc">Redesign total untuk Gen-Z &amp; Milenial Indonesia — pengguna fintech pertama kali di Android mid-range. Visual-first, manusia di depan, teks minimal. Tiga arah berbeda: social feed berasa media sosial, bold hero ala Cash App/Gojek, dan agenda timeline untuk pengguna yang suka urutan prioritas. Create-action menggunakan Opsi 1 (pill) dan Opsi 3 (speed dial) — keduanya tetap dari round sebelumnya.</p>
+
+    <div class="phones-row">
+
+      <!-- V2 Home 1: People-First Social -->
+      <div class="phone-slot">
+        <div class="phone-label">
+          People-First Social
+          <span class="rec-pill-dark">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            Terkuat
+          </span>
+        </div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="home-v2-people.html" title="Home v2 People-First" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Wajah &amp; grup di atas sebagai hero. Feed aktivitas sosial dengan nama, emoji, reaksi. Venmo/BEEM energy. Compose Pill di bawah. Paling terasa "app orang-orang" bukan "dashboard keuangan".
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="home-v2-people.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling social &amp; human — screenshot-worthy</li>
+              <li>Avatar cluster visual langsung: siapa yang arisan/patungan sama kamu</li>
+              <li>Social feed + reaksi emoji cocok untuk Gen-Z</li>
+              <li>Compose Pill — familiar, zero discovery needed</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Layar lebih padat — butuh scroll untuk melihat semua</li>
+              <li>Dua row scrollable (grup + orang) bisa membingungkan</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- V2 Home 2: Bold Hero -->
+      <div class="phone-slot">
+        <div class="phone-label">Bold Hero</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="home-v2-hero.html" title="Home v2 Bold Hero" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Full-bleed emerald gradient hero dengan satu pesan dominan ("Rp 200.000 jatuh tempo 5 hari lagi"). Dua stream kartu horizontal di bawah — satu Arisan, satu Patungan. Speed Dial FAB.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn" href="home-v2-hero.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Kesan pertama paling premium &amp; bold</li>
+              <li>ONE message = zero cognitive load saat buka app</li>
+              <li>Horizontal scroll cards = compact, bisa lihat banyak</li>
+              <li>Speed Dial lebih memorable secara brand</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Hero hanya tampil 1 pesan — kalau tidak ada yang urgent, terasa kosong</li>
+              <li>Horizontal scroll cards butuh gesture discovery</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- V2 Home 3: Agenda Timeline -->
+      <div class="phone-slot">
+        <div class="phone-label">Agenda Timeline</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="home-v2-agenda.html" title="Home v2 Agenda" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Header gradient kompak + summary pills. Lalu timeline vertikal dikelompokkan: "Hari ini", "Minggu ini", "Nanti". Setiap item adalah kartu warna dengan stripe kiri berwarna. Inline CTA per-item (Bayar/Tagih). Speed Dial.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn lv" href="home-v2-agenda.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling jelas soal "apa yang harus dilakukan" — prioritas terlihat langsung</li>
+              <li>Inline CTA per item = kurangi tap</li>
+              <li>Stripe kiri berwarna: Arisan vs Patungan langsung terbaca</li>
+              <li>Cocok untuk pengguna yang punya banyak grup</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Kurang "wow" secara visual dibanding dua lainnya</li>
+              <li>Terasa lebih seperti task manager, kurang playful</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Recommendation box for v2 -->
+  <div class="rec-box rec-box-v2">
+    <div class="rec-box-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--emerald)" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      Rekomendasi — Home v2
+    </div>
+    <div class="rec-box-body">
+      <strong>Home terkuat: People-First Social.</strong> Satu-satunya dari tiga yang benar-benar terasa berbeda dari "app keuangan biasa." Menempatkan orang — bukan angka — sebagai hero screen langsung menjawab brief: Arisan dan Patungan adalah tentang manusia. Feed sosial dengan reaksi emoji terasa natural untuk Gen-Z yang sudah hidup di Instagram/TikTok. Paling screenshot-worthy, paling mungkin disebarkan dari mulut ke mulut.<br><br>
+      <strong>Bold Hero</strong> adalah runner-up yang kuat untuk onboarding atau pengguna yang sudah aktif — kesan pertama paling premium. Pertimbangkan sebagai <em>variant</em> ketika ada aksi mendesak (due date dalam 3 hari).<br><br>
+      <strong>Agenda Timeline</strong> paling fungsional untuk power-user dengan banyak grup, tapi kurang emotional resonance. Simpan sebagai view alternatif yang bisa di-toggle.<br><br>
+      <strong>Create-action terbaik untuk People-First Social: Opsi 1 (Morphing Compose Pill).</strong> Pill duduk tenang di bawah feed, tidak menghalangi konten sosial, dan ketika dibuka morph jadi dua lane (Arisan emerald / Patungan lavender) yang sangat on-brand. Speed Dial (Opsi 3) lebih cocok untuk Bold Hero karena keduanya berbagi energi "bold, satu aksi besar."
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ================================================
+       SECTION A1 — HOME V1 (DITOLAK / TERLALU GENERIK)
+       ================================================ -->
+  <div class="proto-section">
+    <div class="section-eyebrow">Bagian A · Round 1 — Home Lama (Ditolak)</div>
+    <h2 class="section-heading section-heading-muted">
+      Home v1 — Terlalu Generik
+      <span class="badge-rejected">Ditolak</span>
+    </h2>
+    <p class="section-desc section-desc-muted">Feedback product owner: "Terasa seperti app lain pada umumnya — summary card di atas, list di bawah, terlalu generic." Disimpan di sini sebagai referensi perbandingan. Jangan digunakan sebagai dasar iterasi berikutnya.</p>
+
+    <div class="phones-row">
+
+      <!-- Direction 1 -->
+      <div class="phone-slot">
+        <div class="phone-label phone-label-muted">
+          Arah 1 — Unified Feed (v1)
+        </div>
+        <div class="phone-embed-wrap phone-embed-wrap-faded">
+          <iframe src="home-direction1.html" title="Arah 1 Unified Feed" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff section-desc-muted">
+          Satu ringkasan di atas, lalu daftar aktivitas campuran bertag warna. Sebelumnya direkomendasikan — ditolak karena terlalu mirip app generik.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn open-btn-muted" href="home-direction1.html" target="_blank">Lihat (referensi)</a>
+        </div>
+      </div>
+
+      <!-- Direction 2 -->
+      <div class="phone-slot">
+        <div class="phone-label phone-label-muted">Arah 2 — Two Cards (v1)</div>
+        <div class="phone-embed-wrap phone-embed-wrap-faded">
+          <iframe src="home-direction2.html" title="Arah 2 Two Cards" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff section-desc-muted">
+          Dua kartu warna sebagai "pintu masuk" masing-masing fitur. Jelas untuk user baru, tapi terasa seperti dua mini-app.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn open-btn-muted" href="home-direction2.html" target="_blank">Lihat (referensi)</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION A — HOME SCREEN DIRECTIONS (kept for reference label) -->
+  <div class="proto-section section-hidden"><!-- hidden — content moved above -->
+
+    <div class="phones-row">
+
+      <!-- Direction 1 -->
+      <div class="phone-slot">
+        <div class="phone-label">
+          Arah 1 — Unified Feed
+          <span class="rec-pill rec-pill-indent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            Direkomendasikan
+          </span>
+        </div>
+        <div class="phone-embed-wrap">
+          <iframe src="home-direction1.html" title="Arah 1 Unified Feed" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Satu ringkasan di atas, lalu satu daftar aktivitas campuran bertag warna. Paling mirip BEEM — satu app, satu alur. Cocok bila user Arisan dan Patungan seimbang.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="home-direction1.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Terasa seperti satu app yang kohesif</li>
+              <li>Urutan aktivitas berdasarkan waktu, lebih relevan</li>
+              <li>Mudah scan tanpa mental context switch</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Dua fitur kurang terasa "berbeda" secara visual</li>
+              <li>User baru mungkin bingung membedakan Arisan vs Patungan</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direction 2 -->
+      <div class="phone-slot">
+        <div class="phone-label">Arah 2 — Two Cards</div>
+        <div class="phone-embed-wrap">
+          <iframe src="home-direction2.html" title="Arah 2 Two Cards" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Dua kartu warna berbeda sebagai "pintu masuk" masing-masing fitur. Lebih jelas untuk user baru; tap kartu drill ke daftarnya.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn lv" href="home-direction2.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Sangat jelas: "ini Arisan, ini Patungan"</li>
+              <li>Visual kaya (gradient card) = kesan premium</li>
+              <li>Mudah dikembangkan bila ada fitur ketiga nanti</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Dua kali scroll/tap untuk sampai ke item</li>
+              <li>Terasa lebih seperti dua mini-app, bukan satu</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION B — CREATE ACTION OPTIONS -->
+  <div class="proto-section">
+    <div class="section-eyebrow">Bagian B — Aksi Buat Baru (Create Action)</div>
+    <h2 class="section-heading">Tiga Opsi Create Action Orisinal</h2>
+    <p class="section-desc">Tidak ada FAB biasa, tidak ada dua tombol sejajar. Ketiga opsi di bawah ini menjawab pertanyaan: "Bagaimana cara memulai Arisan baru atau tagihan Patungan dari home screen tanpa tab?" — dengan cara yang berbeda-beda dan terasa intentional.</p>
+
+    <div class="phones-row">
+
+      <!-- Option 1 — Compose Pill -->
+      <div class="phone-slot">
+        <div class="phone-label">
+          Opsi 1 — Morphing Compose Pill
+          <span class="rec-pill rec-pill-indent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            Terkuat
+          </span>
+        </div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="create-option1.html" title="Create Opsi 1" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Sebuah pill input "Mulai sesuatu baru…" di bawah layar. Tap — pill melebar dan morph menjadi dua kartu lane: Arisan (emerald) dan Patungan (lavender). Animasi halus, tidak gimmicky. Langsung bisa diklik di atas.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn" href="create-option1.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Familiar (seperti compose di messaging app)</li>
+              <li>Satu interaksi, dua pilihan jelas</li>
+              <li>Tidak mengganggu konten di atasnya</li>
+              <li>Mudah tambah "Gabung" sebagai opsi ketiga</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Butuh satu tap ekstra sebelum pilih</li>
+              <li>Pill bisa tertutup konten bila keyboard muncul</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 2 — Contextual -->
+      <div class="phone-slot">
+        <div class="phone-label">Opsi 2 — Tombol Buat Kontekstual</div>
+        <div class="phone-embed-wrap">
+          <iframe src="create-option2.html" title="Create Opsi 2" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Tidak ada tombol global. Setiap section (Arisan / Patungan) memiliki tombol "+ Buat" sendiri di headernya. Create entry hidup di dalam konteks fitur yang relevan.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn" href="create-option2.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling intuitif — buat Arisan ada di dekat daftar Arisan</li>
+              <li>Zero ambiguity soal apa yang dibuat</li>
+              <li>Tidak perlu sheet/overlay tambahan</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Tombol tersembunyi bila belum scroll ke section</li>
+              <li>Kurang "effortless" — terasa lebih seperti form biasa</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 3 — Speed Dial -->
+      <div class="phone-slot">
+        <div class="phone-label">Opsi 3 — Radial Speed Dial</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="create-option3.html" title="Create Opsi 3" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Satu tombol lingkaran gradient (emerald ke lavender) di tengah bawah. Tap — tiga opsi memfan keluar seperti jangkar: Arisan ke kiri, Gabung di tengah, Patungan ke kanan. Ada pulse ring saat idle. Langsung bisa diklik di atas.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn" href="create-option3.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+        <div class="compare-row compare-row-phone">
+          <div class="compare-box">
+            <div class="compare-label pro">Kelebihan</div>
+            <ul class="compare-list pro">
+              <li>Paling memorable &amp; on-brand</li>
+              <li>Gradient trigger mewakili kedua brand color sekaligus</li>
+              <li>Terasa premium, gesture yang menyenangkan</li>
+            </ul>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label con">Kekurangan</div>
+            <ul class="compare-list con">
+              <li>Label mungkin terpotong di layar kecil</li>
+              <li>Butuh discovery — user harus tahu ini bisa di-tap</li>
+              <li>Kurva belajar lebih tinggi dari pill</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION C — DRILL DOWN -->
+  <div class="proto-section">
+    <div class="section-eyebrow">Bagian C — Navigasi Drill-Down</div>
+    <h2 class="section-heading">Layar List Arisan Saya</h2>
+    <p class="section-desc">Contoh bagaimana navigasi bekerja tanpa tab bar: tombol back (kiri atas) kembali ke Beranda. Header menggunakan badge modul + judul. Filter &amp; search terintegrasi di header, bukan di body. Klik back arrow untuk kembali ke Arah 2.</p>
+
+    <div class="phones-row">
+      <div class="phone-slot">
+        <div class="phone-label">Arisan Saya — Drill Down dari Beranda</div>
+        <div class="phone-embed-wrap interactive">
+          <iframe src="drill-down-arisan.html" title="Drill Down Arisan" loading="lazy"></iframe>
+        </div>
+        <div class="phone-tradeoff">
+          Back arrow top-left kembali ke home. Tidak ada bottom tab. Group cards menampilkan progress putaran, iuran, dan highlight penerima giliran berikutnya.
+        </div>
+        <div class="phone-actions">
+          <a class="open-btn em" href="drill-down-arisan.html" target="_blank">Buka &amp; Interaksi</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- RECOMMENDATION BOX (Round 1–2 reference) -->
+  <div class="rec-box">
+    <div class="rec-box-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--emerald)" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      Rekomendasi Desainer (Round 1–2, sudah digantikan Round 3)
+    </div>
+    <div class="rec-box-body">
+      <strong>Home Screen: Arah 1 (Unified Feed).</strong> Satu feed campuran bertag warna terasa paling aligned dengan filosofi BEEM — "satu app, satu fokus." Ricky dan kebanyakan pengguna memiliki aktivitas Arisan dan Patungan yang saling berkaitan; menyatukan keduanya dalam satu kronologi lebih relevan daripada memisahkan secara modul. Hierarki visualnya juga lebih bersih.<br><br>
+      <strong>Create Action: Opsi 1 (Morphing Compose Pill).</strong> Pill "Mulai sesuatu baru…" adalah bahasa yang sudah dipahami pengguna modern (seperti compose di WhatsApp/Gmail) tapi dieksekusi dengan cara yang lebih segar. Animasi morph ke dua lane memberikan konteks jelas tanpa butuh penjelasan tambahan. Tidak gimmicky, tidak memerlukan discovery khusus, dan tidak menghalangi konten. Opsi 3 (speed dial) lebih "wah" secara visual tapi membutuhkan kurva belajar yang lebih tinggi — lebih cocok bila app sudah punya fanbase yang teredukasi.<br><br>
+      <strong>Kombinasi terbaik:</strong> Arah 1 + Opsi 1. Ini menghasilkan satu layar bersih dengan feed terpadu, dan satu akses create yang konsisten di bagian bawah layar. Opsi 2 (kontekstual) adalah fallback yang solid bila owner ingin pemisahan fitur lebih eksplisit — pasangkan dengan Arah 2.
+    </div>
+  </div>
+
+    </div><!-- /earlier-rounds-body -->
+  </details><!-- /earlier-rounds -->
+
+</div><!-- /gallery-wrap -->
+</body>
+</html>

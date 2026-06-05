@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Makan Bali — Detail Patungan</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+.screen-inner { padding-bottom: 96px; }
+
+/* Header */
+.detail-header {
+  background: var(--surface);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky; top: 0; z-index: 10;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none;
+}
+.header-title { font-size: 16px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; flex: 1; }
+.header-sub { font-size: 11px; color: var(--ink-2); font-weight: 500; }
+
+/* Hero banner — lavender */
+.bill-hero {
+  margin: 16px 20px 0;
+  background: linear-gradient(135deg, #3b0764 0%, #6d28d9 60%, #a78bfa 100%);
+  border-radius: 20px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.bh-blob {
+  position: absolute; top: -30px; right: -30px;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+}
+.bh-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.25);
+  padding: 4px 10px; border-radius: 99px;
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px;
+}
+.bh-name { font-size: 24px; font-weight: 800; color: white; letter-spacing: -.03em; line-height: 1.1; margin-bottom: 4px; }
+.bh-sub { font-size: 12px; color: rgba(255,255,255,.8); font-weight: 600; margin-bottom: 16px; }
+.bh-stats { display: flex; gap: 16px; }
+.bh-stat { text-align: center; }
+.bh-stat-val { font-size: 18px; font-weight: 800; color: white; letter-spacing: -.02em; }
+.bh-stat-lbl { font-size: 9px; color: rgba(255,255,255,.7); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+.bh-progress { margin-top: 14px; }
+.bh-track { height: 7px; border-radius: 99px; background: rgba(255,255,255,.2); overflow: hidden; margin-bottom: 5px; }
+.bh-fill { height: 100%; border-radius: 99px; background: rgba(255,255,255,.85); }
+.bh-labels { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,.7); font-weight: 600; }
+
+/* Kamu bayar card */
+.you-paid-card {
+  margin: 14px 20px 0;
+  background: var(--lavender-tint); border: 1.5px solid var(--lavender-soft);
+  border-radius: 16px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.ypc-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--lavender-dark); display: grid; place-items: center; flex-shrink: 0;
+}
+.ypc-info { flex: 1; }
+.ypc-lbl { font-size: 10px; font-weight: 700; color: var(--lavender-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+.ypc-amount { font-size: 16px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; }
+.ypc-sub { font-size: 11px; color: var(--ink-2); font-weight: 500; margin-top: 2px; }
+
+/* Progress section */
+.prog-section { margin: 14px 20px 0; }
+.prog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.prog-label { font-size: 13px; font-weight: 800; color: var(--ink-1); }
+.prog-pct { font-size: 12px; font-weight: 800; color: var(--lavender-dark); }
+.prog-track-big { height: 12px; border-radius: 99px; background: var(--line-soft); overflow: hidden; margin-bottom: 5px; }
+.prog-fill-lv { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--lavender-dark), var(--lavender)); }
+.prog-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-3); font-weight: 600; }
+
+/* Participants */
+.participants-section { padding: 16px 20px 0; }
+.ps-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.ps-title { font-size: 13px; font-weight: 800; color: var(--ink-1); }
+.ps-count { font-size: 11px; font-weight: 700; color: var(--ink-3); }
+.part-card {
+  background: var(--surface); border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2); overflow: hidden;
+}
+.part-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 14px; cursor: pointer; transition: background .1s;
+}
+.part-row:hover { background: var(--gray-soft); }
+.part-row + .part-row { border-top: 1px solid var(--line-soft); }
+.part-av {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white; flex-shrink: 0;
+}
+.part-info { flex: 1; }
+.part-name { font-size: 13px; font-weight: 700; color: var(--ink-1); }
+.part-sub { font-size: 10px; color: var(--ink-3); font-weight: 500; margin-top: 1px; }
+.part-amount { font-size: 12px; font-weight: 800; color: var(--ink-1); margin-right: 6px; }
+.part-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 800;
+}
+.part-badge.paid { background: var(--lavender-soft); color: var(--lavender-dark); }
+.part-badge.unpaid { background: #fee2e2; color: var(--danger); }
+.part-badge.you { background: var(--emerald-soft); color: var(--emerald-dark); }
+
+/* Action footer */
+.action-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 12px 20px 28px;
+  background: linear-gradient(to top, var(--app-bg) 70%, transparent);
+}
+.remind-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--lavender-dark), var(--lavender));
+  color: white; border: none; border-radius: 14px;
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  box-shadow: 0 4px 16px rgba(109,40,217,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .1s;
+}
+.remind-btn:active { transform: scale(.98); }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" style="position:relative;">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Header -->
+      <div class="detail-header">
+        <a href="final-home.html" class="back-btn" aria-label="Kembali">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <div>
+          <div class="header-title">🍽 Makan Bali</div>
+          <div class="header-sub">6 orang · Dibuat 1 Jun 2025</div>
+        </div>
+        <button style="border:none;background:none;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+      </div>
+
+      <!-- Hero Banner -->
+      <div class="bill-hero">
+        <div class="bh-blob"></div>
+        <div class="bh-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Patungan Aktif
+        </div>
+        <div class="bh-name">🍽 Makan<br>Malam Bali</div>
+        <div class="bh-sub">Total tagihan Rp 540.000 · 6 orang</div>
+        <div class="bh-stats">
+          <div class="bh-stat"><div class="bh-stat-val">3</div><div class="bh-stat-lbl">Lunas</div></div>
+          <div class="bh-stat"><div class="bh-stat-val">3</div><div class="bh-stat-lbl">Belum</div></div>
+          <div class="bh-stat"><div class="bh-stat-val">Rp 216k</div><div class="bh-stat-lbl">Tersisa</div></div>
+        </div>
+        <div class="bh-progress">
+          <div class="bh-track"><div class="bh-fill" style="width:60%"></div></div>
+          <div class="bh-labels"><span>Rp 324.000 sudah masuk</span><span>60% lunas</span></div>
+        </div>
+      </div>
+
+      <!-- Your contribution -->
+      <div class="you-paid-card">
+        <div class="ypc-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="ypc-info">
+          <div class="ypc-lbl">Bagianmu (Ricky)</div>
+          <div class="ypc-amount">Rp 90.000</div>
+          <div class="ypc-sub">Lunas — dibayar 2 Jun · GoPay</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+
+      <!-- Progress -->
+      <div class="prog-section">
+        <div class="prog-head">
+          <span class="prog-label">Progres Pembayaran</span>
+          <span class="prog-pct">60%</span>
+        </div>
+        <div class="prog-track-big"><div class="prog-fill-lv" style="width:60%"></div></div>
+        <div class="prog-meta"><span>3 dari 6 orang sudah bayar</span><span>Sisa Rp 216.000</span></div>
+      </div>
+
+      <!-- Participants -->
+      <div class="participants-section">
+        <div class="ps-head">
+          <span class="ps-title">Peserta</span>
+          <span class="ps-count">6 orang · Rp 90.000/orang</span>
+        </div>
+        <div class="part-card">
+
+          <div class="part-row">
+            <div class="part-av" style="background:#3b82f6;">RF</div>
+            <div class="part-info">
+              <div class="part-name">Ricky Felix (Kamu)</div>
+              <div class="part-sub">Bayar 2 Jun · GoPay</div>
+            </div>
+            <span class="part-amount">Rp 90k</span>
+            <span class="part-badge you">Lunas ✓</span>
+          </div>
+
+          <div class="part-row">
+            <div class="part-av" style="background:#8b5cf6;">RA</div>
+            <div class="part-info">
+              <div class="part-name">Rina Amalia</div>
+              <div class="part-sub">Bayar 4 Jun · Transfer BCA</div>
+            </div>
+            <span class="part-amount">Rp 90k</span>
+            <span class="part-badge paid">Lunas</span>
+          </div>
+
+          <div class="part-row">
+            <div class="part-av" style="background:#f59e0b;">DW</div>
+            <div class="part-info">
+              <div class="part-name">Dewi Wulandari</div>
+              <div class="part-sub">Bayar 3 Jun · DANA</div>
+            </div>
+            <span class="part-amount">Rp 90k</span>
+            <span class="part-badge paid">Lunas</span>
+          </div>
+
+          <div class="part-row">
+            <div class="part-av" style="background:#ef4444;">SN</div>
+            <div class="part-info">
+              <div class="part-name">Sari Indah</div>
+              <div class="part-sub">Belum bayar — diingatkan kemarin</div>
+            </div>
+            <span class="part-amount">Rp 90k</span>
+            <span class="part-badge unpaid">Belum</span>
+          </div>
+
+          <div class="part-row">
+            <div class="part-av" style="background:#ec4899;">MK</div>
+            <div class="part-info">
+              <div class="part-name">Mira Kusuma</div>
+              <div class="part-sub">Belum bayar</div>
+            </div>
+            <span class="part-amount">Rp 90k</span>
+            <span class="part-badge unpaid">Belum</span>
+          </div>
+
+          <div class="part-row">
+            <div class="part-av" style="background:#0891b2;">AN</div>
+            <div class="part-info">
+              <div class="part-name">Ari Nugraha</div>
+              <div class="part-sub">Belum bayar</div>
+            </div>
+            <span class="part-amount">Rp 90k</span>
+            <span class="part-badge unpaid">Belum</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Action Footer -->
+  <div class="action-footer">
+    <button class="remind-btn" onclick="alert('Pengingat dikirim ke Sari, Mira, dan Ari!')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Ingatkan 3 Orang yang Belum Bayar
+    </button>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept B — Conversational Today | Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* =====================================================
+   CONCEPT B — CONVERSATIONAL TODAY
+   The app "talks" to the user: a short human narrative
+   of today in chat-style bubbles, each with an inline
+   action. Feels like a friend reminding you, not a
+   control panel.
+   Compose Pill at bottom — same pattern as Concept A
+   because "chat metaphor + compose input" is a coherent
+   UI language: the bubbles look like messages, the pill
+   looks like the reply box. Keeps it warm and familiar.
+   ===================================================== */
+
+* { -webkit-tap-highlight-color: transparent; }
+
+.screen-inner { padding-bottom: 108px; }
+
+/* ---- Top bar (warm white) ---- */
+.top-bar-today {
+  background: var(--surface);
+  padding: 14px 20px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky; top: 0; z-index: 10;
+}
+.top-left { display: flex; flex-direction: column; gap: 2px; }
+.top-greeting { font-size: 11px; font-weight: 600; color: var(--ink-2); letter-spacing: .01em; }
+.top-name { font-size: 20px; font-weight: 800; color: var(--ink-1); letter-spacing: -0.03em; line-height: 1; }
+.top-right { display: flex; align-items: center; gap: 8px; }
+.icon-btn-today {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer;
+  color: var(--ink-1); position: relative;
+}
+.notif-dot-today {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--danger); border: 2px solid white;
+}
+.avatar-today {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--emerald);
+  border: 2px solid var(--emerald-soft);
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white; cursor: pointer;
+}
+
+/* ---- Date chip ---- */
+.date-chip {
+  display: flex; justify-content: center;
+  padding: 14px 0 6px;
+}
+.date-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--line-soft);
+  padding: 5px 14px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; color: var(--ink-2); letter-spacing: .02em;
+}
+
+/* ---- Chat bubbles container ---- */
+.bubbles-wrap {
+  padding: 8px 16px 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* App bubble (from the app, left-aligned) */
+.app-bubble-row {
+  display: flex; align-items: flex-end; gap: 8px;
+  animation: bubbleIn .35s cubic-bezier(.34,1.1,.64,1) both;
+}
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.app-bubble-row:nth-child(1) { animation-delay: .05s; }
+.app-bubble-row:nth-child(2) { animation-delay: .2s; }
+.app-bubble-row:nth-child(3) { animation-delay: .38s; }
+.app-bubble-row:nth-child(4) { animation-delay: .55s; }
+
+.bubble-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 16px; flex-shrink: 0; margin-bottom: 2px;
+  background: var(--line-soft);
+}
+.bubble-body {
+  flex: 1;
+  max-width: calc(100% - 44px);
+}
+.bubble-card {
+  background: var(--surface);
+  border-radius: 18px 18px 18px 4px;
+  padding: 13px 15px;
+  box-shadow: 0 2px 8px rgba(17,24,39,.06), 0 1px 2px rgba(17,24,39,.04);
+  position: relative;
+  overflow: hidden;
+}
+/* Feature color stripe */
+.bubble-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
+}
+.bubble-card.arisan::before { background: var(--emerald); }
+.bubble-card.patungan::before { background: var(--lavender); }
+.bubble-card.neutral::before { background: var(--ink-3); }
+
+.bubble-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 99px;
+  font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.bubble-tag.arisan { background: var(--emerald-soft); color: var(--emerald-dark); }
+.bubble-tag.patungan { background: var(--lavender-soft); color: var(--lavender-dark); }
+
+.bubble-text {
+  font-size: 14px; font-weight: 500; color: var(--ink-1);
+  line-height: 1.5; margin-bottom: 10px;
+}
+.bubble-text strong { font-weight: 800; }
+.bubble-text .amount { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; display: block; margin: 2px 0 4px; }
+.bubble-text .amount.em { color: var(--emerald-dark); }
+.bubble-text .amount.lv { color: var(--lavender-dark); }
+.bubble-text .amount.warn { color: #b45309; }
+
+/* Inline action inside bubble */
+.bubble-action {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.ba-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: 10px; border: none;
+  font-family: inherit; font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: transform .1s, opacity .1s;
+  letter-spacing: -.01em;
+}
+.ba-btn:active { transform: scale(.96); opacity: .9; }
+.ba-btn.primary-em { background: var(--emerald); color: white; }
+.ba-btn.primary-lv { background: var(--lavender); color: white; }
+.ba-btn.ghost { background: var(--gray-soft); color: var(--ink-1); border: 1px solid var(--line); }
+.ba-btn.ghost-warn { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+/* Mini progress in bubble */
+.bubble-progress {
+  margin: 8px 0 10px;
+}
+.bp-track { height: 5px; border-radius: 99px; background: var(--line-soft); overflow: hidden; margin-bottom: 4px; }
+.bp-fill-em { height: 100%; border-radius: 99px; background: var(--emerald); }
+.bp-fill-lv { height: 100%; border-radius: 99px; background: var(--lavender); }
+.bp-meta { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; color: var(--ink-3); }
+
+/* Avatar strip inside bubble */
+.bubble-avatars {
+  display: flex; align-items: center; margin-bottom: 8px;
+}
+.bav {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid white; display: grid; place-items: center;
+  font-size: 9px; font-weight: 800; color: white; margin-left: -5px; flex-shrink: 0;
+}
+.bav:first-child { margin-left: 0; }
+.bav-more {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--line); border: 2px solid white;
+  display: grid; place-items: center;
+  font-size: 9px; font-weight: 700; color: var(--ink-2);
+  margin-left: -5px;
+}
+.bubble-people-label { font-size: 10px; color: var(--ink-3); font-weight: 600; margin-left: 7px; }
+
+/* "Lihat semua" row link */
+.see-all-row {
+  display: flex; justify-content: flex-end;
+  padding: 2px 0 0;
+}
+.see-all-link {
+  font-size: 11px; font-weight: 700; color: var(--emerald-dark);
+  text-decoration: none; display: flex; align-items: center; gap: 3px;
+}
+.see-all-link.lv { color: var(--lavender-dark); }
+
+/* "All caught up" tail bubble */
+.tail-bubble {
+  display: flex; justify-content: center;
+  padding: 8px 0 16px;
+}
+.tail-pill {
+  background: var(--gray-soft); color: var(--ink-3);
+  font-size: 11px; font-weight: 600;
+  padding: 6px 14px; border-radius: 99px;
+  border: 1px solid var(--line);
+}
+
+/* ---- Compose Pill ---- */
+.compose-outer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 16px 28px;
+  background: linear-gradient(to top, var(--app-bg) 75%, transparent);
+  z-index: 40;
+  pointer-events: none;
+}
+.compose-pill {
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 4px 24px rgba(17,24,39,.14);
+  overflow: hidden;
+  pointer-events: auto;
+  transition: border-radius .3s cubic-bezier(.4,0,.2,1), border-color .3s ease, box-shadow .3s ease;
+}
+.compose-pill.open {
+  border-radius: 20px;
+  border-color: transparent;
+  box-shadow: 0 8px 40px rgba(17,24,39,.2);
+}
+.pill-collapsed {
+  height: 50px;
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 10px; cursor: pointer;
+}
+.compose-pill.open .pill-collapsed { display: none; }
+.pill-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--emerald), var(--lavender));
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: transform .2s;
+}
+.compose-pill:not(.open):hover .pill-icon { transform: rotate(90deg); }
+.pill-label { flex: 1; font-size: 14px; color: var(--ink-3); font-weight: 500; }
+.pill-dots { display: flex; gap: 4px; }
+.pill-dot { width: 8px; height: 8px; border-radius: 50%; }
+.pill-dot.em { background: var(--emerald); }
+.pill-dot.lv { background: var(--lavender); }
+
+.pill-expanded { display: none; }
+.compose-pill.open .pill-expanded { display: block; }
+.pill-close-row { padding: 12px 16px 8px; display: flex; justify-content: flex-end; }
+.pill-close-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; color: var(--ink-2);
+}
+.pill-lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px 14px; }
+.pill-lane {
+  border-radius: 14px; border: none; padding: 14px 12px;
+  font-family: inherit; cursor: pointer; transition: transform .1s; text-align: left;
+}
+.pill-lane:active { transform: scale(.97); }
+.pill-lane.em { background: var(--emerald-tint); border: 1.5px solid var(--emerald-soft); }
+.pill-lane.lv { background: var(--lavender-tint); border: 1.5px solid var(--lavender-soft); }
+.lane-icon { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 8px; }
+.lane-icon.em { background: var(--emerald-soft); }
+.lane-icon.lv { background: var(--lavender-soft); }
+.lane-title { font-size: 14px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 2px; }
+.lane-title.em { color: var(--emerald-dark); }
+.lane-title.lv { color: var(--lavender-dark); }
+.lane-sub { font-size: 10px; font-weight: 500; color: var(--ink-3); }
+
+.dimmer {
+  position: absolute; inset: 0; z-index: 35;
+  background: rgba(17,24,39,.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s; backdrop-filter: blur(1px);
+}
+.dimmer.active { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".5"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="var(--ink-1)"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".5"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Top bar -->
+      <div class="top-bar-today">
+        <div class="top-left">
+          <span class="top-greeting">Selamat pagi 👋</span>
+          <span class="top-name">Ricky</span>
+        </div>
+        <div class="top-right">
+          <button class="icon-btn-today" aria-label="Notifikasi">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-dot-today"></span>
+          </button>
+          <div class="avatar-today">RF</div>
+        </div>
+      </div>
+
+      <!-- Date -->
+      <div class="date-chip">
+        <div class="date-pill">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Kamis, 5 Juni 2025
+        </div>
+      </div>
+
+      <!-- BUBBLES -->
+      <div class="bubbles-wrap">
+
+        <!-- Bubble 1: Arisan iuran due -->
+        <div class="app-bubble-row">
+          <div class="bubble-avatar">💰</div>
+          <div class="bubble-body">
+            <div class="bubble-card arisan">
+              <div class="bubble-tag arisan">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Arisan
+              </div>
+              <div class="bubble-text">
+                Hei Ricky! Iuran <strong>Arisan Keluarga Sari</strong> kamu jatuh tempo <strong>5 hari lagi</strong>.
+                <span class="amount em">Rp 200.000</span>
+                Budi Setiawan dapat giliran bulan ini — yuk bantu dia 🎉
+              </div>
+              <div class="bubble-avatars">
+                <div class="bav" style="background:var(--emerald);">BS</div>
+                <div class="bav" style="background:#3b82f6;">RA</div>
+                <div class="bav" style="background:#8b5cf6;">DK</div>
+                <div class="bav-more">+9</div>
+                <span class="bubble-people-label">12 anggota</span>
+              </div>
+              <div class="bubble-progress">
+                <div class="bp-track"><div class="bp-fill-em" style="width:67%"></div></div>
+                <div class="bp-meta"><span>8/12 sudah bayar</span><span>10 Jun 2025</span></div>
+              </div>
+              <div class="bubble-action">
+                <button class="ba-btn primary-em" onclick="alert('Bayar Rp 200.000')">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Bayar Sekarang
+                </button>
+                <a href="today-detail-arisan.html" style="text-decoration:none;">
+                  <button class="ba-btn ghost">Lihat Detail</button>
+                </a>
+              </div>
+            </div>
+            <div class="see-all-row">
+              <a class="see-all-link" href="today-detail-arisan.html">Lihat semua 3 arisan →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bubble 2: Patungan Hotel Bromo urgent -->
+        <div class="app-bubble-row">
+          <div class="bubble-avatar">⚡</div>
+          <div class="bubble-body">
+            <div class="bubble-card patungan">
+              <div class="bubble-tag patungan">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Patungan
+              </div>
+              <div class="bubble-text">
+                <strong>Hotel Bromo</strong> 🏨 butuh dilunasi dalam <strong>3 hari</strong>!
+                <span class="amount warn">Rp 900.000 kurang</span>
+                3 dari 4 teman belum balik uang kamu. Ingatkan mereka?
+              </div>
+              <div class="bubble-avatars">
+                <div class="bav" style="background:#ef4444;">BS</div>
+                <div class="bav" style="background:#f97316;">IR</div>
+                <div class="bav" style="background:#f59e0b;">MF</div>
+                <span class="bubble-people-label">3 belum bayar</span>
+              </div>
+              <div class="bubble-progress">
+                <div class="bp-track"><div class="bp-fill-lv" style="width:25%"></div></div>
+                <div class="bp-meta"><span>25% lunas · Rp 300rb masuk</span><span>Deadline 8 Jun</span></div>
+              </div>
+              <div class="bubble-action">
+                <button class="ba-btn primary-lv" onclick="alert('Kirim pengingat ke 3 teman')">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Ingatkan 3 Teman
+                </button>
+                <button class="ba-btn ghost-warn">Cek Detail</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bubble 3: Patungan Makan Bali update -->
+        <div class="app-bubble-row">
+          <div class="bubble-avatar">🍽</div>
+          <div class="bubble-body">
+            <div class="bubble-card patungan">
+              <div class="bubble-tag patungan">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Patungan
+              </div>
+              <div class="bubble-text">
+                Update: <strong>Rina</strong> baru bayar Rp 90.000 ke <strong>Makan malam Bali</strong>! Tinggal 3 orang lagi.
+                <span class="amount lv">Rp 216.000 tersisa</span>
+              </div>
+              <div class="bubble-avatars">
+                <div class="bav" style="background:var(--emerald);">RA</div>
+                <div class="bav-more">baru bayar!</div>
+              </div>
+              <div class="bubble-progress">
+                <div class="bp-track"><div class="bp-fill-lv" style="width:60%"></div></div>
+                <div class="bp-meta"><span>60% lunas</span><span>Rp 324rb sudah masuk</span></div>
+              </div>
+              <div class="bubble-action">
+                <button class="ba-btn ghost" onclick="alert('Lihat Patungan Makan Bali')">Lihat Tagihan</button>
+              </div>
+            </div>
+            <div class="see-all-row">
+              <a class="see-all-link lv" href="#">Lihat semua 2 patungan →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tail bubble -->
+        <div class="tail-bubble">
+          <div class="tail-pill">Itu saja untuk hari ini. Sampai sini dulu ya 😊</div>
+        </div>
+
+      </div><!-- /bubbles-wrap -->
+
+    </div><!-- /screen-inner -->
+  </div><!-- /screen -->
+
+  <!-- Dimmer -->
+  <div class="dimmer" id="dimmer" onclick="closePill()"></div>
+
+  <!-- Compose Pill -->
+  <div class="compose-outer">
+    <div class="compose-pill" id="composePill">
+      <div class="pill-collapsed" onclick="openPill()">
+        <div class="pill-icon">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <span class="pill-label">Mulai sesuatu baru…</span>
+        <div class="pill-dots">
+          <div class="pill-dot em"></div>
+          <div class="pill-dot lv"></div>
+        </div>
+      </div>
+      <div class="pill-expanded">
+        <div class="pill-close-row">
+          <button class="pill-close-btn" onclick="closePill()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="pill-lanes">
+          <button class="pill-lane em" onclick="alert('Buat Arisan baru')">
+            <div class="lane-icon em">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            </div>
+            <div class="lane-title em">Arisan</div>
+            <div class="lane-sub">Buat grup baru</div>
+          </button>
+          <button class="pill-lane lv" onclick="alert('Buat Patungan baru')">
+            <div class="lane-icon lv">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--lavender-dark)" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="lane-title lv">Patungan</div>
+            <div class="lane-sub">Bagi tagihan</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /phone-frame -->
+</div>
+
+<script>
+function openPill() {
+  document.getElementById('composePill').classList.add('open');
+  document.getElementById('dimmer').classList.add('active');
+}
+function closePill() {
+  document.getElementById('composePill').classList.remove('open');
+  document.getElementById('dimmer').classList.remove('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Opsi 2 — Contextual In-Section Buttons | Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ====== CONTEXTUAL IN-SECTION ENTRY POINTS ======
+   No dedicated create button.
+   Each module section on the home screen has its own
+   inline "+ Buat" entry that is always visible,
+   living naturally within that section's color world.
+   Feels like the action belongs to each feature, not to "the app."
+*/
+
+.screen-inner { padding: 16px 16px 40px; }
+
+/* Module section wrapper */
+.module-section {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+/* Section header strip */
+.mod-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.mod-header-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.mod-header-icon.em { background: var(--emerald); }
+.mod-header-icon.lv { background: var(--lavender-dark); }
+.mod-header-text { flex: 1; }
+.mod-name { font-size: 14px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; line-height: 1; }
+.mod-sub { font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+.mod-header-action { display: flex; align-items: center; gap: 6px; }
+
+/* The contextual create button */
+.ctx-create-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  border: none; cursor: pointer;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: -.01em;
+  font-family: inherit;
+  transition: transform .1s, box-shadow .15s;
+}
+.ctx-create-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(17,24,39,.12); }
+.ctx-create-btn:active { transform: translateY(0); }
+
+.ctx-create-btn.arisan {
+  background: var(--emerald);
+  color: white;
+}
+.ctx-create-btn.patungan {
+  background: var(--lavender-dark);
+  color: white;
+}
+
+/* Stats row */
+.mod-stats {
+  display: flex; gap: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.mod-stat { flex: 1; }
+.mod-stat + .mod-stat {
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+  margin-left: 16px;
+}
+.mod-stat-label { font-size: 10px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.mod-stat-val { font-size: 18px; font-weight: 800; color: var(--ink-1); letter-spacing: -0.02em; margin-top: 2px; }
+.mod-stat-sub { font-size: 10px; color: var(--ink-2); }
+
+/* Group row items */
+.group-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px;
+  cursor: pointer; transition: background .1s;
+}
+.group-row:hover { background: var(--gray-soft); }
+.group-row + .group-row { border-top: 1px solid var(--line-soft); }
+.group-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 800; flex-shrink: 0; color: white;
+}
+.group-avatar.em { background: linear-gradient(135deg, var(--emerald-dark), var(--emerald)); }
+.group-avatar.lv { background: linear-gradient(135deg, var(--lavender-dark), var(--lavender)); }
+.group-body { flex: 1; min-width: 0; }
+.group-name { font-size: 13px; font-weight: 700; color: var(--ink-1); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.group-meta { font-size: 11px; color: var(--ink-2); margin-top: 1px; }
+.group-right { text-align: right; flex-shrink: 0; }
+.group-amount { font-size: 13px; font-weight: 700; color: var(--ink-1); }
+.group-badge { font-size: 10px; color: var(--ink-3); margin-top: 1px; }
+
+/* Progress bar inside row */
+.row-progress {
+  height: 2px; border-radius: 99px;
+  background: var(--line-soft); overflow: hidden;
+  margin-top: 4px;
+}
+.row-progress-fill { height: 100%; border-radius: 99px; }
+
+/* See all link */
+.see-all-row {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line-soft);
+  gap: 4px;
+}
+.see-all-link {
+  font-size: 12px; font-weight: 600; background: none; border: none;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+}
+.see-all-link.em { color: var(--emerald-dark); }
+.see-all-link.lv { color: var(--lavender-dark); }
+
+/* Due banner */
+.due-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  background: var(--emerald-tint);
+  border-bottom: 1px solid var(--emerald-soft);
+}
+.due-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); flex-shrink: 0; }
+.due-text { flex: 1; font-size: 11px; font-weight: 600; color: var(--emerald-dark); }
+.due-amount { font-size: 12px; font-weight: 800; color: var(--emerald-dark); }
+
+/* Patungan progress pill */
+.bill-progress-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: var(--r-pill);
+  font-size: 10px; font-weight: 600;
+}
+.bill-progress-pill.pending { background: #fef3c7; color: #b45309; }
+.bill-progress-pill.partial { background: var(--lavender-soft); color: var(--lavender-dark); }
+.bill-progress-pill.settled { background: var(--emerald-soft); color: var(--emerald-dark); }
+
+/* Join option at bottom of Arisan section */
+.join-inline {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px dashed var(--line);
+  background: var(--gray-soft);
+  cursor: pointer; transition: background .1s;
+}
+.join-inline:hover { background: var(--line-soft); }
+.join-inline-text { font-size: 12px; font-weight: 600; color: var(--ink-2); flex: 1; }
+.join-inline-arrow { color: var(--ink-3); }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".3"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".35"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="top-bar-greeting">Selamat pagi</span>
+      <span class="top-bar-name">Ricky</span>
+    </div>
+    <div class="top-bar-right">
+      <button class="icon-btn" aria-label="Notifikasi">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="avatar-btn">RF</div>
+    </div>
+  </div>
+
+  <!-- Screen -->
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Balance summary (compact) -->
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <div class="card" style="flex:1;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Iuran Jatuh Tempo</div>
+          <div style="font-size:18px;font-weight:800;color:var(--ink-1);letter-spacing:-0.03em;">Rp 200.000</div>
+          <div style="font-size:10px;color:var(--emerald-dark);margin-top:2px;">dalam 5 hari</div>
+        </div>
+        <div class="card" style="flex:1;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Belum Dibayar</div>
+          <div style="font-size:18px;font-weight:800;color:var(--ink-1);letter-spacing:-0.03em;">Rp 450.000</div>
+          <div style="font-size:10px;color:var(--lavender-dark);margin-top:2px;">2 tagihan terbuka</div>
+        </div>
+      </div>
+
+      <!-- ARISAN SECTION -->
+      <div class="module-section">
+        <div class="mod-header">
+          <div class="mod-header-icon em">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="mod-header-text">
+            <div class="mod-name">Arisan</div>
+            <div class="mod-sub">3 grup aktif</div>
+          </div>
+          <div class="mod-header-action">
+            <!-- THIS IS THE CONTEXTUAL CREATE ENTRY -->
+            <button class="ctx-create-btn arisan" onclick="alert('Buat Arisan Baru')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Buat
+            </button>
+          </div>
+        </div>
+
+        <!-- Due strip -->
+        <div class="due-row">
+          <span class="due-dot"></span>
+          <span class="due-text">Arisan Keluarga Sari — jatuh tempo 10 Jun</span>
+          <span class="due-amount">Rp 200.000</span>
+        </div>
+
+        <!-- Group rows -->
+        <div class="group-row">
+          <div class="group-avatar em">AK</div>
+          <div class="group-body">
+            <div class="group-name">Arisan Keluarga Sari</div>
+            <div class="group-meta">12 anggota · Rp 200.000/bln</div>
+            <div class="row-progress"><div class="row-progress-fill" style="width:45%;background:var(--emerald);"></div></div>
+          </div>
+          <div class="group-right">
+            <div class="group-amount">6/12</div>
+            <div class="group-badge">putaran</div>
+          </div>
+        </div>
+        <div class="group-row">
+          <div class="group-avatar em">AK</div>
+          <div class="group-body">
+            <div class="group-name">Arisan Kantor</div>
+            <div class="group-meta">8 anggota · Rp 150.000/bln</div>
+            <div class="row-progress"><div class="row-progress-fill" style="width:25%;background:var(--emerald);"></div></div>
+          </div>
+          <div class="group-right">
+            <div class="group-amount">2/8</div>
+            <div class="group-badge">putaran</div>
+          </div>
+        </div>
+        <div class="group-row">
+          <div class="group-avatar em" style="font-size:11px;">RT5</div>
+          <div class="group-body">
+            <div class="group-name">Arisan RT 05</div>
+            <div class="group-meta">20 anggota · Rp 50.000/mgg</div>
+            <div class="row-progress"><div class="row-progress-fill" style="width:15%;background:var(--emerald);"></div></div>
+          </div>
+          <div class="group-right">
+            <div class="group-amount">3/20</div>
+            <div class="group-badge">putaran</div>
+          </div>
+        </div>
+
+        <!-- Join inline -->
+        <div class="join-inline" onclick="alert('Gabung Arisan')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          <span class="join-inline-text">Punya kode undangan? Gabung arisan</span>
+          <svg class="join-inline-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+      <!-- PATUNGAN SECTION -->
+      <div class="module-section">
+        <div class="mod-header">
+          <div class="mod-header-icon lv">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="mod-header-text">
+            <div class="mod-name">Patungan</div>
+            <div class="mod-sub">2 tagihan terbuka</div>
+          </div>
+          <div class="mod-header-action">
+            <!-- CONTEXTUAL CREATE FOR PATUNGAN -->
+            <button class="ctx-create-btn patungan" onclick="alert('Buat Tagihan Patungan')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Buat
+            </button>
+          </div>
+        </div>
+
+        <!-- Bill rows -->
+        <div class="group-row">
+          <div class="group-avatar lv">🍽</div>
+          <div class="group-body">
+            <div class="group-name">Makan malam Bali</div>
+            <div class="group-meta">6 orang · Rp 540.000</div>
+            <div style="margin-top:4px;"><span class="bill-progress-pill partial">60% lunas</span></div>
+          </div>
+          <div class="group-right">
+            <div class="group-amount" style="color:var(--lavender-dark);">+Rp 216.000</div>
+            <div class="group-badge">milikmu</div>
+          </div>
+        </div>
+        <div class="group-row">
+          <div class="group-avatar lv">🏨</div>
+          <div class="group-body">
+            <div class="group-name">Hotel Bromo</div>
+            <div class="group-meta">4 orang · Rp 1.200.000</div>
+            <div style="margin-top:4px;"><span class="bill-progress-pill pending">25% lunas</span></div>
+          </div>
+          <div class="group-right">
+            <div class="group-amount" style="color:var(--warn);">Rp 234.000</div>
+            <div class="group-badge">milikmu</div>
+          </div>
+        </div>
+        <div class="group-row" style="opacity:.5;">
+          <div class="group-avatar lv">🎬</div>
+          <div class="group-body">
+            <div class="group-name">Tiket konser</div>
+            <div class="group-meta">3 orang · Rp 800.000</div>
+            <div style="margin-top:4px;"><span class="bill-progress-pill settled">Lunas</span></div>
+          </div>
+          <div class="group-right">
+            <div class="group-amount" style="color:var(--emerald-dark);">+Rp 800.000</div>
+            <div class="group-badge">selesai</div>
+          </div>
+        </div>
+
+        <div class="see-all-row">
+          <button class="see-all-link lv">
+            Lihat semua tagihan
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

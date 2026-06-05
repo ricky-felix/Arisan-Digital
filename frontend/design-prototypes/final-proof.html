@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bukti Transfer — Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── Variant theming (default: patungan/lavender) ── */
+:root {
+  --accent:       var(--lavender-dark);
+  --accent-mid:   var(--lavender);
+  --accent-soft:  var(--lavender-soft);
+  --accent-tint:  var(--lavender-tint);
+  --grad-start:   #3b0764;
+  --grad-mid:     #6d28d9;
+  --grad-end:     #a78bfa;
+  --grad-header:  linear-gradient(165deg, #059669 0%, #10b981 45%, #a78bfa 100%); /* identical to profile banner */
+  --btn-shadow:   rgba(109,40,217,.35);
+  --success-ring: rgba(139,92,246,.25);
+}
+
+/* Arisan/emerald variant — applied via .variant-arisan on <body> */
+body.variant-arisan {
+  --accent:       var(--emerald-dark);
+  --accent-mid:   var(--emerald);
+  --accent-soft:  var(--emerald-soft);
+  --accent-tint:  var(--emerald-tint);
+  --grad-start:   #064e3b;
+  --grad-mid:     #059669;
+  --grad-end:     #34d399;
+  --grad-header:  linear-gradient(165deg, #059669 0%, #10b981 45%, #a78bfa 100%); /* identical to profile banner */
+  --btn-shadow:   rgba(5,150,105,.35);
+  --success-ring: rgba(16,185,129,.2);
+}
+
+/* ── Nav bar ── */
+.prf-nav {
+  background: var(--surface);
+  height: 52px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0;
+  gap: 10px;
+}
+.prf-back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; color: var(--ink-1);
+  transition: background .15s;
+}
+.prf-back-btn:hover { background: var(--line); }
+.prf-nav-title {
+  flex: 1;
+  font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em;
+}
+.prf-share-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  color: var(--ink-2); transition: background .15s;
+}
+.prf-share-btn:hover { background: var(--line); }
+
+/* ── Screen scroll area ── */
+.prf-screen {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  background: var(--app-bg);
+  scrollbar-width: none;
+  padding-bottom: 110px;
+}
+.prf-screen::-webkit-scrollbar { display: none; }
+
+/* ── Paper receipt card ── */
+.receipt-paper {
+  margin: 16px 16px 0;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: var(--sh-2), 0 0 0 1px rgba(0,0,0,.04);
+  overflow: hidden;
+}
+
+/* ── Gradient header band ── */
+.prf-header {
+  background: var(--grad-header);
+  padding: 20px 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.prf-header-blob1 {
+  position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,.08); pointer-events: none;
+}
+.prf-header-blob2 {
+  position: absolute; bottom: -20px; left: -20px;
+  width: 90px; height: 90px; border-radius: 50%;
+  background: rgba(255,255,255,.06); pointer-events: none;
+}
+
+/* Brand row */
+.prf-brand-row {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 18px;
+}
+.prf-logo {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: rgba(255,255,255,.2);
+  border: 1.5px solid rgba(255,255,255,.35);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+.prf-logo-letter {
+  font-size: 18px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1;
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,.75) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.prf-wordmark { font-size: 14px; font-weight: 800; color: white; letter-spacing: -.01em; }
+.prf-wordmark-sub { font-size: 9px; font-weight: 600; color: rgba(255,255,255,.65); letter-spacing: .04em; text-transform: uppercase; }
+.prf-type-chip {
+  margin-left: auto;
+  background: rgba(255,255,255,.2);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 99px; padding: 4px 10px;
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .1em; text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Success hero ── */
+.prf-success-hero {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.prf-check-ring {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 2.5px solid rgba(255,255,255,.7);
+  display: grid; place-items: center;
+  margin-bottom: 10px;
+  box-shadow: 0 0 0 8px rgba(255,255,255,.08);
+}
+.prf-success-label {
+  font-size: 13px; font-weight: 800; color: rgba(255,255,255,.9);
+  letter-spacing: .02em; text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.prf-success-amount {
+  font-size: 32px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.prf-success-amount-sub {
+  font-size: 11px; color: rgba(255,255,255,.7); font-weight: 600;
+  letter-spacing: .01em; margin-top: 4px;
+}
+
+/* ── Perforated edge ── */
+.prf-perforate {
+  display: flex; align-items: center;
+  margin: 0 -1px; /* bleed to card edge */
+  position: relative;
+}
+.prf-perforate-line {
+  flex: 1; height: 1.5px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--line) 0, var(--line) 6px,
+    transparent 6px, transparent 10px
+  );
+  margin: 0 4px;
+}
+.prf-perforate-hole {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--app-bg);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+}
+
+/* ── Receipt body ── */
+.prf-body { padding: 16px 20px 0; }
+
+/* Detail rows */
+.prf-row {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-soft);
+  gap: 12px;
+}
+.prf-row:last-child { border-bottom: none; }
+.prf-row-label {
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  flex-shrink: 0; min-width: 76px;
+  padding-top: 1px;
+}
+.prf-row-val {
+  font-size: 13px; font-weight: 700; color: var(--ink-1);
+  text-align: right; line-height: 1.35;
+}
+.prf-row-val.accent { color: var(--accent); }
+.prf-row-val.large {
+  font-size: 18px; font-weight: 800; letter-spacing: -.02em;
+  color: var(--accent);
+}
+
+/* Status badge */
+.prf-status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 99px;
+  background: var(--emerald-soft); color: var(--emerald-dark);
+  font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+
+/* ── Ref + method block ── */
+.prf-meta-block {
+  margin: 0 20px;
+  background: var(--line-soft);
+  border-radius: 12px; padding: 12px 14px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  margin-bottom: 0;
+}
+.prf-meta-label {
+  font-size: 9px; font-weight: 700; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px;
+}
+.prf-meta-val {
+  font-size: 12px; font-weight: 700; color: var(--ink-1); letter-spacing: -.01em;
+}
+.prf-meta-val.accent { color: var(--accent); }
+
+/* Divider line */
+.prf-divider {
+  margin: 14px 20px;
+  height: 1px; background: var(--line-soft);
+}
+
+/* ── Branded footer ── */
+.prf-footer {
+  padding: 14px 20px 18px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.prf-footer-logo {
+  width: 16px; height: 16px; border-radius: 4px;
+  background: linear-gradient(135deg, var(--emerald), var(--lavender));
+  display: grid; place-items: center;
+  font-size: 9px; font-weight: 900; color: white;
+}
+.prf-footer-text {
+  font-size: 10px; color: var(--ink-3); font-weight: 600; letter-spacing: .01em;
+}
+
+/* ── Variant-specific content toggles ── */
+.prf-patungan-only { display: block; }
+body.variant-arisan .prf-patungan-only { display: none; }
+.prf-arisan-only { display: none; }
+body.variant-arisan .prf-arisan-only { display: block; }
+
+/* Row value: inline spans for variant switching */
+.prf-val-patungan { display: inline; }
+body.variant-arisan .prf-val-patungan { display: none; }
+.prf-val-arisan { display: none; }
+body.variant-arisan .prf-val-arisan { display: inline; }
+
+/* ── Action footer ── */
+.prf-actions {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 16px 26px;
+  background: linear-gradient(to top, var(--app-bg) 72%, transparent);
+}
+.prf-btn-primary {
+  width: 100%; padding: 15px;
+  background: var(--accent);
+  color: white; border: none; border-radius: 14px;
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  box-shadow: 0 4px 16px var(--btn-shadow);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .1s, opacity .15s;
+  margin-bottom: 8px;
+}
+.prf-btn-primary:active { transform: scale(.98); }
+.prf-btn-secondary {
+  width: 100%; padding: 12px;
+  background: var(--accent-tint);
+  color: var(--accent); border: 1.5px solid var(--accent-soft);
+  border-radius: 14px;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; letter-spacing: -.01em;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s;
+}
+.prf-btn-secondary:hover { background: var(--accent-soft); }
+.prf-btn-secondary:active { transform: scale(.98); }
+
+/* ── Toast ── */
+.prf-toast {
+  position: absolute; bottom: 116px; left: 16px; right: 16px;
+  background: #111827; color: white;
+  border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700;
+  z-index: 70;
+  transform: translateY(16px); opacity: 0;
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+}
+.prf-toast.show { opacity: 1; transform: translateY(0); }
+.prf-toast-icon {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); display: grid; place-items: center;
+}
+</style>
+</head>
+<body>
+<!--
+  VARIANT CONTROL
+  ---------------
+  Default (no class): Patungan / lavender — "Tiket Konser" example.
+  Arisan/emerald variant: add class="variant-arisan" to <body>,
+  triggered by ?type=arisan in the URL (handled by JS below).
+-->
+
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" id="phoneFrame" style="position:relative;">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="var(--ink-1)"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Nav bar -->
+  <div class="prf-nav">
+    <a href="final-home.html" class="prf-back-btn" aria-label="Kembali">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <span class="prf-nav-title">Bukti Transfer</span>
+    <button class="prf-share-btn" onclick="handleShare()" aria-label="Bagikan">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    </button>
+  </div>
+
+  <!-- Scrollable screen -->
+  <div class="prf-screen">
+
+    <!-- ═══════════════════════════════════════════
+         RECEIPT PAPER CARD
+         (designed to read cleanly as a saved image)
+    ═══════════════════════════════════════════ -->
+    <div class="receipt-paper">
+
+      <!-- ── Gradient header band: brand + success hero ── -->
+      <div class="prf-header">
+        <div class="prf-header-blob1"></div>
+        <div class="prf-header-blob2"></div>
+
+        <!-- Brand row -->
+        <div class="prf-brand-row">
+          <div class="prf-logo">
+            <span class="prf-logo-letter">A</span>
+          </div>
+          <div>
+            <div class="prf-wordmark">Arisan Digital</div>
+            <div class="prf-wordmark-sub">Platform Keuangan Sosial</div>
+          </div>
+          <div class="prf-type-chip">Bukti Transfer</div>
+        </div>
+
+        <!-- Success hero: check icon + label + amount -->
+        <div class="prf-success-hero">
+          <div class="prf-check-ring">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="prf-success-label">Pembayaran Berhasil</div>
+          <div class="prf-success-amount">
+            <span class="prf-val-patungan">Rp 200.000</span>
+            <span class="prf-val-arisan">Rp 200.000</span>
+          </div>
+          <div class="prf-success-amount-sub">
+            <span class="prf-val-patungan">Bagianmu · Patungan Tiket Konser</span>
+            <span class="prf-val-arisan">Iuran · Arisan Kompleks Putaran 3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Perforated tear edge ── -->
+      <div class="prf-perforate">
+        <div class="prf-perforate-hole"></div>
+        <div class="prf-perforate-line"></div>
+        <div class="prf-perforate-hole"></div>
+      </div>
+
+      <!-- ── Receipt detail rows ── -->
+      <div class="prf-body">
+
+        <div class="prf-row">
+          <span class="prf-row-label">Dari</span>
+          <span class="prf-row-val">Ricky Felix</span>
+        </div>
+
+        <div class="prf-row">
+          <span class="prf-row-label">Ke</span>
+          <span class="prf-row-val">
+            <span class="prf-val-patungan">Ari Nugraha</span>
+            <span class="prf-val-arisan">Dompet Grup<br>Arisan Kompleks</span>
+          </span>
+        </div>
+
+        <div class="prf-row">
+          <span class="prf-row-label">Untuk</span>
+          <span class="prf-row-val">
+            <span class="prf-val-patungan">Patungan —<br>Tiket Konser</span>
+            <span class="prf-val-arisan">Iuran Arisan Kompleks<br>Putaran 3</span>
+          </span>
+        </div>
+
+        <div class="prf-row">
+          <span class="prf-row-label">
+            <span class="prf-val-patungan">Bagianmu</span>
+            <span class="prf-val-arisan">Jumlah</span>
+          </span>
+          <span class="prf-row-val large">
+            <span class="prf-val-patungan">Rp 200.000</span>
+            <span class="prf-val-arisan">Rp 200.000</span>
+          </span>
+        </div>
+
+        <div class="prf-row">
+          <span class="prf-row-label">Tanggal</span>
+          <span class="prf-row-val">5 Jun 2026, 09:41 WIB</span>
+        </div>
+
+        <div class="prf-row">
+          <span class="prf-row-label">Metode</span>
+          <span class="prf-row-val accent">GoPay</span>
+        </div>
+
+        <div class="prf-row" style="border-bottom:none;">
+          <span class="prf-row-label">Status</span>
+          <span class="prf-row-val">
+            <span class="prf-status-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Berhasil
+            </span>
+          </span>
+        </div>
+
+      </div><!-- /prf-body -->
+
+      <!-- ── Ref + additional meta block ── -->
+      <div class="prf-meta-block" style="margin:10px 20px 0;">
+        <div>
+          <div class="prf-meta-label">No. Referensi</div>
+          <div class="prf-meta-val accent">TRX-AD-20260605-0042</div>
+        </div>
+        <div>
+          <div class="prf-meta-label">Jenis</div>
+          <div class="prf-meta-val">
+            <span class="prf-val-patungan">Patungan</span>
+            <span class="prf-val-arisan">Arisan</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Branded footer ── -->
+      <div class="prf-footer">
+        <div class="prf-footer-logo">A</div>
+        <span class="prf-footer-text">Dibuat dengan Arisan Digital</span>
+      </div>
+
+    </div><!-- /receipt-paper -->
+
+  </div><!-- /prf-screen -->
+
+  <!-- ── Floating action buttons ── -->
+  <div class="prf-actions">
+    <button class="prf-btn-primary" onclick="handleShare()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Bagikan Bukti
+    </button>
+    <button class="prf-btn-secondary" onclick="handleSave()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Simpan sebagai Gambar
+    </button>
+  </div>
+
+  <!-- Toast -->
+  <div class="prf-toast" id="prfToast">
+    <div class="prf-toast-icon">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <span id="prfToastMsg">Bukti transfer dibagikan</span>
+  </div>
+
+</div><!-- /phone-frame -->
+</div>
+
+<script>
+// ── Variant detection: ?type=arisan switches to emerald/arisan variant ──
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get('type');
+  if (type === 'arisan') {
+    document.body.classList.add('variant-arisan');
+    document.getElementById('phoneFrame').style.background = '#065f46';
+  } else {
+    document.getElementById('phoneFrame').style.background = '#3b0764';
+  }
+})();
+
+// ── Toast helper ──
+let toastTimer = null;
+function showPrfToast(msg) {
+  const toast = document.getElementById('prfToast');
+  document.getElementById('prfToastMsg').textContent = msg;
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ── Share action ──
+function handleShare() {
+  const isArisan = document.body.classList.contains('variant-arisan');
+  showPrfToast(isArisan
+    ? 'Bukti transfer dibagikan ✓'
+    : 'Bukti transfer dibagikan ✓');
+}
+
+// ── Save action ──
+function handleSave() {
+  showPrfToast('Tersimpan ke galeri ✓');
+}
+</script>
+</body>
+</html>

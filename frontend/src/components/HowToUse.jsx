@@ -3,17 +3,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, cardHover } from "../utils/animations";
+import { Reveal } from "./Reveal";
 
 export function HowToUse() {
   return (
     <section id="cara-kerja" className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="how-to-use-heading">
-      <motion.div
-        className="container mx-auto"
-        variants={staggerContainer}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <Reveal className="container mx-auto">
         <motion.div
           className="mx-auto mb-12 w-full max-w-lg text-center md:mb-16 lg:mb-20"
           variants={staggerItem}
@@ -98,7 +93,7 @@ export function HowToUse() {
             </div>
           </motion.div>
         </motion.div>
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

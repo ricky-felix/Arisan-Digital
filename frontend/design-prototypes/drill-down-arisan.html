@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drill-down — Arisan Saya | Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ====== ARISAN LIST — DRILL-DOWN ======
+   Reachable from either home direction.
+   Back arrow returns to home.
+   No bottom tabs.
+*/
+
+/* Custom page header — replaces the generic top-bar */
+.page-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0;
+}
+.page-header-top {
+  display: flex; align-items: center;
+  padding: 10px 16px 8px; gap: 10px;
+}
+.back-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--gray-soft);
+  border: none; display: grid; place-items: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--ink-1); transition: background .1s;
+}
+.back-btn:hover { background: var(--line); }
+.page-title-block { flex: 1; }
+.page-module-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: var(--r-pill);
+  background: var(--emerald-soft); color: var(--emerald-dark);
+  font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; margin-bottom: 3px;
+}
+.page-title { font-size: 20px; font-weight: 800; color: var(--ink-1); letter-spacing: -0.03em; line-height: 1; }
+.page-header-actions { display: flex; gap: 6px; }
+
+/* Search + filter bar */
+.filter-bar {
+  padding: 10px 16px 12px; display: flex; flex-direction: column; gap: 8px;
+}
+.search-input-wrap { position: relative; }
+.search-input {
+  width: 100%; padding: 9px 12px 9px 36px;
+  border: 1.5px solid var(--line); border-radius: var(--r-input);
+  font-family: inherit; font-size: 13px; color: var(--ink-1);
+  background: var(--gray-soft); outline: none;
+  transition: border-color .15s, background .15s;
+}
+.search-input:focus { border-color: var(--emerald); background: var(--surface); }
+.search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-3); pointer-events: none;
+}
+.chips-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.chips-row::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: var(--r-pill);
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  font-size: 12px; font-weight: 600; color: var(--ink-2);
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: all .15s; font-family: inherit;
+}
+.chip.active { border-color: var(--emerald); background: var(--emerald-soft); color: var(--emerald-dark); }
+.chip:hover:not(.active) { border-color: var(--line); background: var(--gray-soft); }
+
+/* Screen body */
+.screen-inner { padding: 16px 16px 40px; }
+
+/* Group card */
+.group-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2);
+  margin-bottom: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.group-card:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(17,24,39,.1); }
+
+.group-card-header {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px 12px;
+}
+.group-initial {
+  width: 46px; height: 46px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--emerald-dark), var(--emerald));
+  display: grid; place-items: center; flex-shrink: 0;
+  color: white; font-size: 15px; font-weight: 800; letter-spacing: -.02em;
+}
+.group-info { flex: 1; min-width: 0; }
+.group-name {
+  font-size: 15px; font-weight: 800; color: var(--ink-1);
+  letter-spacing: -.02em; margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.group-desc { font-size: 11px; color: var(--ink-2); }
+.group-header-right { text-align: right; flex-shrink: 0; }
+.group-role {
+  display: inline-block;
+  padding: 2px 8px; border-radius: var(--r-pill);
+  font-size: 10px; font-weight: 700; letter-spacing: .02em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.group-role.admin { background: var(--emerald-soft); color: var(--emerald-dark); }
+.group-role.member { background: var(--line-soft); color: var(--ink-2); }
+.group-next-due { font-size: 11px; color: var(--ink-2); }
+
+/* Progress section */
+.group-card-progress {
+  padding: 0 16px 12px;
+}
+.progress-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 5px;
+}
+.progress-label { font-size: 11px; color: var(--ink-2); }
+.progress-count { font-size: 11px; font-weight: 700; color: var(--emerald-dark); }
+.prog-bar { height: 5px; border-radius: 99px; background: var(--line-soft); overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; background: var(--emerald); }
+
+/* Stats in footer */
+.group-card-footer {
+  display: flex; gap: 0;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--gray-soft);
+}
+.gc-stat { flex: 1; text-align: center; }
+.gc-stat + .gc-stat { border-left: 1px solid var(--line); }
+.gc-stat-val { font-size: 13px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; }
+.gc-stat-label { font-size: 10px; color: var(--ink-2); margin-top: 1px; }
+
+/* Upcoming giliran callout */
+.giliran-callout {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 16px 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--emerald-tint);
+  border: 1px solid var(--emerald-soft);
+}
+.giliran-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); flex-shrink: 0; }
+.giliran-text { font-size: 11px; color: var(--emerald-dark); font-weight: 600; flex: 1; }
+.giliran-chevron { color: var(--emerald); }
+
+/* Section label before list */
+.list-section-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-3);
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 8px; margin-top: 4px;
+}
+
+/* Join prompt */
+.join-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  border: 1.5px dashed var(--line);
+  padding: 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; margin-bottom: 12px;
+  transition: border-color .15s, background .15s;
+}
+.join-card:hover { border-color: var(--emerald); background: var(--emerald-tint); }
+.join-card-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--gray-soft);
+  display: grid; place-items: center; flex-shrink: 0;
+  color: var(--ink-2);
+}
+.join-card-text { flex: 1; }
+.join-card-title { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.join-card-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".3"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".35"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Page Header (no global top bar — this IS the header) -->
+  <div class="page-header">
+    <div class="page-header-top">
+      <a href="home-direction2.html">
+        <button class="back-btn" aria-label="Kembali ke Beranda">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </a>
+      <div class="page-title-block">
+        <div class="page-module-badge">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Arisan
+        </div>
+        <div class="page-title">Arisan Saya</div>
+      </div>
+      <div class="page-header-actions">
+        <button class="icon-btn" aria-label="Buat Arisan Baru">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search + chips -->
+    <div class="filter-bar">
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Cari grup arisan…">
+      </div>
+      <div class="chips-row">
+        <button class="chip active">Semua</button>
+        <button class="chip">Sebagai Admin</button>
+        <button class="chip">Sebagai Anggota</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen Content -->
+  <div class="screen">
+    <div class="screen-inner">
+
+      <div class="list-section-label">3 Grup Aktif</div>
+
+      <!-- GROUP 1 — Arisan Keluarga Sari -->
+      <div class="group-card" onclick="alert('Detail Arisan Keluarga Sari')">
+        <div class="group-card-header">
+          <div class="group-initial">AK</div>
+          <div class="group-info">
+            <div class="group-name">Arisan Keluarga Sari</div>
+            <div class="group-desc">12 anggota · Rp 200.000/bulan</div>
+          </div>
+          <div class="group-header-right">
+            <div class="group-role admin">Admin</div>
+            <div class="group-next-due">Jatuh tempo 10 Jun</div>
+          </div>
+        </div>
+
+        <div class="giliran-callout">
+          <span class="giliran-dot"></span>
+          <span class="giliran-text">Putaran berikutnya: Budi Santoso · 10 Jun</span>
+          <svg class="giliran-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+
+        <div class="group-card-progress">
+          <div class="progress-row">
+            <span class="progress-label">Putaran berjalan</span>
+            <span class="progress-count">6 dari 12</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:50%;"></div></div>
+        </div>
+
+        <div class="group-card-footer">
+          <div class="gc-stat">
+            <div class="gc-stat-val">Rp 200K</div>
+            <div class="gc-stat-label">Iuran/bln</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-val">6/12</div>
+            <div class="gc-stat-label">Putaran</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-val" style="color:var(--emerald-dark);">Rp 2,4 Jt</div>
+            <div class="gc-stat-label">Pot total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GROUP 2 — Arisan Kantor -->
+      <div class="group-card" onclick="alert('Detail Arisan Kantor')">
+        <div class="group-card-header">
+          <div class="group-initial" style="font-size:12px;">AKT</div>
+          <div class="group-info">
+            <div class="group-name">Arisan Kantor</div>
+            <div class="group-desc">8 anggota · Rp 150.000/bulan</div>
+          </div>
+          <div class="group-header-right">
+            <div class="group-role member">Anggota</div>
+            <div class="group-next-due">Jatuh tempo 15 Jun</div>
+          </div>
+        </div>
+
+        <div class="group-card-progress">
+          <div class="progress-row">
+            <span class="progress-label">Putaran berjalan</span>
+            <span class="progress-count">2 dari 8</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:25%;"></div></div>
+        </div>
+
+        <div class="group-card-footer">
+          <div class="gc-stat">
+            <div class="gc-stat-val">Rp 150K</div>
+            <div class="gc-stat-label">Iuran/bln</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-val">2/8</div>
+            <div class="gc-stat-label">Putaran</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-val" style="color:var(--emerald-dark);">Rp 1,2 Jt</div>
+            <div class="gc-stat-label">Pot total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GROUP 3 — Arisan RT 05 -->
+      <div class="group-card" onclick="alert('Detail Arisan RT 05')">
+        <div class="group-card-header">
+          <div class="group-initial" style="font-size:12px;">RT5</div>
+          <div class="group-info">
+            <div class="group-name">Arisan RT 05</div>
+            <div class="group-desc">20 anggota · Rp 50.000/minggu</div>
+          </div>
+          <div class="group-header-right">
+            <div class="group-role member">Anggota</div>
+            <div class="group-next-due">Minggu ini</div>
+          </div>
+        </div>
+
+        <div class="group-card-progress">
+          <div class="progress-row">
+            <span class="progress-label">Putaran berjalan</span>
+            <span class="progress-count">3 dari 20</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:15%;"></div></div>
+        </div>
+
+        <div class="group-card-footer">
+          <div class="gc-stat">
+            <div class="gc-stat-val">Rp 50K</div>
+            <div class="gc-stat-label">Iuran/mgg</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-val">3/20</div>
+            <div class="gc-stat-label">Putaran</div>
+          </div>
+          <div class="gc-stat">
+            <div class="gc-stat-val" style="color:var(--emerald-dark);">Rp 1 Jt</div>
+            <div class="gc-stat-label">Pot total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Join card -->
+      <div class="join-card" onclick="alert('Gabung dengan kode undangan')">
+        <div class="join-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        </div>
+        <div class="join-card-text">
+          <div class="join-card-title">Gabung arisan lain</div>
+          <div class="join-card-sub">Masukkan kode undangan dari admin</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

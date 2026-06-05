@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dompet Saya — Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── Page layout ── */
+.page-gallery {
+  display: flex; justify-content: center; align-items: flex-start;
+  min-height: 100vh; padding: 40px 20px;
+}
+.phone-frame-rel { position: relative; }
+
+/* ── Header ── */
+.ov-header {
+  background: var(--surface);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky; top: 0; z-index: 10;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; color: var(--ink-1);
+}
+.back-btn:hover { background: var(--line); }
+.ov-title { font-size: 17px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; flex: 1; }
+
+/* ── Module cards (from home-direction2) ── */
+.module-card {
+  border-radius: var(--r-card);
+  padding: 18px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  position: relative; overflow: hidden;
+}
+.module-card:hover { transform: translateY(-1px); box-shadow: var(--sh-3); }
+.module-card:active { transform: translateY(0); }
+
+.module-card.arisan {
+  background: linear-gradient(145deg, #059669 0%, #10b981 60%, #34d399 100%);
+  color: white;
+}
+.module-card.patungan {
+  background: linear-gradient(145deg, #7c3aed 0%, #8b5cf6 60%, #a78bfa 100%);
+  color: white;
+}
+/* Dompet Grup — deep slate-teal vault gradient */
+.module-card.dompet {
+  background: linear-gradient(145deg, #0f2d3a 0%, #0f4a5a 45%, #0d7a7a 100%);
+  color: white;
+}
+
+/* Decorative circles */
+.module-card::before {
+  content: '';
+  position: absolute;
+  right: -20px; top: -20px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  pointer-events: none;
+}
+.module-card::after {
+  content: '';
+  position: absolute;
+  right: 30px; bottom: -30px;
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  pointer-events: none;
+}
+
+.module-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; position: relative; z-index: 1;
+}
+.module-card-icon {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: rgba(255,255,255,.2);
+  display: grid; place-items: center;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  flex-shrink: 0;
+}
+.mch-left { display: flex; align-items: center; gap: 10px; }
+.module-card-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; opacity: .85;
+}
+/* Chevron arrow — rotates when expanded */
+.module-card-arrow {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,255,255,.15);
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+.wallet-card.open .module-card-arrow { transform: rotate(180deg); }
+
+.module-card-body { position: relative; z-index: 1; }
+.module-card-name {
+  font-size: 17px; font-weight: 800; letter-spacing: -0.02em;
+  margin-bottom: 3px; line-height: 1.2;
+}
+.module-card-desc { font-size: 11px; opacity: .8; }
+
+.module-card-stats {
+  display: flex;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.2);
+  position: relative; z-index: 1;
+}
+.module-card-stat { flex: 1; }
+.module-card-stat + .module-card-stat {
+  padding-left: 16px;
+  border-left: 1px solid rgba(255,255,255,.2);
+  margin-left: 16px;
+}
+.mc-stat-label { font-size: 10px; opacity: .75; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.mc-stat-val { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-top: 2px; }
+.mc-stat-sub { font-size: 10px; opacity: .7; margin-top: 1px; }
+
+/* Due strip */
+.card-due-strip {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.15);
+  display: flex; align-items: center; gap: 8px;
+  position: relative; z-index: 1;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.card-due-dot { width: 6px; height: 6px; border-radius: 50%; background: #fbbf24; flex-shrink: 0; }
+.card-due-dot.orange { background: #fb923c; }
+.card-due-dot.teal { background: #5eead4; }
+.card-due-text { font-size: 11px; font-weight: 600; flex: 1; opacity: .9; }
+.card-due-amount { font-size: 12px; font-weight: 800; }
+
+/* ── Wallet card wrapper (collapsible) ── */
+.wallet-card {
+  margin: 16px 16px 0;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  box-shadow: var(--sh-1), var(--sh-2);
+}
+/* Remove default module-card radius when nested inside wallet-card */
+.wallet-card .module-card {
+  border-radius: 0;
+  margin: 0;
+}
+/* Restore top corners for the card face */
+.wallet-card .module-card {
+  border-radius: var(--r-card) var(--r-card) 0 0;
+}
+/* When collapsed, bottom of card face should also be rounded */
+.wallet-card:not(.open) .module-card {
+  border-radius: var(--r-card);
+}
+
+/* ── Expandable inner panel ── */
+.card-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height .34s cubic-bezier(.4,0,.2,1), opacity .24s ease;
+}
+.wallet-card.open .card-panel {
+  max-height: 700px;
+  opacity: 1;
+}
+
+/* Inner rows container */
+.panel-rows {
+  background: #f8fafc;
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+
+/* ── Inner list rows ── */
+.panel-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .12s;
+  background: #ffffff;
+}
+.panel-row:hover { background: #f3f4f6; }
+.panel-row + .panel-row { border-top: 1px solid var(--line-soft); }
+
+/* Urgent accent */
+.panel-row.urgent-arisan { border-left: 3px solid var(--emerald-dark); }
+.panel-row.urgent-patungan { border-left: 3px solid var(--lavender-dark); }
+.panel-row.settled { opacity: .72; }
+
+/* Row icon */
+.pr-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center; flex-shrink: 0;
+  font-size: 17px;
+}
+.pr-icon.em { background: var(--emerald-soft); color: var(--emerald-dark); }
+.pr-icon.lv { background: var(--lavender-soft); color: var(--lavender-dark); }
+.pr-icon.teal { background: #ccfbf1; color: #0f766e; }
+.pr-icon.grey { background: var(--gray-soft); color: var(--ink-2); }
+
+/* Row info */
+.pr-info { flex: 1; min-width: 0; }
+.pr-name { font-size: 14px; font-weight: 700; color: var(--ink-1); letter-spacing: -.01em; }
+.pr-meta { font-size: 11px; color: var(--ink-2); font-weight: 500; margin-top: 2px; }
+.pr-bar { height: 3px; background: rgba(0,0,0,.08); border-radius: 99px; margin-top: 5px; overflow: hidden; }
+.pr-fill { height: 100%; border-radius: 99px; }
+.pr-fill.em { background: var(--emerald-dark); }
+.pr-fill.lv { background: var(--lavender-dark); }
+.pr-fill.teal { background: #0d9488; }
+.pr-fill.grey { background: var(--ink-3); }
+
+/* Row right side */
+.pr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.pr-amount { font-size: 13px; font-weight: 800; }
+.pr-amount.em { color: var(--emerald-dark); }
+.pr-amount.lv { color: var(--lavender-dark); }
+.pr-amount.teal { color: #0f766e; }
+.pr-amount.neutral { color: var(--ink-1); }
+.pr-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px; border-radius: 99px;
+  font-size: 9px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
+}
+.pr-badge.em { background: rgba(16,185,129,.18); color: var(--emerald-dark); }
+.pr-badge.lv { background: rgba(139,92,246,.18); color: var(--lavender-dark); }
+.pr-badge.teal { background: #ccfbf1; color: #0f766e; }
+.pr-badge.urgent { background: #fee2e2; color: var(--danger); }
+.pr-badge.settled { background: var(--gray-soft); color: var(--ink-3); }
+
+/* Progress fill widths — named classes replace inline style="width:XX%" */
+.w-15  { width: 15%; }
+.w-25  { width: 25%; }
+.w-60  { width: 60%; }
+.w-67  { width: 67%; }
+.w-100 { width: 100%; }
+
+/* Bottom padding spacer */
+.screen-end { height: 32px; }
+</style>
+</head>
+<body>
+<div class="page-gallery">
+<div class="phone-frame phone-frame-rel">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Header -->
+      <div class="ov-header">
+        <a href="final-home.html" class="back-btn" aria-label="Kembali ke Home">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <span class="ov-title">Dompet Saya</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="14" y1="18" x2="20" y2="18"/></svg>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           CARD 1 — ARISAN (emerald, expanded by default)
+           ══════════════════════════════════════════ -->
+      <div class="wallet-card open" id="wArisan">
+        <div class="module-card arisan"
+             role="button"
+             tabindex="0"
+             aria-expanded="true"
+             aria-controls="panelArisan"
+             onclick="toggleCard('wArisan','panelArisan',this)"
+             onkeydown="if(event.key==='Enter'||event.key===' ')toggleCard('wArisan','panelArisan',this)">
+
+          <div class="module-card-header">
+            <div class="mch-left">
+              <div class="module-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <span class="module-card-label">Arisan</span>
+            </div>
+            <div class="module-card-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="module-card-body">
+            <div class="module-card-name">Tabungan Bergilir</div>
+            <div class="module-card-desc">3 grup aktif · Rp 400.000/bln total iuran</div>
+          </div>
+
+          <div class="module-card-stats">
+            <div class="module-card-stat">
+              <div class="mc-stat-label">Grup Aktif</div>
+              <div class="mc-stat-val">3</div>
+              <div class="mc-stat-sub">12–20 anggota</div>
+            </div>
+            <div class="module-card-stat">
+              <div class="mc-stat-label">Iuran Berikutnya</div>
+              <div class="mc-stat-val">Rp 200.000</div>
+              <div class="mc-stat-sub">Arisan Keluarga</div>
+            </div>
+          </div>
+
+          <div class="card-due-strip">
+            <span class="card-due-dot"></span>
+            <span class="card-due-text">Jatuh tempo dalam 5 hari · 10 Jun</span>
+            <span class="card-due-amount">Rp 200.000</span>
+          </div>
+        </div>
+
+        <!-- Expanded panel -->
+        <div class="card-panel" id="panelArisan">
+          <div class="panel-rows">
+
+            <!-- Keluarga Sari — urgent -->
+            <a href="final-group-detail.html" class="panel-row urgent-arisan">
+              <div class="pr-icon em">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="pr-info">
+                <div class="pr-name">Keluarga Sari</div>
+                <div class="pr-meta">12 anggota · 8/12 bayar · Giliran: Budi S.</div>
+                <div class="pr-bar"><div class="pr-fill em w-67"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount em">Rp 200k</span>
+                <span class="pr-badge urgent">2 hari lagi</span>
+              </div>
+            </a>
+
+            <!-- Arisan Kantor -->
+            <a href="#" class="panel-row">
+              <div class="pr-icon em">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              </div>
+              <div class="pr-info">
+                <div class="pr-name">Arisan Kantor</div>
+                <div class="pr-meta">8 anggota · 2/8 putaran · Rp 150k/bln</div>
+                <div class="pr-bar"><div class="pr-fill em w-25"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount em">Rp 150k</span>
+                <span class="pr-badge em">15 Jun</span>
+              </div>
+            </a>
+
+            <!-- Arisan RT 05 -->
+            <a href="#" class="panel-row">
+              <div class="pr-icon em">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <div class="pr-info">
+                <div class="pr-name">Arisan RT 05</div>
+                <div class="pr-meta">20 anggota · 3/20 putaran · Rp 50k/mgg</div>
+                <div class="pr-bar"><div class="pr-fill em w-15"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount em">Rp 50k</span>
+                <span class="pr-badge em">Minggu ini</span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+      </div><!-- /wArisan -->
+
+      <!-- ══════════════════════════════════════════
+           CARD 2 — PATUNGAN (lavender, collapsed)
+           ══════════════════════════════════════════ -->
+      <div class="wallet-card" id="wPatungan">
+        <div class="module-card patungan"
+             role="button"
+             tabindex="0"
+             aria-expanded="false"
+             aria-controls="panelPatungan"
+             onclick="toggleCard('wPatungan','panelPatungan',this)"
+             onkeydown="if(event.key==='Enter'||event.key===' ')toggleCard('wPatungan','panelPatungan',this)">
+
+          <div class="module-card-header">
+            <div class="mch-left">
+              <div class="module-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <span class="module-card-label">Patungan</span>
+            </div>
+            <div class="module-card-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="module-card-body">
+            <div class="module-card-name">Bagi Pengeluaran</div>
+            <div class="module-card-desc">2 tagihan terbuka · Rp 450.000 belum masuk</div>
+          </div>
+
+          <div class="module-card-stats">
+            <div class="module-card-stat">
+              <div class="mc-stat-label">Tagihan Open</div>
+              <div class="mc-stat-val">2</div>
+              <div class="mc-stat-sub">dari 3 total</div>
+            </div>
+            <div class="module-card-stat">
+              <div class="mc-stat-label">Belum Masuk</div>
+              <div class="mc-stat-val">Rp 450.000</div>
+              <div class="mc-stat-sub">dari orang lain</div>
+            </div>
+          </div>
+
+          <div class="card-due-strip">
+            <span class="card-due-dot orange"></span>
+            <span class="card-due-text">Hotel Bromo — 3 orang belum bayar</span>
+            <span class="card-due-amount">Rp 900.000</span>
+          </div>
+        </div>
+
+        <!-- Expanded panel -->
+        <div class="card-panel" id="panelPatungan">
+          <div class="panel-rows">
+
+            <!-- Makan Bali -->
+            <a href="final-bill-detail.html" class="panel-row">
+              <div class="pr-icon lv">🍽</div>
+              <div class="pr-info">
+                <div class="pr-name">Makan Bali</div>
+                <div class="pr-meta">6 orang · 3 belum bayar · Rp 90k/orang</div>
+                <div class="pr-bar"><div class="pr-fill lv w-60"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount lv">Rp 540k</span>
+                <span class="pr-badge lv">60%</span>
+              </div>
+            </a>
+
+            <!-- Hotel Bromo — urgent -->
+            <a href="final-bill-detail.html" class="panel-row urgent-patungan">
+              <div class="pr-icon lv">🏨</div>
+              <div class="pr-info">
+                <div class="pr-name">Hotel Bromo</div>
+                <div class="pr-meta">4 orang · 3 belum bayar · Deadline 8 Jun</div>
+                <div class="pr-bar"><div class="pr-fill lv w-25"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount lv">Rp 1,2jt</span>
+                <span class="pr-badge urgent">Urgent</span>
+              </div>
+            </a>
+
+            <!-- Tiket Konser — settled -->
+            <a href="final-bill-detail.html" class="panel-row settled">
+              <div class="pr-icon grey">🎬</div>
+              <div class="pr-info">
+                <div class="pr-name">Tiket Konser</div>
+                <div class="pr-meta">4 orang · Semua sudah bayar</div>
+                <div class="pr-bar"><div class="pr-fill grey w-100"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount neutral">Rp 800k</span>
+                <span class="pr-badge settled">Selesai</span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+      </div><!-- /wPatungan -->
+
+      <!-- ══════════════════════════════════════════
+           CARD 3 — DOMPET GRUP (conditional)
+           Shown only when group wallet(s) exist.
+           In this prototype: 1 active wallet (Keluarga Sari's pot).
+           Render guard: IF group_wallets.length > 0
+           ══════════════════════════════════════════ -->
+      <div class="wallet-card" id="wDompet">
+        <div class="module-card dompet"
+             role="button"
+             tabindex="0"
+             aria-expanded="false"
+             aria-controls="panelDompet"
+             onclick="toggleCard('wDompet','panelDompet',this)"
+             onkeydown="if(event.key==='Enter'||event.key===' ')toggleCard('wDompet','panelDompet',this)">
+
+          <div class="module-card-header">
+            <div class="mch-left">
+              <div class="module-card-icon">
+                <!-- Wallet icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/><circle cx="17" cy="15" r="1.5" fill="white" stroke="none"/></svg>
+              </div>
+              <span class="module-card-label">Dompet Grup</span>
+            </div>
+            <div class="module-card-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="module-card-body">
+            <div class="module-card-name">Saldo Tersimpan</div>
+            <div class="module-card-desc">1 dompet aktif · akan dicairkan bulan ini</div>
+          </div>
+
+          <div class="module-card-stats">
+            <div class="module-card-stat">
+              <div class="mc-stat-label">Total Saldo</div>
+              <div class="mc-stat-val">Rp 1,6jt</div>
+              <div class="mc-stat-sub">terkumpul</div>
+            </div>
+            <div class="module-card-stat">
+              <div class="mc-stat-label">Akan Cair</div>
+              <div class="mc-stat-val">10 Jun</div>
+              <div class="mc-stat-sub">ke Budi S.</div>
+            </div>
+          </div>
+
+          <div class="card-due-strip">
+            <span class="card-due-dot teal"></span>
+            <span class="card-due-text">Keluarga Sari — 8/12 sudah setor</span>
+            <span class="card-due-amount">Rp 1.600.000 / 2.400.000</span>
+          </div>
+        </div>
+
+        <!-- Expanded panel -->
+        <div class="card-panel" id="panelDompet">
+          <div class="panel-rows">
+
+            <!-- Dompet Keluarga Sari -->
+            <a href="final-group-detail.html" class="panel-row">
+              <div class="pr-icon teal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/><circle cx="17" cy="15" r="1.5" fill="#0f766e" stroke="none"/></svg>
+              </div>
+              <div class="pr-info">
+                <div class="pr-name">Dompet Keluarga Sari</div>
+                <div class="pr-meta">Terkumpul Rp 1.600.000 dari Rp 2.400.000 · Cair 10 Jun ke Budi S.</div>
+                <div class="pr-bar"><div class="pr-fill teal w-67"></div></div>
+              </div>
+              <div class="pr-right">
+                <span class="pr-amount teal">Rp 1,6jt</span>
+                <span class="pr-badge teal">67%</span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+      </div><!-- /wDompet -->
+      <!-- END IF group_wallets -->
+
+      <div class="screen-end"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function toggleCard(wrapId, panelId, cardEl) {
+  const wrap = document.getElementById(wrapId);
+  const isOpen = wrap.classList.contains('open');
+  wrap.classList.toggle('open', !isOpen);
+  cardEl.setAttribute('aria-expanded', String(!isOpen));
+}
+</script>
+</body>
+</html>

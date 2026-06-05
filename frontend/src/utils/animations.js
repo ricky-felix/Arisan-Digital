@@ -150,12 +150,17 @@ export const staggerItemScale = {
   },
 };
 
-// Scroll-reveal variants trigger on `amount` (fraction visible) only — no
-// negative `viewport.margin`. A negative margin becomes the IntersectionObserver
-// rootMargin, and on mobile the visual viewport resizes when the address bar
-// collapses on first scroll, shifting that inset edge right as the reveal fires.
-// The resulting enter→leave→enter replayed the animation and read as a blink /
-// the component mounting twice. `once: true` + amount-based triggering is stable.
+// Scroll-reveal variants. Prefer the `<Reveal>` component (components/Reveal.jsx)
+// over wiring these into a `whileInView` prop. On mobile the `whileInView` prop
+// re-checks intersection on every IntersectionObserver callback, including the
+// one fired when the address bar collapses on first scroll and resizes the
+// visual viewport — that momentarily drops the entering element back under the
+// `amount` threshold and over it again (enter→leave→enter), replaying the
+// animation as a blink that the `once` latch doesn't reliably suppress. `Reveal`
+// drives the same animation from a `useInView` hook whose `once: true` result is
+// latched in React state and cannot revert on resize, so the reveal runs once.
+// (These spreads are kept for any one-off `whileInView` use; the `viewport`
+// here carries no negative margin, which was a separate, earlier blink source.)
 export const scrollReveal = {
   initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },

@@ -9,7 +9,8 @@ import {
 } from "@relume_io/relume-ui";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { staggerContainer, staggerItemLeft, staggerItemRight } from "../utils/animations";
+import { staggerItemLeft, staggerItemRight } from "../utils/animations";
+import { Reveal } from "./Reveal";
 
 const useCarousel = () => {
   const [api, setApi] = useState();
@@ -43,23 +44,59 @@ const useCarousel = () => {
 const slides = [
   {
     src: "/pictures/app/beranda.png",
-    alt: "Dashboard Arisan Digital di tampilan desktop dan mobile, menampilkan ringkasan grup aktif, tagihan, dan tabungan",
+    alt: "Beranda Arisan Digital: satu kartu fokus menampilkan iuran berikutnya, giliran penerima, dan tombol bayar langsung",
+    title: "Beranda",
+    caption:
+      "Satu kartu fokus menampilkan iuran berikutnya, siapa yang dapat giliran, dan tombol bayar langsung. Geser untuk berpindah antar grup arisan dan tagihan patungan.",
   },
   {
-    src: "/pictures/app/arisan.png",
-    alt: "Daftar grup arisan di desktop dan mobile dengan status ronde, jumlah anggota, dan jadwal berikutnya",
+    src: "/pictures/app/buat-arisan.png",
+    alt: "Buat Arisan: form pengaturan nama grup, iuran per ronde, frekuensi, metode giliran, dan tanggal mulai",
+    title: "Buat Arisan",
+    caption:
+      "Atur arisan baru dalam satu layar — nama grup, iuran per ronde, frekuensi, metode giliran, dan tanggal mulai. Anggota tinggal bergabung lewat link undangan.",
   },
   {
-    src: "/pictures/app/bayar.png",
-    alt: "Halaman pembayaran di desktop dan mobile untuk mengelola tagihan iuran dan konfirmasi bukti transfer",
+    src: "/pictures/app/buat-patungan.png",
+    alt: "Buat Patungan: form judul, kategori, dan total tagihan yang dibagi rata ke peserta",
+    title: "Buat Patungan",
+    caption:
+      "Bagi pengeluaran bersama: isi judul, kategori, dan total tagihan, lalu biarkan terbagi rata ke setiap peserta yang bergabung lewat link.",
   },
   {
-    src: "/pictures/app/patungan.png",
-    alt: "Fitur bagi tagihan di desktop dan mobile untuk membagi pengeluaran bersama dengan teman",
+    src: "/pictures/app/dompet.png",
+    alt: "Dompet Saya: kartu Arisan, Patungan, dan dompet grup yang bisa dibuka untuk melihat rincian aktivitas",
+    title: "Dompet Saya",
+    caption:
+      "Rangkuman Arisan, Patungan, dan dompet grup dalam kartu yang bisa dibuka untuk melihat rincian setiap aktivitas keuanganmu.",
+  },
+  {
+    src: "/pictures/app/anggota.png",
+    alt: "Anggota grup arisan dalam tampilan orbit melingkar dengan status pembayaran tiap anggota dan giliran penerima",
+    title: "Anggota Grup",
+    caption:
+      "Lihat anggota grup arisan dalam satu orbit melingkar. Warna menandai siapa yang sudah bayar, belum bayar, dan siapa yang dapat giliran bulan ini.",
+  },
+  {
+    src: "/pictures/app/notifikasi.png",
+    alt: "Notifikasi berbentuk percakapan: kabar masuk di kiri, hal yang perlu kamu tindak di kanan dengan aksi langsung",
+    title: "Notifikasi",
+    caption:
+      "Notifikasi tampil seperti percakapan — kabar masuk di kiri, hal yang perlu kamu tindak di kanan. Bayar atau ingatkan teman langsung tanpa pindah halaman.",
+  },
+  {
+    src: "/pictures/app/bukti.png",
+    alt: "Bukti Transfer: struk digital pembayaran dengan rincian pengirim, penerima, jumlah, dan status berhasil untuk dibagikan ke grup",
+    title: "Bukti Transfer",
+    caption:
+      "Setiap pembayaran menghasilkan struk digital rapi — rincian pengirim, penerima, jumlah, dan status — yang bisa langsung dibagikan ke grup atau disimpan sebagai gambar.",
   },
   {
     src: "/pictures/app/profil.png",
-    alt: "Halaman profil dan pengaturan akun di desktop dan mobile dengan kontrol notifikasi dan keamanan",
+    alt: "Halaman profil dengan ringkasan aktivitas serta pengaturan akun, pembayaran, dan keamanan",
+    title: "Profil",
+    caption:
+      "Ringkasan aktivitasmu beserta pengaturan akun, metode pembayaran, keamanan, dan notifikasi dalam satu halaman.",
   },
 ];
 
@@ -67,13 +104,7 @@ export function Gallery() {
   const carousel = useCarousel();
   return (
     <section id="testimoni" className="overflow-hidden bg-background-primary py-16 md:py-24 lg:py-28" aria-labelledby="gallery-heading">
-      <motion.div
-        className="grid auto-cols-fr grid-cols-1 items-center gap-12 md:gap-16 lg:grid-cols-2 lg:gap-0"
-        variants={staggerContainer}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <Reveal className="grid auto-cols-fr grid-cols-1 items-center gap-12 md:gap-16 lg:grid-cols-2 lg:gap-0">
         <div className="flex lg:justify-self-end">
           <motion.div className="mx-[5%] w-full max-w-md lg:mb-24 lg:ml-[5vw] lg:mr-20" variants={staggerItemLeft}>
             <h2 id="gallery-heading" className="mb-5 text-5xl font-bold leading-tight text-text-primary md:mb-6 md:text-7xl lg:text-8xl">
@@ -104,6 +135,10 @@ export function Gallery() {
                     className="size-full object-cover"
                   />
                 </div>
+                <div className="mt-4">
+                  <h3 className="text-base font-semibold text-text-primary md:text-lg">{slide.title}</h3>
+                  <p className="mt-1 text-sm text-text-primary/80 md:text-base">{slide.caption}</p>
+                </div>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -133,7 +168,7 @@ export function Gallery() {
           </div>
         </Carousel>
         </motion.div>
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

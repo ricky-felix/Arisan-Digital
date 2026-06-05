@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilih gaya "Giliran" (tanpa avatar) — Arisan card</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ─── Page chrome ─── */
+body {
+  background: #dde4ec;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 48px 32px 100px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-header {
+  margin-bottom: 52px;
+  max-width: 1200px;
+}
+.page-eyebrow {
+  font-size: 11px; font-weight: 700;
+  color: #059669; letter-spacing: .1em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.page-title {
+  font-size: 28px; font-weight: 800;
+  color: #111827; letter-spacing: -0.03em;
+  margin-bottom: 8px; line-height: 1.1;
+}
+.page-sub {
+  font-size: 14px; color: #6b7280;
+  font-weight: 500; line-height: 1.6;
+  max-width: 640px;
+}
+
+/* ─── Five-column row ─── */
+.variants-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 24px;
+}
+
+.variant-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.variant-label-block {
+  text-align: center;
+  width: 292px;
+}
+.variant-number {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #111827; color: white;
+  font-size: 11px; font-weight: 800;
+  margin-bottom: 8px;
+}
+.variant-number.rec { background: #059669; }
+.variant-name {
+  font-size: 14px; font-weight: 800;
+  color: #111827; letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.variant-desc {
+  font-size: 11px; color: #6b7280;
+  line-height: 1.5; font-weight: 500;
+}
+.rec-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px;
+  background: #059669; color: white;
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .05em; text-transform: uppercase;
+  margin-left: 6px; vertical-align: middle;
+}
+
+/* ─── Phone bezel ─── */
+.phone {
+  width: 292px;
+  height: 580px;
+  background: #065f46;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 7px #1a1a1a,
+    0 0 0 9px #2e2e2e,
+    0 24px 60px rgba(0,0,0,.28),
+    0 4px 16px rgba(0,0,0,.14);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ─── Emerald card (full bleed) ─── */
+.em-card {
+  position: absolute; inset: 0;
+  background: linear-gradient(165deg,
+    #064e3b 0%, #065f46 28%, #059669 62%, #10b981 82%, #34d399 100%);
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 18px 20px;
+  overflow: hidden;
+}
+
+/* Decorative blobs */
+.blob1 {
+  position: absolute; top: -30px; right: -30px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,.07); pointer-events: none;
+}
+.blob2 {
+  position: absolute; bottom: 80px; left: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,.04); pointer-events: none;
+}
+.blob3 {
+  position: absolute; top: 120px; right: -60px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,.03); pointer-events: none;
+}
+
+/* Status bar */
+.s-status {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 36px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 20px;
+  z-index: 10;
+}
+.s-time { font-size: 13px; font-weight: 700; color: white; }
+.s-icons { display: flex; gap: 5px; align-items: center; opacity: .85; }
+
+/* Story segments */
+.s-segments {
+  position: absolute; top: 38px; left: 14px; right: 14px;
+  display: flex; gap: 3px; z-index: 10; pointer-events: none;
+}
+.s-seg {
+  flex: 1; height: 2.5px; border-radius: 99px;
+  background: rgba(255,255,255,.28);
+}
+.s-seg.active { background: white; }
+.s-seg.past { background: rgba(255,255,255,.62); }
+
+/* Chips */
+.s-chips {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  margin-bottom: 12px;
+}
+.s-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 99px;
+  background: rgba(255,255,255,.2);
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .06em; text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.2);
+}
+.s-urgent {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 99px;
+  background: rgba(239,68,68,.85);
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .03em;
+}
+
+/* Group name */
+.s-group-name {
+  font-size: 26px; font-weight: 800; color: white;
+  letter-spacing: -0.04em; line-height: 1.05;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.s-status-line {
+  font-size: 11px; color: rgba(255,255,255,.82);
+  font-weight: 600; margin-bottom: 12px; line-height: 1.4;
+}
+
+/* Progress */
+.s-prog-track {
+  height: 7px; border-radius: 99px;
+  background: rgba(255,255,255,.2); overflow: hidden;
+  margin-bottom: 5px;
+}
+.s-prog-fill {
+  height: 100%; border-radius: 99px;
+  background: rgba(255,255,255,.9);
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+.s-prog-labels {
+  display: flex; justify-content: space-between;
+  font-size: 9px; color: rgba(255,255,255,.68); font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* CTA */
+.s-cta {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: white; border-radius: 12px; border: none;
+  padding: 12px 16px;
+  font-family: inherit; font-size: 13px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.22);
+  color: #065f46; width: 100%; letter-spacing: -.01em;
+  transition: transform .1s;
+}
+.s-cta:active { transform: scale(.97); }
+
+/* Giliran zone */
+.giliran-zone { margin-bottom: 12px; }
+
+/* ══════════════════════════════════════════
+   VARIANT 1 — COIN JAR / POT FILL
+   ══════════════════════════════════════════ */
+.v1-jar-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* SVG jar container */
+.v1-jar-svg-wrap {
+  position: relative;
+  width: 64px;
+  flex-shrink: 0;
+}
+
+/* Liquid fill inside jar — pure CSS */
+.v1-jar-body {
+  width: 64px;
+  height: 72px;
+  border-radius: 0 0 14px 14px;
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.35);
+  border-top: none;
+  position: relative;
+  overflow: hidden;
+}
+.v1-jar-lid {
+  width: 72px; height: 10px; border-radius: 6px;
+  background: rgba(255,255,255,.25);
+  border: 1.5px solid rgba(255,255,255,.4);
+  margin-left: -4px; /* slight overhang */
+  position: relative; z-index: 2;
+}
+.v1-jar-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, rgba(52,211,153,.6) 0%, rgba(16,185,129,.85) 100%);
+  border-radius: 0 0 12px 12px;
+  height: 0%; /* animated to 67% */
+  transition: height 1.4s cubic-bezier(.4,0,.2,1);
+}
+/* Wave on top of fill */
+.v1-jar-fill::after {
+  content: '';
+  position: absolute;
+  top: -4px; left: -10px; right: -10px;
+  height: 8px;
+  background: rgba(52,211,153,.7);
+  border-radius: 50%;
+  animation: v1Wave 2.2s ease-in-out infinite;
+}
+@keyframes v1Wave {
+  0%, 100% { transform: translateX(0) scaleY(1); }
+  50%       { transform: translateX(6px) scaleY(1.3); }
+}
+
+/* Coins inside jar */
+.v1-coins {
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 2px;
+  opacity: 0;
+  transition: opacity .4s ease .9s;
+}
+.v1-coin {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fde68a, #f59e0b);
+  border: 1px solid rgba(245,158,11,.8);
+  animation: v1CoinShimmer 2.4s ease-in-out infinite;
+}
+.v1-coin:nth-child(2) { animation-delay: .4s; }
+.v1-coin:nth-child(3) { animation-delay: .8s; }
+@keyframes v1CoinShimmer {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(1.35); }
+}
+
+/* Text side of jar */
+.v1-jar-text { flex: 1; }
+.v1-label-top {
+  font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,.6); letter-spacing: .07em;
+  text-transform: uppercase; margin-bottom: 3px;
+}
+.v1-name-line {
+  font-size: 14px; font-weight: 800;
+  color: white; letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  animation: v1NameIn .5s ease .2s both;
+}
+@keyframes v1NameIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.v1-amount-row {
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,.82);
+}
+.v1-amount-row strong { color: white; }
+.v1-jar-pct {
+  font-size: 9px; font-weight: 800;
+  color: rgba(255,255,255,.55);
+  margin-top: 3px;
+}
+/* Gold dot accent */
+.v1-gold-dot {
+  display: inline-block;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #f59e0b;
+  margin-right: 4px;
+  vertical-align: middle;
+  box-shadow: 0 0 6px rgba(245,158,11,.7);
+  animation: v1DotPulse 2s ease-in-out infinite;
+}
+@keyframes v1DotPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(245,158,11,.6); }
+  50%       { box-shadow: 0 0 10px rgba(245,158,11,.9); }
+}
+
+/* ══════════════════════════════════════════
+   VARIANT 2 — SEGMENTED PROGRESS RING
+   ══════════════════════════════════════════ */
+.v2-ring-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.v2-donut-svg {
+  flex-shrink: 0;
+  overflow: visible;
+}
+/* Each arc segment drawn via stroke-dasharray in JS */
+.v2-seg {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: butt;
+  transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+}
+.v2-seg-empty { stroke: rgba(255,255,255,.16); }
+.v2-seg-filled { stroke: rgba(255,255,255,.75); }
+.v2-seg-gold {
+  stroke: #f59e0b;
+  filter: drop-shadow(0 0 4px rgba(245,158,11,.8));
+}
+.v2-center-text {
+  font-size: 9px; font-weight: 700;
+  fill: rgba(255,255,255,.65);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.v2-center-name {
+  font-size: 13px; font-weight: 800;
+  fill: white;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  letter-spacing: -.02em;
+}
+.v2-center-amount {
+  font-size: 8px; font-weight: 600;
+  fill: rgba(255,255,255,.55);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* Text beside ring */
+.v2-ring-text { flex: 1; }
+.v2-ring-label {
+  font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,.6); letter-spacing: .07em;
+  text-transform: uppercase; margin-bottom: 3px;
+}
+.v2-ring-name {
+  font-size: 13px; font-weight: 800;
+  color: white; letter-spacing: -.02em;
+  margin-bottom: 4px;
+}
+.v2-ring-sub {
+  font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,.72);
+}
+.v2-ring-sub .highlight { color: white; }
+.v2-legend {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 5px;
+}
+.v2-legend-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+.v2-legend-text { font-size: 8.5px; font-weight: 600; color: rgba(255,255,255,.6); }
+
+/* ══════════════════════════════════════════
+   VARIANT 3 — BOLD TYPOGRAPHIC
+   ══════════════════════════════════════════ */
+.v3-typo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.v3-putaran {
+  font-size: 32px; font-weight: 800;
+  color: rgba(255,255,255,.38);
+  letter-spacing: -0.05em; line-height: 1;
+  margin-bottom: 2px;
+  animation: v3CountIn .6s ease both;
+}
+@keyframes v3CountIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.v3-divider-line {
+  height: 1px;
+  background: rgba(255,255,255,.18);
+  margin: 6px 0;
+}
+.v3-giliran-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 2px;
+}
+.v3-gold-accent {
+  width: 3px; height: 24px; border-radius: 99px;
+  background: #f59e0b;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(245,158,11,.7);
+  animation: v3AccentIn .5s ease .15s both;
+}
+@keyframes v3AccentIn {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+.v3-giliran-text {
+  display: flex; flex-direction: column;
+}
+.v3-giliran-label {
+  font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,.6); letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.v3-giliran-name {
+  font-size: 20px; font-weight: 800;
+  color: white; letter-spacing: -0.04em; line-height: 1;
+  animation: v3NameIn .5s cubic-bezier(.34,1.3,.64,1) .25s both;
+}
+@keyframes v3NameIn {
+  from { opacity: 0; transform: scale(.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.v3-sudah-setor {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,.72);
+  letter-spacing: -.01em;
+}
+.v3-sudah-setor strong { color: white; }
+/* Underline flash on the name */
+.v3-giliran-name::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: rgba(245,158,11,.7);
+  border-radius: 99px;
+  margin-top: 2px;
+  animation: v3Underline .5s ease .4s both;
+  transform-origin: left;
+}
+@keyframes v3Underline {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ══════════════════════════════════════════
+   VARIANT 4 — ROTATION TIMELINE
+   ══════════════════════════════════════════ */
+.v4-timeline-outer {
+  overflow: hidden;
+  position: relative;
+}
+.v4-timeline-scroll {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.v4-timeline-scroll::-webkit-scrollbar { display: none; }
+
+.v4-period {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+  padding: 0 8px;
+}
+/* Connector line between periods */
+.v4-period::before {
+  content: '';
+  position: absolute;
+  top: 14px; left: 0; right: 0;
+  height: 1.5px;
+  background: rgba(255,255,255,.2);
+  z-index: 0;
+}
+.v4-period:first-child::before { left: 50%; }
+.v4-period:last-child::before  { right: 50%; }
+
+.v4-node-outer {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1; margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.v4-node-outer.past {
+  background: rgba(255,255,255,.3);
+  border: 1.5px solid rgba(255,255,255,.5);
+}
+.v4-node-outer.current {
+  background: white;
+  border: 2px solid white;
+  box-shadow: 0 0 0 5px rgba(255,255,255,.18), 0 0 14px rgba(52,211,153,.7);
+  animation: v4CurrentPulse 2s ease-in-out infinite;
+}
+@keyframes v4CurrentPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255,255,255,.15), 0 0 12px rgba(52,211,153,.5); }
+  50%       { box-shadow: 0 0 0 7px rgba(255,255,255,.1), 0 0 20px rgba(52,211,153,.8); }
+}
+.v4-node-outer.future {
+  background: rgba(255,255,255,.08);
+  border: 1.5px dashed rgba(255,255,255,.28);
+}
+.v4-check {
+  color: rgba(255,255,255,.85);
+}
+.v4-bullet {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+}
+/* Current marker arrow */
+.v4-current-marker {
+  position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; line-height: 1;
+  animation: v4MarkerBounce 1.8s ease-in-out infinite;
+}
+@keyframes v4MarkerBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(-3px); }
+}
+.v4-prd-num {
+  font-size: 7px; font-weight: 700;
+  color: rgba(255,255,255,.45);
+  margin-bottom: 2px;
+}
+.v4-prd-name {
+  font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,.6);
+  text-align: center; max-width: 44px;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+.v4-prd-name.current-name {
+  color: #065f46; font-weight: 800; font-size: 8.5px;
+  background: rgba(255,255,255,.9);
+  padding: 1px 5px; border-radius: 99px;
+  max-width: none;
+}
+.v4-prd-name.future-name {
+  color: rgba(255,255,255,.38);
+}
+.v4-caption {
+  font-size: 9px; font-weight: 600;
+  color: rgba(255,255,255,.65);
+  margin-top: 6px;
+}
+.v4-caption strong { color: white; }
+
+/* ══════════════════════════════════════════
+   VARIANT 5 — NAME FORTUNE WHEEL
+   ══════════════════════════════════════════ */
+.v5-wheel-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.v5-wheel-svg-container {
+  position: relative;
+  flex-shrink: 0;
+  width: 110px; height: 110px;
+}
+.v5-wheel-svg {
+  width: 110px; height: 110px;
+}
+/* Pointer arrow */
+.v5-pointer {
+  position: absolute;
+  top: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 14px solid #f59e0b;
+  filter: drop-shadow(0 2px 4px rgba(245,158,11,.7));
+  z-index: 10;
+  animation: v5PointerSettle 0.1s ease 2.1s both;
+}
+@keyframes v5PointerSettle {
+  0%   { transform: translateX(-50%) rotate(-3deg); }
+  50%  { transform: translateX(-50%) rotate(2deg); }
+  100% { transform: translateX(-50%) rotate(0); }
+}
+/* Center hub */
+.v5-hub {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  z-index: 5;
+}
+
+/* Wheel text info */
+.v5-wheel-text { flex: 1; }
+.v5-undian-label {
+  font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,.6); letter-spacing: .07em;
+  text-transform: uppercase; margin-bottom: 3px;
+}
+.v5-winner-name {
+  font-size: 15px; font-weight: 800;
+  color: white; letter-spacing: -0.03em;
+  margin-bottom: 2px;
+}
+.v5-bulan-ini {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 99px;
+  background: rgba(245,158,11,.25);
+  border: 1px solid rgba(245,158,11,.5);
+  font-size: 8.5px; font-weight: 700;
+  color: #fde68a;
+  margin-bottom: 5px;
+}
+.v5-setor {
+  font-size: 9.5px; font-weight: 600;
+  color: rgba(255,255,255,.65);
+}
+.v5-setor strong { color: white; }
+
+/* ── Shared status bar SVGs ── */
+.sig-bar { color: white; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-eyebrow">Desain Arisan Digital — Iterasi v2</div>
+  <div class="page-title">Pilih gaya "Giliran" (tanpa avatar) — Arisan card</div>
+  <div class="page-sub">
+    Lima konsep tanpa lingkaran avatar — menggunakan metafora uang, data-viz, tipografi, dan waktu/undian.
+    Chrome kartu identik; hanya elemen giliran yang berbeda. Data: Arisan Keluarga Sari, 12 anggota, giliran Budi S.
+  </div>
+</div>
+
+<div class="variants-row">
+
+  <!-- ════════════════════════════════════
+       VARIANT 1 — COIN JAR / POT FILL
+       ════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">1</div>
+      <div class="variant-name">Coin Jar / Pot Fill</div>
+      <div class="variant-desc">
+        Celengan visual yang terisi ~67% dengan koin emas berkilap. Fill naik saat load, koin berkedip. Metafora uang, tanpa wajah.
+      </div>
+    </div>
+
+    <div class="phone" id="phone-v1">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V1 -->
+        <div class="giliran-zone">
+          <div class="v1-jar-wrap">
+            <div class="v1-jar-svg-wrap">
+              <div class="v1-jar-lid"></div>
+              <div class="v1-jar-body" id="v1-jar-body">
+                <div class="v1-jar-fill" id="v1-jar-fill"></div>
+                <div class="v1-coins" id="v1-coins">
+                  <div class="v1-coin"></div>
+                  <div class="v1-coin"></div>
+                  <div class="v1-coin"></div>
+                </div>
+              </div>
+            </div>
+            <div class="v1-jar-text">
+              <div class="v1-label-top">Bulan ini untuk</div>
+              <div class="v1-name-line">
+                <span class="v1-gold-dot"></span>Budi S.
+              </div>
+              <div class="v1-amount-row">
+                <strong>Rp 1,6jt</strong> / 2,4jt terkumpul
+              </div>
+              <div class="v1-jar-pct">67% terisi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan · 12 anggota
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 2 hari lagi · 8 dari 12 sudah setor</div>
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:0%" id="v1-prog"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah setor</span><span>Putaran 6/12</span></div>
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       VARIANT 2 — SEGMENTED PROGRESS RING
+       ════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number rec">2</div>
+      <div class="variant-name">Segmented Progress Ring <span class="rec-pill">Rekomendasi</span></div>
+      <div class="variant-desc">
+        Donut 12 segmen: 8 putih (sudah setor), 4 outline (belum), segmen giliran aksen emas + marker. Center: nama Budi. Segment draw masuk satu per satu.
+      </div>
+    </div>
+
+    <div class="phone" id="phone-v2">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V2 -->
+        <div class="giliran-zone">
+          <div class="v2-ring-wrap">
+            <svg class="v2-donut-svg" id="v2-svg" width="90" height="90" viewBox="0 0 90 90">
+              <!-- Segments drawn by JS -->
+              <text x="45" y="38" class="v2-center-text">Giliran</text>
+              <text x="45" y="52" class="v2-center-name" id="v2-center-name" opacity="0">Budi</text>
+              <text x="45" y="63" class="v2-center-amount">Rp 1,6jt</text>
+            </svg>
+            <div class="v2-ring-text">
+              <div class="v2-ring-label">Penerima bulan ini</div>
+              <div class="v2-ring-name">Budi S.</div>
+              <div class="v2-ring-sub">
+                <span class="highlight">8</span> sudah setor<br>
+                <span class="highlight">4</span> belum setor
+              </div>
+              <div class="v2-legend">
+                <div class="v2-legend-dot" style="background:rgba(255,255,255,.75);"></div>
+                <span class="v2-legend-text">Sudah</span>
+                <div class="v2-legend-dot" style="background:#f59e0b;"></div>
+                <span class="v2-legend-text">Giliran</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan · 12 anggota
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 2 hari lagi · 8 dari 12 sudah setor</div>
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:0%" id="v2-prog"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah setor</span><span>Putaran 6/12</span></div>
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       VARIANT 3 — BOLD TYPOGRAPHIC
+       ════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">3</div>
+      <div class="variant-name">Bold Typographic</div>
+      <div class="variant-desc">
+        Tanpa ilustrasi sama sekali. Tipografi berani: "Putaran 6/12" raksasa + "Giliran · Budi S." dominan dengan garis aksen emas. Sangat bersih dan cepat dibaca.
+      </div>
+    </div>
+
+    <div class="phone" id="phone-v3">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V3 -->
+        <div class="giliran-zone">
+          <div class="v3-typo-block">
+            <div class="v3-putaran">6/12</div>
+            <div class="v3-divider-line"></div>
+            <div class="v3-giliran-row">
+              <div class="v3-gold-accent"></div>
+              <div class="v3-giliran-text">
+                <span class="v3-giliran-label">Giliran bulan ini</span>
+                <span class="v3-giliran-name">Budi S.</span>
+              </div>
+            </div>
+            <div class="v3-sudah-setor"><strong>8 dari 12</strong> sudah setor</div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan · 12 anggota
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 2 hari lagi · 8 dari 12 sudah setor</div>
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:0%" id="v3-prog"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah setor</span><span>Putaran 6/12</span></div>
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       VARIANT 4 — ROTATION TIMELINE
+       ════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">4</div>
+      <div class="variant-name">Rotation Timeline</div>
+      <div class="variant-desc">
+        Strip jadwal rotasi horizontal: nama penerima per putaran, masa lalu dicentang, bulan ini bercahaya, masa depan redup. Marker bergerak naik-turun.
+      </div>
+    </div>
+
+    <div class="phone" id="phone-v4">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V4 -->
+        <div class="giliran-zone">
+          <div class="v4-timeline-outer">
+            <div class="v4-timeline-scroll" id="v4-scroll">
+              <!-- Past periods -->
+              <div class="v4-period">
+                <div class="v4-prd-num">P4</div>
+                <div class="v4-node-outer past">
+                  <svg class="v4-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="v4-prd-name">Rina</div>
+              </div>
+              <div class="v4-period">
+                <div class="v4-prd-num">P5</div>
+                <div class="v4-node-outer past">
+                  <svg class="v4-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div class="v4-prd-name">Doni</div>
+              </div>
+              <!-- CURRENT -->
+              <div class="v4-period">
+                <div class="v4-prd-num" style="color:rgba(255,255,255,.8);">P6</div>
+                <div class="v4-node-outer current" style="position:relative;">
+                  <div class="v4-current-marker">▼</div>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="3" fill="#065f46"/></svg>
+                </div>
+                <div class="v4-prd-name current-name">Budi</div>
+              </div>
+              <!-- Future periods -->
+              <div class="v4-period">
+                <div class="v4-prd-num">P7</div>
+                <div class="v4-node-outer future">
+                  <div class="v4-bullet"></div>
+                </div>
+                <div class="v4-prd-name future-name">Karin</div>
+              </div>
+              <div class="v4-period">
+                <div class="v4-prd-num">P8</div>
+                <div class="v4-node-outer future">
+                  <div class="v4-bullet"></div>
+                </div>
+                <div class="v4-prd-name future-name">Andi</div>
+              </div>
+              <div class="v4-period">
+                <div class="v4-prd-num">P9</div>
+                <div class="v4-node-outer future">
+                  <div class="v4-bullet"></div>
+                </div>
+                <div class="v4-prd-name future-name">Siti</div>
+              </div>
+            </div>
+            <div class="v4-caption">Jadwal putaran · <strong>Budi S.</strong> bulan ini</div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan · 12 anggota
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 2 hari lagi · 8 dari 12 sudah setor</div>
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:0%" id="v4-prog"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah setor</span><span>Putaran 6/12</span></div>
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       VARIANT 5 — NAME FORTUNE WHEEL
+       ════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label-block">
+      <div class="variant-number">5</div>
+      <div class="variant-name">Name Fortune Wheel</div>
+      <div class="variant-desc">
+        Roda undian bergaya putar dengan irisan nama anggota (teks saja). Pointer emas berhenti di "Budi" setelah animasi berputar saat load. Nuansa lotre tradisional.
+      </div>
+    </div>
+
+    <div class="phone" id="phone-v5">
+      <div class="em-card">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+        <div class="blob3"></div>
+
+        <div class="s-status">
+          <span class="s-time">9:41</span>
+          <div class="s-icons">
+            <svg width="13" height="10" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+            <svg width="22" height="10" viewBox="0 0 25 12" fill="white"><rect x="0" y="1" width="21" height="10" rx="3" stroke="white" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+          </div>
+        </div>
+        <div class="s-segments">
+          <div class="s-seg past"></div>
+          <div class="s-seg active"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+          <div class="s-seg"></div>
+        </div>
+
+        <!-- GILIRAN ZONE V5 -->
+        <div class="giliran-zone">
+          <div class="v5-wheel-wrap">
+            <div class="v5-wheel-svg-container">
+              <div class="v5-pointer"></div>
+              <svg class="v5-wheel-svg" id="v5-svg" viewBox="0 0 110 110"></svg>
+              <div class="v5-hub"></div>
+            </div>
+            <div class="v5-wheel-text">
+              <div class="v5-undian-label">Hasil undian</div>
+              <div class="v5-winner-name">Budi S.</div>
+              <div class="v5-bulan-ini">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Bulan ini
+              </div>
+              <div class="v5-setor"><strong>8 dari 12</strong><br>sudah setor</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-chips">
+          <span class="s-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            2 hari lagi
+          </span>
+          <span class="s-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Arisan · 12 anggota
+          </span>
+        </div>
+
+        <div class="s-group-name">Keluarga<br>Sari</div>
+        <div class="s-status-line">Jatuh tempo 2 hari lagi · 8 dari 12 sudah setor</div>
+        <div class="s-prog-track"><div class="s-prog-fill" style="width:0%" id="v5-prog"></div></div>
+        <div class="s-prog-labels"><span>8/12 sudah setor</span><span>Putaran 6/12</span></div>
+        <button class="s-cta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Bayar Iuran Rp 200.000
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /variants-row -->
+
+<script>
+/* ──────────────────────────────────────────
+   VARIANT 1 — Jar fill + coin reveal
+────────────────────────────────────────── */
+(function () {
+  var fill = document.getElementById('v1-jar-fill');
+  var coins = document.getElementById('v1-coins');
+  var prog = document.getElementById('v1-prog');
+  if (!fill) return;
+  // Delay so CSS transition fires
+  requestAnimationFrame(function () {
+    setTimeout(function () {
+      fill.style.height = '67%';
+      prog.style.width = '67%';
+      setTimeout(function () {
+        coins.style.opacity = '1';
+      }, 900);
+    }, 80);
+  });
+})();
+
+/* ──────────────────────────────────────────
+   VARIANT 2 — Segmented donut ring (SVG)
+────────────────────────────────────────── */
+(function () {
+  var svg = document.getElementById('v2-svg');
+  var centerName = document.getElementById('v2-center-name');
+  var prog = document.getElementById('v2-prog');
+  if (!svg) return;
+
+  var cx = 45, cy = 45, r = 34;
+  var circumference = 2 * Math.PI * r;
+  var total = 12;
+  var gap = 2; // degrees gap between segments
+  var segAngle = (360 / total) - gap;
+  var segArc = (segAngle / 360) * circumference;
+  var stepArc = (360 / total / 360) * circumference;
+
+  // Segment states: 0-7 = paid (white), 8 = giliran (gold), 9-11 = empty
+  // We rotate so giliran (index 8) sits at the top (270deg)
+  // giliran at top = segment index offset so index 8 = top
+  var gilanIdx = 8;
+  // offset so gilanIdx sits at top (270deg)
+  var startOffset = 270 - (gilanIdx * (360 / total)) - (segAngle / 2);
+
+  function makeSegment(i, type) {
+    var el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    el.setAttribute('cx', cx);
+    el.setAttribute('cy', cy);
+    el.setAttribute('r', r);
+    el.classList.add('v2-seg');
+
+    // Rotation angle for this segment
+    var angle = startOffset + i * (360 / total);
+    el.setAttribute('transform', 'rotate(' + angle + ' ' + cx + ' ' + cy + ')');
+
+    // Use stroke-dasharray: [segArc, rest]
+    var rest = circumference - segArc;
+    el.setAttribute('stroke-dasharray', segArc + ' ' + rest);
+    // Start fully hidden (offset = full circumference), will animate to 0
+    el.setAttribute('stroke-dashoffset', '0');
+
+    if (type === 'filled') {
+      el.classList.add('v2-seg-filled');
+    } else if (type === 'gold') {
+      el.classList.add('v2-seg-gold');
+    } else {
+      el.classList.add('v2-seg-empty');
+    }
+
+    // Animate in with stagger — start at full offset then transition to 0
+    el.style.strokeDashoffset = segArc;
+    el.style.transition = 'stroke-dashoffset ' + (.4 + i * .06) + 's cubic-bezier(.4,0,.2,1) ' + (.05 * i) + 's';
+
+    return el;
+  }
+
+  // Build and insert segments BEFORE the text elements
+  var firstText = svg.querySelector('text');
+  for (var i = 0; i < total; i++) {
+    var type = i < 8 ? 'filled' : (i === gilanIdx ? 'gold' : 'empty');
+    var seg = makeSegment(i, type);
+    svg.insertBefore(seg, firstText);
+  }
+
+  // Animate on next frame
+  requestAnimationFrame(function () {
+    setTimeout(function () {
+      svg.querySelectorAll('.v2-seg').forEach(function (s) {
+        s.style.strokeDashoffset = '0';
+      });
+      prog.style.width = '67%';
+      // Reveal center name
+      setTimeout(function () {
+        centerName.setAttribute('opacity', '1');
+        centerName.style.transition = 'opacity .4s ease';
+      }, 600);
+    }, 100);
+  });
+})();
+
+/* ──────────────────────────────────────────
+   VARIANT 3 — progress bar only
+────────────────────────────────────────── */
+(function () {
+  var prog = document.getElementById('v3-prog');
+  if (!prog) return;
+  setTimeout(function () { prog.style.width = '67%'; }, 120);
+})();
+
+/* ──────────────────────────────────────────
+   VARIANT 4 — scroll to current + progress
+────────────────────────────────────────── */
+(function () {
+  var scroll = document.getElementById('v4-scroll');
+  var prog = document.getElementById('v4-prog');
+  if (!scroll) return;
+  setTimeout(function () {
+    // Scroll so current (3rd item, index 2) is near center
+    scroll.scrollLeft = 28;
+    prog.style.width = '67%';
+  }, 200);
+})();
+
+/* ──────────────────────────────────────────
+   VARIANT 5 — Fortune wheel (SVG) + spin
+────────────────────────────────────────── */
+(function () {
+  var svg = document.getElementById('v5-svg');
+  var prog = document.getElementById('v5-prog');
+  if (!svg) return;
+
+  var cx = 55, cy = 55, r = 48;
+  var members = ['Budi', 'Rina', 'Doni', 'Karin', 'Andi', 'Siti', 'Dewi', 'Hana', 'Yoga', 'Tono', 'Lina', 'Bayu'];
+  var total = members.length;
+  var sliceAngle = 360 / total; // 30 degrees each
+
+  // Budi is at index 0 — we want pointer (top = 270deg / -90deg) pointing at Budi
+  // Budi slice center = -90deg when wheel is at resting rotation
+  // Wheel starts rotated so Budi center is at top
+  // Budi center at 270deg means: offset = 270 - (0 * 30) - 15 = 255 deg start angle for slice 0
+  // We'll apply a CSS rotation to the whole SVG group
+
+  // Colors: Budi = highlight, others = alternating emerald shades
+  var colors = [
+    'rgba(52,211,153,.55)',   // Budi — highlighted
+    'rgba(255,255,255,.12)',
+    'rgba(255,255,255,.08)',
+    'rgba(255,255,255,.12)',
+    'rgba(255,255,255,.08)',
+    'rgba(255,255,255,.12)',
+    'rgba(255,255,255,.08)',
+    'rgba(255,255,255,.12)',
+    'rgba(255,255,255,.08)',
+    'rgba(255,255,255,.12)',
+    'rgba(255,255,255,.08)',
+    'rgba(255,255,255,.12)',
+  ];
+  var borderColors = [
+    'rgba(52,211,153,.9)',
+    'rgba(255,255,255,.2)',
+    'rgba(255,255,255,.15)',
+    'rgba(255,255,255,.2)',
+    'rgba(255,255,255,.15)',
+    'rgba(255,255,255,.2)',
+    'rgba(255,255,255,.15)',
+    'rgba(255,255,255,.2)',
+    'rgba(255,255,255,.15)',
+    'rgba(255,255,255,.2)',
+    'rgba(255,255,255,.15)',
+    'rgba(255,255,255,.2)',
+  ];
+
+  function polarToCartesian(cx, cy, r, deg) {
+    var rad = (deg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+
+  function slicePath(i) {
+    var startDeg = i * sliceAngle;
+    var endDeg = startDeg + sliceAngle;
+    var s = polarToCartesian(cx, cy, r, startDeg);
+    var e = polarToCartesian(cx, cy, r, endDeg);
+    var largeArc = sliceAngle > 180 ? 1 : 0;
+    return [
+      'M', cx, cy,
+      'L', s.x, s.y,
+      'A', r, r, 0, largeArc, 1, e.x, e.y,
+      'Z'
+    ].join(' ');
+  }
+
+  // Create wheel group
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('id', 'v5-wheel-group');
+
+  // Draw outer ring background
+  var bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  bgCircle.setAttribute('cx', cx); bgCircle.setAttribute('cy', cy); bgCircle.setAttribute('r', r);
+  bgCircle.setAttribute('fill', 'rgba(0,0,0,.2)');
+  bgCircle.setAttribute('stroke', 'rgba(255,255,255,.15)');
+  bgCircle.setAttribute('stroke-width', '1');
+  g.appendChild(bgCircle);
+
+  // Draw slices
+  for (var i = 0; i < total; i++) {
+    // Slice fill
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', slicePath(i));
+    path.setAttribute('fill', colors[i]);
+    path.setAttribute('stroke', borderColors[i]);
+    path.setAttribute('stroke-width', '0.5');
+    g.appendChild(path);
+
+    // Label text — positioned along mid-angle of slice
+    var midAngle = i * sliceAngle + sliceAngle / 2;
+    var textR = r * 0.62;
+    var tp = polarToCartesian(cx, cy, textR, midAngle);
+
+    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', tp.x);
+    text.setAttribute('y', tp.y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'middle');
+    // Rotate text to align radially
+    text.setAttribute('transform', 'rotate(' + midAngle + ' ' + tp.x + ' ' + tp.y + ')');
+    text.setAttribute('font-family', 'Plus Jakarta Sans, system-ui, sans-serif');
+    text.setAttribute('font-weight', i === 0 ? '800' : '600');
+    text.setAttribute('font-size', i === 0 ? '6.5' : '5.5');
+    text.setAttribute('fill', i === 0 ? 'white' : 'rgba(255,255,255,.6)');
+    text.textContent = members[i];
+    g.appendChild(text);
+  }
+
+  // Outer ring border
+  var outerRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  outerRing.setAttribute('cx', cx); outerRing.setAttribute('cy', cy); outerRing.setAttribute('r', r);
+  outerRing.setAttribute('fill', 'none');
+  outerRing.setAttribute('stroke', 'rgba(255,255,255,.25)');
+  outerRing.setAttribute('stroke-width', '1.5');
+  g.appendChild(outerRing);
+
+  svg.appendChild(g);
+
+  // Budi is at slice 0. Pointer is at top (-90 / 270 deg from positive x-axis).
+  // We want Budi's mid-angle (15 deg in local coords) to sit at the top of SVG (270 deg).
+  // Target rotation: 270 - 15 = 255 deg
+  var targetRotation = 255;
+
+  // Spin animation: start from targetRotation + several full spins, end at targetRotation
+  var spinRevolutions = 3;
+  var startRotation = targetRotation + spinRevolutions * 360;
+
+  // Apply immediately a fast starting rotation, then animate to rest
+  g.style.transformOrigin = cx + 'px ' + cy + 'px';
+  g.style.transform = 'rotate(' + startRotation + 'deg)';
+
+  requestAnimationFrame(function () {
+    setTimeout(function () {
+      g.style.transition = 'transform 2.0s cubic-bezier(.17,.67,.35,1.02)';
+      g.style.transform = 'rotate(' + targetRotation + 'deg)';
+      prog.style.width = '67%';
+    }, 80);
+  });
+
+  // Tick sounds visually: add subtle highlight flash on pointer as it approaches end
+})();
+</script>
+</body>
+</html>

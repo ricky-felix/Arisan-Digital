@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keluarga Sari — Detail Arisan</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+.screen-inner { padding-bottom: 96px; }
+
+/* Header */
+.detail-header {
+  background: var(--surface);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky; top: 0; z-index: 10;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none;
+}
+.header-info { flex: 1; }
+.header-title { font-size: 16px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; }
+.header-sub { font-size: 11px; color: var(--ink-2); font-weight: 500; margin-top: 1px; }
+
+/* Hero banner */
+.group-hero {
+  margin: 16px 20px 0;
+  background: linear-gradient(135deg, #064e3b 0%, #059669 60%, #34d399 100%);
+  border-radius: 20px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.gh-blob {
+  position: absolute; top: -30px; right: -30px;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+}
+.gh-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.25);
+  padding: 4px 10px; border-radius: 99px;
+  font-size: 9px; font-weight: 800; color: white;
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.gh-urgent {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(239,68,68,.85); padding: 4px 10px; border-radius: 99px;
+  font-size: 9px; font-weight: 800; color: white; margin-left: 6px;
+}
+.gh-name { font-size: 24px; font-weight: 800; color: white; letter-spacing: -.03em; line-height: 1.1; margin-bottom: 4px; }
+.gh-sub { font-size: 12px; color: rgba(255,255,255,.8); font-weight: 600; margin-bottom: 16px; }
+.gh-stats { display: flex; gap: 16px; }
+.gh-stat { text-align: center; }
+.gh-stat-val { font-size: 18px; font-weight: 800; color: white; letter-spacing: -.02em; line-height: 1; }
+.gh-stat-lbl { font-size: 9px; color: rgba(255,255,255,.7); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+
+/* Section: progress */
+.prog-section { margin: 16px 20px 0; }
+.prog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.prog-label { font-size: 13px; font-weight: 800; color: var(--ink-1); }
+.prog-pct { font-size: 12px; font-weight: 800; color: var(--emerald-dark); }
+.prog-track-big { height: 12px; border-radius: 99px; background: var(--line-soft); overflow: hidden; margin-bottom: 5px; }
+.prog-fill-big { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--emerald-dark), var(--emerald)); }
+.prog-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-3); font-weight: 600; }
+
+/* Recipient callout */
+.recipient-card {
+  margin: 14px 20px 0;
+  background: linear-gradient(135deg, var(--emerald-tint), #f0fdf4);
+  border: 1.5px solid var(--emerald-soft);
+  border-radius: 16px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.rc-av {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--emerald); display: grid; place-items: center;
+  font-size: 14px; font-weight: 800; color: white; flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--emerald-soft);
+}
+.rc-info { flex: 1; }
+.rc-lbl { font-size: 10px; font-weight: 700; color: var(--emerald-dark); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+.rc-name { font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; }
+.rc-sub { font-size: 11px; color: var(--ink-2); font-weight: 500; margin-top: 2px; }
+
+/* Putaran timeline */
+.tl-section { padding: 16px 20px 0; }
+.tl-title { font-size: 13px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; margin-bottom: 10px; }
+.tl-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.tl-scroll::-webkit-scrollbar { display: none; }
+.tl-item { flex-shrink: 0; width: 52px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tl-num { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.tl-num.done { background: var(--emerald); color: white; }
+.tl-num.current { background: var(--emerald-dark); color: white; box-shadow: 0 0 0 3px var(--emerald-soft); }
+.tl-num.upcoming { background: var(--line-soft); color: var(--ink-3); }
+.tl-name { font-size: 8px; font-weight: 700; color: var(--ink-3); text-align: center; line-height: 1.3; }
+
+/* Members preview */
+.members-section { padding: 16px 20px 0; }
+.ms-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.ms-title { font-size: 13px; font-weight: 800; color: var(--ink-1); }
+.ms-count { font-size: 11px; font-weight: 700; color: var(--ink-3); }
+
+/* Member rows preview */
+.member-preview-card {
+  background: var(--surface); border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2); overflow: hidden;
+}
+.mem-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 14px; cursor: pointer; transition: background .1s;
+}
+.mem-row:hover { background: var(--gray-soft); }
+.mem-row + .mem-row { border-top: 1px solid var(--line-soft); }
+.mem-av {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 800; color: white; flex-shrink: 0;
+}
+.mem-info { flex: 1; min-width: 0; }
+.mem-name { font-size: 13px; font-weight: 700; color: var(--ink-1); }
+.mem-sub { font-size: 10px; color: var(--ink-3); font-weight: 500; margin-top: 1px; }
+.mem-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 800;
+}
+.mem-badge.paid { background: var(--emerald-soft); color: var(--emerald-dark); }
+.mem-badge.unpaid { background: #fee2e2; color: var(--danger); }
+.mem-badge.giliran { background: #fef3c7; color: #92400e; }
+
+/* View all members button */
+.view-members-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin: 10px 0 0;
+  padding: 12px;
+  background: var(--emerald-tint); border: 1.5px solid var(--emerald-soft);
+  border-radius: 12px; cursor: pointer; font-family: inherit;
+  font-size: 13px; font-weight: 700; color: var(--emerald-dark);
+  text-decoration: none; transition: background .15s;
+}
+.view-members-btn:hover { background: var(--emerald-soft); }
+
+/* Action footer */
+.action-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 12px 20px 28px;
+  background: linear-gradient(to top, var(--app-bg) 70%, transparent);
+}
+.pay-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--emerald-dark), var(--emerald));
+  color: white; border: none; border-radius: 14px;
+  font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  box-shadow: 0 4px 16px rgba(5,150,105,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .1s;
+}
+.pay-btn:active { transform: scale(.98); }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" style="position:relative;">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Header -->
+      <div class="detail-header">
+        <a href="final-home.html" class="back-btn" aria-label="Kembali">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        <div class="header-info">
+          <div class="header-title">Keluarga Sari</div>
+          <div class="header-sub">12 anggota · Putaran ke-6 · Rp 200.000/bln</div>
+        </div>
+        <button style="border:none;background:none;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+      </div>
+
+      <!-- Hero Banner -->
+      <div class="group-hero">
+        <div class="gh-blob"></div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+          <div class="gh-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            Arisan Aktif
+          </div>
+          <span class="gh-urgent">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Jatuh tempo 2 hari!
+          </span>
+        </div>
+        <div class="gh-name">Arisan Keluarga<br>Sari 🏡</div>
+        <div class="gh-sub">Terkumpul Rp 1.600.000 dari target Rp 2.400.000</div>
+        <div class="gh-stats">
+          <div class="gh-stat">
+            <div class="gh-stat-val">8/12</div>
+            <div class="gh-stat-lbl">Sudah Bayar</div>
+          </div>
+          <div class="gh-stat">
+            <div class="gh-stat-val">Rp 200k</div>
+            <div class="gh-stat-lbl">Per Bulan</div>
+          </div>
+          <div class="gh-stat">
+            <div class="gh-stat-val">10 Jun</div>
+            <div class="gh-stat-lbl">Jatuh Tempo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="prog-section">
+        <div class="prog-head">
+          <span class="prog-label">Progres Iuran Bulan Ini</span>
+          <span class="prog-pct">67%</span>
+        </div>
+        <div class="prog-track-big"><div class="prog-fill-big" style="width:67%"></div></div>
+        <div class="prog-meta"><span>8 dari 12 anggota sudah bayar</span><span>Sisa Rp 800.000</span></div>
+      </div>
+
+      <!-- Recipient highlight -->
+      <div class="recipient-card">
+        <div class="rc-av">BS</div>
+        <div class="rc-info">
+          <div class="rc-lbl">Penerima Putaran ke-6</div>
+          <div class="rc-name">Budi Setiawan 🎉</div>
+          <div class="rc-sub">Menunggu semua bayar · 4 belum lunas</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-dark)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <!-- Putaran Timeline -->
+      <div class="tl-section">
+        <div class="tl-title">Urutan Giliran</div>
+        <div class="tl-scroll">
+          <div class="tl-item"><div class="tl-num done">1</div><div class="tl-name">Rina A.</div></div>
+          <div class="tl-item"><div class="tl-num done">2</div><div class="tl-name">Dian K.</div></div>
+          <div class="tl-item"><div class="tl-num done">3</div><div class="tl-name">Siti N.</div></div>
+          <div class="tl-item"><div class="tl-num done">4</div><div class="tl-name">M. Haikal</div></div>
+          <div class="tl-item"><div class="tl-num done">5</div><div class="tl-name">Kamu 😊</div></div>
+          <div class="tl-item"><div class="tl-num current">6</div><div class="tl-name">Budi S. 🎉</div></div>
+          <div class="tl-item"><div class="tl-num upcoming">7</div><div class="tl-name">Anggi P.</div></div>
+          <div class="tl-item"><div class="tl-num upcoming">8</div><div class="tl-name">Yuni P.</div></div>
+          <div class="tl-item"><div class="tl-num upcoming">9</div><div class="tl-name">Teguh R.</div></div>
+          <div class="tl-item"><div class="tl-num upcoming">10</div><div class="tl-name">Lina B.</div></div>
+          <div class="tl-item"><div class="tl-num upcoming">11</div><div class="tl-name">Karni M.</div></div>
+          <div class="tl-item"><div class="tl-num upcoming">12</div><div class="tl-name">Nana R.</div></div>
+        </div>
+      </div>
+
+      <!-- Members Preview -->
+      <div class="members-section">
+        <div class="ms-head">
+          <span class="ms-title">Anggota &amp; Status</span>
+          <span class="ms-count">12 anggota</span>
+        </div>
+        <div class="member-preview-card">
+          <div class="mem-row">
+            <div class="mem-av" style="background:var(--emerald);">BS</div>
+            <div class="mem-info">
+              <div class="mem-name">Budi Setiawan</div>
+              <div class="mem-sub">Penerima putaran ke-6 🎉</div>
+            </div>
+            <span class="mem-badge giliran">Giliran!</span>
+          </div>
+          <div class="mem-row">
+            <div class="mem-av" style="background:#3b82f6;">RF</div>
+            <div class="mem-info">
+              <div class="mem-name">Ricky Felix (Kamu)</div>
+              <div class="mem-sub">Belum bayar — jatuh tempo 2 hari</div>
+            </div>
+            <span class="mem-badge unpaid">Belum</span>
+          </div>
+          <div class="mem-row">
+            <div class="mem-av" style="background:#8b5cf6;">RA</div>
+            <div class="mem-info">
+              <div class="mem-name">Rina Amalia</div>
+              <div class="mem-sub">Bayar 8 Jun · Transfer BCA</div>
+            </div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+          <div class="mem-row">
+            <div class="mem-av" style="background:#f59e0b;">DK</div>
+            <div class="mem-info">
+              <div class="mem-name">Dian Kusuma</div>
+              <div class="mem-sub">Bayar 7 Jun · GoPay</div>
+            </div>
+            <span class="mem-badge paid">Lunas</span>
+          </div>
+        </div>
+
+        <!-- View all members → orbit screen -->
+        <a href="final-members-orbit.html" class="view-members-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+          Lihat anggota dalam orbit
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Action Footer -->
+  <div class="action-footer">
+    <button class="pay-btn" onclick="alert('Proses bayar Rp 200.000 ke Budi...')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Bayar Iuranku Rp 200.000
+    </button>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

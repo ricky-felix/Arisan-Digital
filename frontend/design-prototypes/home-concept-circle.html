@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept C — Living Money Circle | Arisan Digital</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* =====================================================
+   CONCEPT C — LIVING MONEY CIRCLE
+   Playful spatial metaphor: one Arisan group at a time,
+   drawn as an orbit of friend avatars around a "pot"
+   that visibly fills as members pay.
+   Small flip toggle (Arisan <-> Patungan).
+   Patungan view: friends as paid/unpaid bubbles.
+   Speed Dial FAB — chosen because the radial orbit metaphor
+   and the radial FAB share the same "things spinning around
+   a center" visual grammar. Both are spatial and playful,
+   making the UI feel coherent rather than mismatched.
+   ===================================================== */
+
+* { -webkit-tap-highlight-color: transparent; }
+
+.screen-inner { padding-bottom: 100px; }
+
+/* ---- Top bar ---- */
+.top-bar-circle {
+  background: var(--surface);
+  padding: 12px 20px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line-soft);
+}
+.top-left-group { display: flex; flex-direction: column; gap: 1px; }
+.tl-greeting { font-size: 11px; color: var(--ink-2); font-weight: 500; }
+.tl-name { font-size: 20px; font-weight: 800; color: var(--ink-1); letter-spacing: -0.03em; line-height: 1; }
+.top-right-group { display: flex; gap: 8px; align-items: center; }
+.icon-btn-c {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer;
+  color: var(--ink-1); position: relative;
+}
+.notif-dot-c {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--danger); border: 2px solid white;
+}
+.avatar-c {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--emerald); border: 2px solid var(--emerald-soft);
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: white; cursor: pointer;
+}
+
+/* ---- Feature toggle pill ---- */
+.feature-toggle {
+  display: flex; justify-content: center;
+  padding: 14px 20px 0;
+}
+.toggle-track {
+  display: flex;
+  background: var(--line-soft);
+  border-radius: 99px;
+  padding: 3px;
+  gap: 2px;
+  position: relative;
+}
+.toggle-btn {
+  padding: 7px 20px;
+  border-radius: 99px; border: none;
+  font-family: inherit; font-size: 12px; font-weight: 800;
+  cursor: pointer; transition: all .25s cubic-bezier(.4,0,.2,1);
+  letter-spacing: -.01em;
+  background: transparent; color: var(--ink-3);
+  display: flex; align-items: center; gap: 5px;
+  position: relative; z-index: 1;
+}
+.toggle-btn.active-em { background: var(--emerald); color: white; box-shadow: 0 2px 8px rgba(16,185,129,.3); }
+.toggle-btn.active-lv { background: var(--lavender); color: white; box-shadow: 0 2px 8px rgba(167,139,250,.3); }
+
+/* ---- View panels ---- */
+.view-panel { display: none; }
+.view-panel.active { display: block; }
+
+/* ============================
+   ARISAN VIEW — ORBIT
+   ============================ */
+.orbit-section {
+  padding: 16px 20px 0;
+}
+
+/* Group swiper */
+.group-switcher {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.group-label {
+  font-size: 11px; color: var(--ink-2); font-weight: 600; letter-spacing: .02em;
+}
+.group-name-display {
+  font-size: 17px; font-weight: 800; color: var(--ink-1); letter-spacing: -.03em;
+}
+.group-nav { display: flex; gap: 4px; }
+.gnav-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer;
+  transition: background .1s;
+}
+.gnav-btn:hover { background: var(--line); }
+.gnav-btn:disabled { opacity: .3; }
+
+/* Orbit stage */
+.orbit-stage {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* square */
+  margin-bottom: 16px;
+}
+.orbit-inner {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Orbit rings */
+.orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(16,185,129,.25);
+  pointer-events: none;
+  animation: ringRotate 30s linear infinite;
+}
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.orbit-ring-outer {
+  width: 86%; padding-bottom: 86%;
+  border-color: rgba(16,185,129,.15);
+  animation-duration: 45s;
+}
+.orbit-ring-inner {
+  width: 60%; padding-bottom: 60%;
+  border-color: rgba(16,185,129,.22);
+  animation-duration: 25s;
+  animation-direction: reverse;
+}
+
+/* Center pot */
+.center-pot {
+  position: absolute;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--emerald-soft), 0 4px 24px rgba(16,185,129,.2), var(--sh-2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform .15s, box-shadow .15s;
+  overflow: hidden;
+}
+.center-pot:active { transform: scale(.95); }
+/* Fill animation */
+.pot-fill {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  border-radius: 50%;
+  background: linear-gradient(to top, var(--emerald) 0%, #34d399 100%);
+  transition: height .8s cubic-bezier(.4,0,.2,1);
+  opacity: .25;
+}
+.pot-content { position: relative; z-index: 1; text-align: center; }
+.pot-emoji { font-size: 22px; margin-bottom: 2px; }
+.pot-amount { font-size: 13px; font-weight: 800; color: var(--emerald-dark); letter-spacing: -.02em; }
+.pot-label { font-size: 9px; color: var(--ink-3); font-weight: 600; letter-spacing: .03em; text-transform: uppercase; }
+
+/* Orbiting avatars — positioned via JS */
+.orbit-avatar {
+  position: absolute;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  transition: transform .15s;
+}
+.orbit-avatar:active .oav-circle { transform: scale(.9); }
+.oav-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 800; color: white;
+  box-shadow: 0 2px 8px rgba(17,24,39,.2);
+  border: 2.5px solid white;
+  transition: transform .15s;
+  flex-shrink: 0;
+}
+.oav-circle.paid { border-color: var(--emerald); }
+.oav-circle.unpaid { border-color: #fbbf24; opacity: .7; }
+.oav-circle.self { border-color: white; box-shadow: 0 0 0 2px var(--emerald), 0 2px 8px rgba(16,185,129,.3); }
+
+/* Legend */
+.orbit-legend {
+  display: flex; gap: 12px; justify-content: center;
+  margin: 0 0 12px;
+}
+.leg-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; color: var(--ink-3);
+}
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+.leg-dot.paid { background: var(--emerald); }
+.leg-dot.unpaid { background: #fbbf24; }
+.leg-dot.self { background: #3b82f6; }
+
+/* Status card below orbit */
+.orbit-status-card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--sh-1), var(--sh-2);
+  padding: 14px 16px;
+  margin: 0 0 12px;
+}
+.osc-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.osc-recipient {
+  display: flex; align-items: center; gap: 9px;
+}
+.osc-av {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--emerald); color: white;
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+.osc-text-main { font-size: 13px; font-weight: 800; color: var(--ink-1); }
+.osc-text-sub { font-size: 11px; color: var(--ink-2); font-weight: 500; margin-top: 1px; }
+.osc-due-badge {
+  padding: 5px 11px; border-radius: 99px;
+  background: #fef3c7; color: #92400e;
+  font-size: 11px; font-weight: 800;
+}
+.osc-progress-track { height: 6px; border-radius: 99px; background: var(--line-soft); overflow: hidden; margin-bottom: 5px; }
+.osc-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--emerald-dark), var(--emerald)); }
+.osc-progress-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-3); font-weight: 600; }
+.osc-cta {
+  width: 100%; margin-top: 12px;
+  background: var(--emerald); color: white; border: none;
+  border-radius: 12px; padding: 12px;
+  font-family: inherit; font-size: 14px; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: transform .1s; letter-spacing: -.01em;
+  box-shadow: 0 3px 12px rgba(16,185,129,.3);
+}
+.osc-cta:active { transform: scale(.98); }
+
+/* Group dots navigation */
+.group-dots {
+  display: flex; justify-content: center; gap: 5px; margin-bottom: 10px;
+}
+.gdot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--line); transition: all .2s;
+}
+.gdot.active { width: 18px; border-radius: 3px; background: var(--emerald); }
+
+/* ============================
+   PATUNGAN VIEW — BUBBLE FIELD
+   ============================ */
+.patungan-section {
+  padding: 16px 20px 0;
+}
+
+.pt-bill-switcher {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.ptb-label { font-size: 11px; color: var(--ink-2); font-weight: 600; }
+.ptb-name { font-size: 17px; font-weight: 800; color: var(--ink-1); letter-spacing: -.03em; }
+.ptb-emoji { font-size: 18px; margin-right: 4px; }
+
+/* Bubble field */
+.bubble-field {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  margin-bottom: 14px;
+  border-radius: 20px;
+  background: var(--lavender-tint);
+  border: 1.5px solid var(--lavender-soft);
+  overflow: hidden;
+}
+/* Center total bubble */
+.field-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  text-align: center;
+}
+.field-pot {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 3px var(--lavender-soft), 0 4px 20px rgba(139,92,246,.2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.fp-emoji { font-size: 22px; margin-bottom: 1px; }
+.fp-amount { font-size: 12px; font-weight: 800; color: var(--lavender-dark); letter-spacing: -.02em; }
+.fp-label { font-size: 9px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+
+/* Person bubbles around center */
+.person-bubble {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 4;
+}
+.pb-circle {
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 800; color: white;
+  border: 2.5px solid white;
+  box-shadow: 0 2px 8px rgba(17,24,39,.15);
+  transition: transform .15s;
+}
+.pb-circle:hover, .pb-circle:active { transform: scale(1.1); }
+.pb-circle.paid { box-shadow: 0 0 0 2px var(--lavender), 0 2px 8px rgba(139,92,246,.3); }
+.pb-circle.unpaid { opacity: .65; }
+.pb-name { font-size: 9px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.pb-status { font-size: 8px; font-weight: 800; }
+.pb-status.paid { color: var(--lavender-dark); }
+.pb-status.unpaid { color: var(--danger); }
+
+/* Bill status card */
+.bill-status-card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--sh-1), var(--sh-2);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.bsc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.bsc-title { font-size: 14px; font-weight: 800; color: var(--ink-1); }
+.bsc-urgent {
+  padding: 4px 10px; border-radius: 99px;
+  background: #fee2e2; color: var(--danger);
+  font-size: 10px; font-weight: 800;
+}
+.bsc-ok {
+  padding: 4px 10px; border-radius: 99px;
+  background: var(--lavender-soft); color: var(--lavender-dark);
+  font-size: 10px; font-weight: 800;
+}
+.bsc-progress-track { height: 6px; border-radius: 99px; background: var(--line-soft); overflow: hidden; margin-bottom: 5px; }
+.bsc-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--lavender-dark), var(--lavender)); }
+.bsc-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-3); font-weight: 600; margin-bottom: 12px; }
+.bsc-cta {
+  width: 100%;
+  background: var(--lavender); color: white; border: none;
+  border-radius: 12px; padding: 12px;
+  font-family: inherit; font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: transform .1s; letter-spacing: -.01em;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  box-shadow: 0 3px 12px rgba(139,92,246,.3);
+}
+.bsc-cta:active { transform: scale(.98); }
+
+/* Bill nav dots */
+.bill-dots {
+  display: flex; justify-content: center; gap: 5px; margin-bottom: 12px;
+}
+.bdot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--line); transition: all .2s;
+}
+.bdot.active { width: 18px; border-radius: 3px; background: var(--lavender); }
+
+/* ---- Speed Dial FAB ---- */
+.speed-dial-c {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 50; width: 220px; display: flex; justify-content: center;
+}
+.sd-main-c {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(145deg, var(--emerald) 0%, var(--lavender) 100%);
+  border: none; cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: 0 6px 24px rgba(16,185,129,.35), 0 2px 8px rgba(167,139,250,.25);
+  position: relative; z-index: 2; transition: transform .15s;
+}
+.sd-main-c:active { transform: scale(.95); }
+.sd-main-c svg { transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
+.sd-main-c.open svg { transform: rotate(45deg); }
+.sd-pulse-c {
+  position: absolute; inset: -8px; border-radius: 50%;
+  border: 2px solid rgba(16,185,129,.3);
+  animation: sdPulseC 2s ease-out infinite; pointer-events: none;
+}
+@keyframes sdPulseC {
+  0% { transform: scale(1); opacity: .7; }
+  70% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+.sd-item-c {
+  position: absolute; bottom: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  opacity: 0; pointer-events: none;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  transform: translateY(0) translateX(0) scale(.6);
+}
+.sd-item-c.open { opacity: 1; pointer-events: auto; }
+.sd-item-c.arisan.open { transform: translateX(-85px) translateY(-60px) scale(1); transition-delay: .05s; }
+.sd-item-c.join.open { transform: translateX(0) translateY(-80px) scale(1); transition-delay: .08s; }
+.sd-item-c.patungan.open { transform: translateX(85px) translateY(-60px) scale(1); transition-delay: .05s; }
+.sd-btn-c {
+  width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: 0 4px 14px rgba(17,24,39,.2); transition: transform .1s;
+}
+.sd-btn-c:active { transform: scale(.92); }
+.sd-btn-c.em { background: var(--emerald); }
+.sd-btn-c.join { background: var(--surface); border: 2px solid var(--line); }
+.sd-btn-c.lv { background: var(--lavender); }
+.sd-label-c {
+  font-size: 10px; font-weight: 800; letter-spacing: -.01em;
+  white-space: nowrap; padding: 3px 8px; border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(17,24,39,.12);
+}
+.sd-label-c.em { background: var(--emerald); color: white; }
+.sd-label-c.join { background: var(--ink-1); color: white; }
+.sd-label-c.lv { background: var(--lavender); color: white; }
+
+.dimmer-c {
+  position: absolute; inset: 0; z-index: 40;
+  background: rgba(17,24,39,.3);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s; backdrop-filter: blur(1.5px);
+}
+.dimmer-c.active { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;">
+<div class="phone-frame" style="position:relative;background:var(--app-bg);">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="var(--ink-1)"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".5"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="var(--ink-1)"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".5"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="var(--ink-1)"><rect x="0" y="1" width="21" height="10" rx="3" stroke="var(--ink-1)" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-inner">
+
+      <!-- Top bar -->
+      <div class="top-bar-circle">
+        <div class="top-left-group">
+          <span class="tl-greeting">Halo Ricky 👋</span>
+          <span class="tl-name">Arisan Digital</span>
+        </div>
+        <div class="top-right-group">
+          <button class="icon-btn-c" aria-label="Notifikasi">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-dot-c"></span>
+          </button>
+          <div class="avatar-c">RF</div>
+        </div>
+      </div>
+
+      <!-- Feature toggle -->
+      <div class="feature-toggle">
+        <div class="toggle-track">
+          <button class="toggle-btn active-em" id="toggleArisan" onclick="switchView('arisan')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            Arisan
+          </button>
+          <button class="toggle-btn" id="togglePatungan" onclick="switchView('patungan')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Patungan
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== ARISAN VIEW ==================== -->
+      <div class="view-panel active" id="viewArisan">
+        <div class="orbit-section">
+
+          <!-- Group switcher header -->
+          <div class="group-switcher">
+            <div>
+              <div class="group-label">Arisan aktif</div>
+              <div class="group-name-display" id="groupNameDisplay">Keluarga Sari</div>
+            </div>
+            <div class="group-nav">
+              <button class="gnav-btn" id="btnGroupPrev" onclick="prevGroup()" disabled>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="gnav-btn" id="btnGroupNext" onclick="nextGroup()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Group dots -->
+          <div class="group-dots" id="groupDots"></div>
+
+          <!-- Orbit stage -->
+          <div class="orbit-stage">
+            <div class="orbit-inner">
+              <!-- Rings -->
+              <div class="orbit-ring orbit-ring-outer"></div>
+              <div class="orbit-ring orbit-ring-inner"></div>
+              <!-- Center pot -->
+              <a href="circle-detail-arisan.html" style="text-decoration:none;">
+                <div class="center-pot" id="centerPot">
+                  <div class="pot-fill" id="potFill" style="height:0%"></div>
+                  <div class="pot-content">
+                    <div class="pot-emoji">🏺</div>
+                    <div class="pot-amount" id="potAmount">Rp 0</div>
+                    <div class="pot-label">terkumpul</div>
+                  </div>
+                </div>
+              </a>
+              <!-- Orbit avatars rendered by JS -->
+              <div id="orbitAvatars"></div>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="orbit-legend">
+            <div class="leg-item"><div class="leg-dot paid"></div>Sudah bayar</div>
+            <div class="leg-item"><div class="leg-dot unpaid"></div>Belum bayar</div>
+            <div class="leg-item"><div class="leg-dot self"></div>Kamu</div>
+          </div>
+
+          <!-- Status card -->
+          <div class="orbit-status-card" id="orbitStatusCard">
+            <!-- populated by JS -->
+          </div>
+
+        </div>
+      </div><!-- /viewArisan -->
+
+      <!-- ==================== PATUNGAN VIEW ==================== -->
+      <div class="view-panel" id="viewPatungan">
+        <div class="patungan-section">
+
+          <!-- Bill switcher -->
+          <div class="pt-bill-switcher">
+            <div>
+              <div class="ptb-label">Tagihan aktif</div>
+              <div class="ptb-name" id="billNameDisplay"><span class="ptb-emoji">🏨</span>Hotel Bromo</div>
+            </div>
+            <div class="group-nav">
+              <button class="gnav-btn" id="btnBillPrev" onclick="prevBill()" disabled>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="gnav-btn" id="btnBillNext" onclick="nextBill()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bill dots -->
+          <div class="bill-dots" id="billDots"></div>
+
+          <!-- Bubble field -->
+          <div class="bubble-field" id="bubbleField">
+            <!-- Center pot -->
+            <div class="field-center">
+              <div class="field-pot" id="fieldPot">
+                <div class="fp-emoji" id="fieldEmoji">🏨</div>
+                <div class="fp-amount" id="fieldAmount">Rp 1,2jt</div>
+                <div class="fp-label">total</div>
+              </div>
+            </div>
+            <!-- Person bubbles via JS -->
+            <div id="personBubbles"></div>
+          </div>
+
+          <!-- Bill status card -->
+          <div class="bill-status-card" id="billStatusCard">
+            <!-- populated by JS -->
+          </div>
+
+        </div>
+      </div><!-- /viewPatungan -->
+
+    </div>
+  </div>
+
+  <!-- Dimmer -->
+  <div class="dimmer-c" id="dimmerC" onclick="closeDial()"></div>
+
+  <!-- Speed Dial FAB -->
+  <div class="speed-dial-c">
+    <div class="sd-item-c arisan" id="sdA">
+      <div class="sd-label-c em">Arisan</div>
+      <button class="sd-btn-c em" onclick="alert('Buat Arisan baru')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      </button>
+    </div>
+    <div class="sd-item-c join" id="sdJ">
+      <div class="sd-label-c join">Gabung</div>
+      <button class="sd-btn-c join" onclick="alert('Gabung Arisan')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" stroke-width="2.5" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      </button>
+    </div>
+    <div class="sd-item-c patungan" id="sdP">
+      <div class="sd-label-c lv">Patungan</div>
+      <button class="sd-btn-c lv" onclick="alert('Buat Patungan baru')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </button>
+    </div>
+    <button class="sd-main-c" id="sdMainC" onclick="toggleDial()">
+      <div class="sd-pulse-c"></div>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ======================================
+   DATA
+   ====================================== */
+const GROUPS = [
+  {
+    name: 'Keluarga Sari',
+    members: 12, iuran: 'Rp 200.000', iuranAmt: 200000,
+    due: '5 hari lagi', dueUrgent: true,
+    putaran: '6/12', potAmt: 1600000, potMax: 2400000,
+    recipient: 'Budi Setiawan',
+    members_data: [
+      { init:'BS', paid:true, self:false, color:'#10b981', angle:0 },
+      { init:'RF', paid:false, self:true, color:'#3b82f6', angle:30 },
+      { init:'RA', paid:true, self:false, color:'#8b5cf6', angle:60 },
+      { init:'DK', paid:true, self:false, color:'#f59e0b', angle:90 },
+      { init:'SN', paid:true, self:false, color:'#ec4899', angle:120 },
+      { init:'MH', paid:true, self:false, color:'#6366f1', angle:150 },
+      { init:'AP', paid:false, self:false, color:'#ef4444', angle:180 },
+      { init:'YP', paid:false, self:false, color:'#14b8a6', angle:210 },
+      { init:'TR', paid:true, self:false, color:'#f97316', angle:240 },
+      { init:'LB', paid:true, self:false, color:'#06b6d4', angle:270 },
+      { init:'KM', paid:false, self:false, color:'#84cc16', angle:300 },
+      { init:'NR', paid:true, self:false, color:'#a78bfa', angle:330 },
+    ]
+  },
+  {
+    name: 'Arisan Kantor',
+    members: 8, iuran: 'Rp 150.000', iuranAmt: 150000,
+    due: '15 Jun', dueUrgent: false,
+    putaran: '2/8', potAmt: 300000, potMax: 1200000,
+    recipient: null,
+    members_data: [
+      { init:'AN', paid:true, self:false, color:'#6366f1', angle:0 },
+      { init:'SB', paid:false, self:false, color:'#14b8a6', angle:45 },
+      { init:'MF', paid:true, self:false, color:'#f97316', angle:90 },
+      { init:'RF', paid:false, self:true, color:'#3b82f6', angle:135 },
+      { init:'JK', paid:false, self:false, color:'#ef4444', angle:180 },
+      { init:'HL', paid:true, self:false, color:'#a78bfa', angle:225 },
+      { init:'PT', paid:false, self:false, color:'#f59e0b', angle:270 },
+      { init:'SW', paid:true, self:false, color:'#ec4899', angle:315 },
+    ]
+  },
+  {
+    name: 'Arisan RT 05',
+    members: 20, iuran: 'Rp 50.000', iuranAmt: 50000,
+    due: 'Minggu ini', dueUrgent: false,
+    putaran: '3/20', potAmt: 150000, potMax: 1000000,
+    recipient: null,
+    members_data: [
+      { init:'PJ', paid:true, self:false, color:'#10b981', angle:0 },
+      { init:'TK', paid:false, self:false, color:'#3b82f6', angle:18 },
+      { init:'LM', paid:true, self:false, color:'#f59e0b', angle:36 },
+      { init:'RF', paid:false, self:true, color:'#8b5cf6', angle:54 },
+      { init:'HN', paid:false, self:false, color:'#ef4444', angle:72 },
+      { init:'DR', paid:false, self:false, color:'#f97316', angle:90 },
+      { init:'KS', paid:true, self:false, color:'#06b6d4', angle:108 },
+      { init:'BT', paid:false, self:false, color:'#ec4899', angle:126 },
+    ]
+  }
+];
+
+const BILLS = [
+  {
+    name: 'Hotel Bromo', emoji: '🏨',
+    total: 1200000, totalFmt: 'Rp 1,2jt',
+    paidPct: 25, urgent: true,
+    people: [
+      { name:'Ricky', init:'RF', color:'#3b82f6', paid:true, size:50, amt:'Rp 300rb' },
+      { name:'Budi', init:'BS', color:'#ef4444', paid:false, size:46, amt:'Rp 300rb' },
+      { name:'Irfan', init:'IR', color:'#f97316', paid:false, size:46, amt:'Rp 300rb' },
+      { name:'Mira', init:'MF', color:'#f59e0b', paid:false, size:46, amt:'Rp 300rb' },
+    ]
+  },
+  {
+    name: 'Makan Bali', emoji: '🍽',
+    total: 540000, totalFmt: 'Rp 540rb',
+    paidPct: 60, urgent: false,
+    people: [
+      { name:'Ricky', init:'RF', color:'#3b82f6', paid:true, size:50, amt:'Rp 90rb' },
+      { name:'Rina', init:'RA', color:'#10b981', paid:true, size:44, amt:'Rp 90rb' },
+      { name:'Dewi', init:'DW', color:'#8b5cf6', paid:true, size:44, amt:'Rp 90rb' },
+      { name:'Aldi', init:'AL', color:'#ef4444', paid:false, size:42, amt:'Rp 90rb' },
+      { name:'Sari', init:'SR', color:'#f97316', paid:false, size:42, amt:'Rp 90rb' },
+      { name:'Budi', init:'BS', color:'#f59e0b', paid:false, size:42, amt:'Rp 90rb' },
+    ]
+  }
+];
+
+let currentGroup = 0;
+let currentBill = 0;
+let dialOpen = false;
+
+/* ======================================
+   ORBIT RENDERING
+   ====================================== */
+function fmt(n) {
+  if (n >= 1000000) return 'Rp ' + (n/1000000).toFixed(1).replace('.0','') + 'jt';
+  return 'Rp ' + (n/1000).toFixed(0) + 'rb';
+}
+
+function renderGroupDots() {
+  const c = document.getElementById('groupDots');
+  c.innerHTML = '';
+  GROUPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'gdot' + (i === currentGroup ? ' active' : '');
+    c.appendChild(d);
+  });
+}
+
+function renderOrbit(groupIdx) {
+  const g = GROUPS[groupIdx];
+  document.getElementById('groupNameDisplay').textContent = g.name;
+  document.getElementById('potAmount').textContent = fmt(g.potAmt);
+
+  // Fill percentage
+  const pct = Math.round((g.potAmt / g.potMax) * 100);
+  document.getElementById('potFill').style.height = pct + '%';
+
+  // Avatars
+  const container = document.getElementById('orbitAvatars');
+  container.innerHTML = '';
+  const stage = document.querySelector('.orbit-stage');
+  const R = stage.offsetWidth * 0.36; // orbit radius
+  const cx = stage.offsetWidth / 2;
+  const cy = stage.offsetWidth / 2;
+
+  // Limit displayed avatars to 8 for readability
+  const displayed = g.members_data.slice(0, 8);
+  const angleStep = 360 / displayed.length;
+
+  displayed.forEach((m, i) => {
+    const angle = (i * angleStep - 90) * (Math.PI / 180);
+    const x = cx + R * Math.cos(angle);
+    const y = cy + R * Math.sin(angle);
+
+    const av = document.createElement('div');
+    av.className = 'orbit-avatar';
+    av.style.left = x + 'px';
+    av.style.top = y + 'px';
+    av.onclick = () => alert(m.init + ' — ' + (m.paid ? 'sudah bayar' : 'belum bayar'));
+
+    const stateClass = m.self ? 'self' : (m.paid ? 'paid' : 'unpaid');
+    av.innerHTML = `<div class="oav-circle ${stateClass}" style="background:${m.color}">${m.init}</div>`;
+    container.appendChild(av);
+  });
+
+  // Status card
+  const paidCount = g.members_data.filter(m => m.paid).length;
+  const unpaidCount = g.members_data.length - paidCount;
+  const mySelf = g.members_data.find(m => m.self);
+  const urgentColor = g.dueUrgent ? '#b45309' : 'var(--emerald-dark)';
+  const dueBg = g.dueUrgent ? '#fef3c7' : 'var(--emerald-tint)';
+  const dueColor = g.dueUrgent ? '#92400e' : 'var(--emerald-dark)';
+
+  document.getElementById('orbitStatusCard').innerHTML = `
+    <div class="osc-row">
+      <div class="osc-recipient">
+        <div class="osc-av">${g.recipient ? g.recipient.split(' ').map(w=>w[0]).join('') : '?'}</div>
+        <div>
+          <div class="osc-text-main">${g.recipient ? '🎉 Giliran ' + g.recipient : 'Putaran ' + g.putaran}</div>
+          <div class="osc-text-sub">${paidCount}/${g.members_data.length} sudah bayar · ${g.iuran}/bln</div>
+        </div>
+      </div>
+      <div class="osc-due-badge" style="background:${dueBg};color:${dueColor};">${g.due}</div>
+    </div>
+    <div class="osc-progress-track">
+      <div class="osc-progress-fill" style="width:${pct}%"></div>
+    </div>
+    <div class="osc-progress-meta">
+      <span>${pct}% terkumpul · ${paidCount} sudah bayar</span>
+      <span>${fmt(g.potAmt)} / ${fmt(g.potMax)}</span>
+    </div>
+    <button class="osc-cta" onclick="${mySelf && !mySelf.paid ? "alert('Bayar " + g.iuran + "')" : "alert('Detail grup')"}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      ${mySelf && !mySelf.paid ? 'Bayar Iuranku ' + g.iuran : 'Lihat Detail Grup'}
+    </button>
+  `;
+
+  renderGroupDots();
+  const prevBtn = document.getElementById('btnGroupPrev');
+  const nextBtn = document.getElementById('btnGroupNext');
+  if (prevBtn) prevBtn.disabled = groupIdx === 0;
+  if (nextBtn) nextBtn.disabled = groupIdx === GROUPS.length - 1;
+}
+
+function prevGroup() {
+  if (currentGroup > 0) { currentGroup--; renderOrbit(currentGroup); }
+}
+function nextGroup() {
+  if (currentGroup < GROUPS.length - 1) { currentGroup++; renderOrbit(currentGroup); }
+}
+
+/* ======================================
+   PATUNGAN / BUBBLE FIELD RENDERING
+   ====================================== */
+function renderBillDots() {
+  const c = document.getElementById('billDots');
+  c.innerHTML = '';
+  BILLS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'bdot' + (i === currentBill ? ' active' : '');
+    c.appendChild(d);
+  });
+}
+
+function renderBillField(billIdx) {
+  const b = BILLS[billIdx];
+  document.getElementById('billNameDisplay').innerHTML = `<span class="ptb-emoji">${b.emoji}</span>${b.name}`;
+  document.getElementById('fieldEmoji').textContent = b.emoji;
+  document.getElementById('fieldAmount').textContent = b.totalFmt;
+
+  // Place person bubbles
+  const container = document.getElementById('personBubbles');
+  container.innerHTML = '';
+  const field = document.getElementById('bubbleField');
+  const fw = field.offsetWidth || 350;
+  const fh = field.offsetHeight || 270;
+  const cx = fw / 2, cy = fh / 2;
+
+  // Arrange in a ring around center
+  const r = Math.min(fw, fh) * 0.33;
+  const n = b.people.length;
+  b.people.forEach((p, i) => {
+    const angle = ((i / n) * 2 * Math.PI) - Math.PI / 2;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    const pb = document.createElement('div');
+    pb.className = 'person-bubble';
+    pb.style.left = x + 'px';
+    pb.style.top = y + 'px';
+    pb.onclick = () => alert(p.name + ' — ' + (p.paid ? 'sudah bayar ' + p.amt : 'belum bayar ' + p.amt));
+
+    const stateClass = p.paid ? 'paid' : 'unpaid';
+    const fontSize = Math.round(p.size * 0.28) + 'px';
+    pb.innerHTML = `
+      <div class="pb-circle ${stateClass}" style="width:${p.size}px;height:${p.size}px;background:${p.color};font-size:${fontSize};">${p.init}</div>
+      <div class="pb-name">${p.name}</div>
+      <div class="pb-status ${stateClass}">${p.paid ? 'Lunas' : 'Belum'}</div>
+    `;
+    container.appendChild(pb);
+  });
+
+  // Status card
+  const paidCount = b.people.filter(p => p.paid).length;
+  const urgentStyle = b.urgent ? 'background:#fee2e2;color:var(--danger);' : 'background:var(--lavender-soft);color:var(--lavender-dark);';
+  document.getElementById('billStatusCard').innerHTML = `
+    <div class="bsc-header">
+      <div class="bsc-title">${b.emoji} ${b.name}</div>
+      <div style="${urgentStyle}padding:4px 10px;border-radius:99px;font-size:10px;font-weight:800;">
+        ${b.urgent ? 'Urgent!' : paidCount + '/' + b.people.length + ' lunas'}
+      </div>
+    </div>
+    <div class="bsc-progress-track">
+      <div class="bsc-progress-fill" style="width:${b.paidPct}%"></div>
+    </div>
+    <div class="bsc-meta">
+      <span>${b.paidPct}% sudah bayar · ${paidCount}/${b.people.length} orang</span>
+      <span>${b.totalFmt} total</span>
+    </div>
+    <button class="bsc-cta" onclick="alert('Tagih teman yang belum bayar')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Ingatkan ${b.people.filter(p => !p.paid).length} Teman
+    </button>
+  `;
+
+  renderBillDots();
+  const prevBtn = document.getElementById('btnBillPrev');
+  const nextBtn = document.getElementById('btnBillNext');
+  if (prevBtn) prevBtn.disabled = billIdx === 0;
+  if (nextBtn) nextBtn.disabled = billIdx === BILLS.length - 1;
+}
+
+function prevBill() {
+  if (currentBill > 0) { currentBill--; renderBillField(currentBill); }
+}
+function nextBill() {
+  if (currentBill < BILLS.length - 1) { currentBill++; renderBillField(currentBill); }
+}
+
+/* ======================================
+   FEATURE TOGGLE
+   ====================================== */
+function switchView(view) {
+  const ta = document.getElementById('toggleArisan');
+  const tp = document.getElementById('togglePatungan');
+  const va = document.getElementById('viewArisan');
+  const vp = document.getElementById('viewPatungan');
+
+  if (view === 'arisan') {
+    ta.className = 'toggle-btn active-em';
+    tp.className = 'toggle-btn';
+    va.classList.add('active');
+    vp.classList.remove('active');
+    setTimeout(() => renderOrbit(currentGroup), 50);
+  } else {
+    tp.className = 'toggle-btn active-lv';
+    ta.className = 'toggle-btn';
+    vp.classList.add('active');
+    va.classList.remove('active');
+    setTimeout(() => renderBillField(currentBill), 50);
+  }
+}
+
+/* ======================================
+   SPEED DIAL
+   ====================================== */
+function toggleDial() {
+  dialOpen = !dialOpen;
+  ['sdA','sdJ','sdP'].forEach(id => document.getElementById(id).classList.toggle('open', dialOpen));
+  document.getElementById('sdMainC').classList.toggle('open', dialOpen);
+  document.getElementById('dimmerC').classList.toggle('active', dialOpen);
+}
+function closeDial() {
+  dialOpen = false;
+  ['sdA','sdJ','sdP'].forEach(id => document.getElementById(id).classList.remove('open'));
+  document.getElementById('sdMainC').classList.remove('open');
+  document.getElementById('dimmerC').classList.remove('active');
+}
+
+/* ======================================
+   INIT
+   ====================================== */
+window.addEventListener('load', () => {
+  renderOrbit(0);
+  renderBillField(0);
+});
+</script>
+</body>
+</html>

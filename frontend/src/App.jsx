@@ -1,21 +1,37 @@
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import LandingPage from "./pages/LandingPage";
-import { LoginOrRegister } from "./pages/LoginOrRegister";
-import { AppHomepage } from "./pages/application/AppHomepage";
-import { ArisanPage } from "./pages/application/ArisanPage";
-import CreateArisanPage from "./pages/application/CreateArisanPage";
-import GroupDetailPage from "./pages/application/GroupDetailPage";
-import { BayarPage } from "./pages/application/BayarPage";
-import { ProfilPage } from "./pages/application/ProfilPage";
-import PatunganPage from "./pages/application/PatunganPage";
-import CreatePatunganPage from "./pages/application/CreatePatunganPage";
-import BillDetailPage from "./pages/application/BillDetailPage";
 import AppLayout from "./components/application/AppLayout";
+import "./styles/app-v1.css"; // v1 / app component classes (.app-*, badges, buttons, patungan)
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import { AccountPromptProvider } from "./context/AccountPromptContext";
+
+// website
+import LandingPage from "./pages/LandingPage";
+import { LoginOrRegister } from "./pages/LoginOrRegister";
+
+// v1 screens
+import { AppHomepage } from "./pages/application/v1/AppHomepage";
+import { ArisanPage } from "./pages/application/v1/ArisanPage";
+import GroupDetailPage from "./pages/application/v1/GroupDetailPage";
+import { BayarPage } from "./pages/application/v1/BayarPage";
+import { ProfilPage } from "./pages/application/v1/ProfilPage";
+import PatunganPage from "./pages/application/v1/PatunganPage";
+import BillDetailPage from "./pages/application/v1/BillDetailPage";
+
+// v2 screens
+import HomeDeck from "./pages/application/v2/HomeDeck";
+import Notifikasi from "./pages/application/v2/Notifikasi";
+import Dompet from "./pages/application/v2/Dompet";
+import MembersOrbit from "./pages/application/v2/MembersOrbit";
+import Profil from "./pages/application/v2/Profil";
+import BuktiTransfer from "./pages/application/v2/BuktiTransfer";
+import Undang from "./pages/application/v2/Undang";
+import GabungMasuk from "./pages/application/v2/GabungMasuk";
+import Gabung from "./pages/application/v2/Gabung";
+import BuatArisan from "./pages/application/v2/BuatArisan";
+import BuatPatungan from "./pages/application/v2/BuatPatungan";
 
 // ── Landing + modal overlay on /login ────────────────────────
 // Both "/" and "/login" render this SAME component, so React keeps the
@@ -32,7 +48,7 @@ function LandingShell() {
       <LandingPage />
       <AnimatePresence>
         {showLogin && (
-          <LoginOrRegister key="login-modal" onClose={() => navigate("/")} />
+          <LoginOrRegister key="login-modal" onClose={() => navigate("/")} onSuccess={() => navigate("/app")} />
         )}
       </AnimatePresence>
     </>
@@ -143,30 +159,41 @@ function AppRoutes() {
         <Route path="/login" element={<LandingShell />} />
 
         {/* App routes (open — anonymous session, no login) */}
-        <Route path="/app" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
+        {/* v2 screens replace /app, /app/notifikasi, /app/profil */}
+        <Route path="/app" element={<ProtectedRoute><HomeDeck /></ProtectedRoute>} />
+        <Route path="/app/notifikasi" element={<ProtectedRoute><Notifikasi /></ProtectedRoute>} />
+        <Route path="/app/dompet" element={<ProtectedRoute><Dompet /></ProtectedRoute>} />
+        <Route path="/app/anggota" element={<ProtectedRoute><MembersOrbit /></ProtectedRoute>} />
+        <Route path="/app/profil" element={<ProtectedRoute><Profil /></ProtectedRoute>} />
+        <Route path="/app/bukti" element={<ProtectedRoute><BuktiTransfer /></ProtectedRoute>} />
+        <Route path="/app/undang" element={<ProtectedRoute><Undang /></ProtectedRoute>} />
+        <Route path="/app/gabung" element={<ProtectedRoute><GabungMasuk /></ProtectedRoute>} />
+        <Route path="/app/gabung/preview" element={<ProtectedRoute><Gabung /></ProtectedRoute>} />
+        {/* Legacy / supporting routes — unchanged */}
         <Route path="/app/arisan" element={<ProtectedRoute><ArisanPage /></ProtectedRoute>} />
-        <Route path="/app/arisan/buat" element={<ProtectedRoute><CreateArisanPage /></ProtectedRoute>} />
-        <Route path="/app/buat-arisan" element={<ProtectedRoute><CreateArisanPage /></ProtectedRoute>} />
+        <Route path="/app/arisan/buat" element={<ProtectedRoute><BuatArisan /></ProtectedRoute>} />
+        <Route path="/app/buat-arisan" element={<ProtectedRoute><BuatArisan /></ProtectedRoute>} />
         <Route path="/app/arisan/:id" element={<ProtectedRoute><GroupDetailPage /></ProtectedRoute>} />
         <Route path="/app/bayar" element={<ProtectedRoute><BayarPage /></ProtectedRoute>} />
-        <Route path="/app/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
-        <Route path="/app/notifikasi" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
         <Route path="/app/analitik" element={<ProtectedRoute><AppHomepage /></ProtectedRoute>} />
         <Route path="/app/patungan" element={<ProtectedRoute><AppLayout title="Patungan"><PatunganPage /></AppLayout></ProtectedRoute>} />
-        <Route path="/app/patungan/buat" element={<ProtectedRoute><CreatePatunganPage /></ProtectedRoute>} />
+        <Route path="/app/patungan/buat" element={<ProtectedRoute><BuatPatungan /></ProtectedRoute>} />
         <Route path="/app/patungan/rutin" element={<ProtectedRoute><AppLayout title="Patungan"><PatunganPage /></AppLayout></ProtectedRoute>} />
         <Route path="/app/patungan/:billId" element={<ProtectedRoute><BillDetailPage /></ProtectedRoute>} />
 
-        {/* Dev-only unguarded routes used by scripts/screenshot-app.mjs to
-            capture the in-app screens for the landing Gallery. Excluded from
-            production builds via import.meta.env.DEV. */}
+        {/* Dev-only unguarded routes for headless screenshot capture at 390×844.
+            No auth, no AppLayout — each screen renders standalone / full-viewport.
+            Exact slugs required by scripts/screenshot-app.mjs. */}
         {import.meta.env.DEV && (
           <>
-            <Route path="/screens/beranda" element={<AppHomepage />} />
-            <Route path="/screens/arisan" element={<ArisanPage />} />
-            <Route path="/screens/bayar" element={<BayarPage />} />
-            <Route path="/screens/patungan" element={<AppLayout title="Patungan"><PatunganPage /></AppLayout>} />
-            <Route path="/screens/profil" element={<ProfilPage />} />
+            <Route path="/screens/beranda"     element={<HomeDeck />} />
+            <Route path="/screens/notifikasi"  element={<Notifikasi />} />
+            <Route path="/screens/dompet"      element={<Dompet />} />
+            <Route path="/screens/anggota"     element={<MembersOrbit />} />
+            <Route path="/screens/profil"      element={<Profil />} />
+            <Route path="/screens/buat-arisan"   element={<BuatArisan />} />
+            <Route path="/screens/buat-patungan" element={<BuatPatungan />} />
+            <Route path="/screens/bukti"         element={<BuktiTransfer />} />
           </>
         )}
 

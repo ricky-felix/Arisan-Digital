@@ -2,8 +2,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import Icon from "./Icon";
-import Avatar from "./Avatar";
-import SaveAccountBanner from "./SaveAccountBanner";
+import Avatar from "./v1/Avatar";
+import SaveAccountBanner from "./v1/SaveAccountBanner";
 
 const NAV = [
   { id: "dashboard", label: "Beranda",    icon: "home",    path: "/app" },

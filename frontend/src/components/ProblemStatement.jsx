@@ -3,18 +3,13 @@
 import { Button } from "./Button";
 import React from "react";
 import { motion } from "framer-motion";
-import { staggerContainer, staggerItemLeft, staggerItemRight, staggerItemScale, buttonHover, buttonTap } from "../utils/animations";
+import { staggerItemLeft, staggerItemRight, staggerItemScale, buttonHover, buttonTap } from "../utils/animations";
+import { Reveal } from "./Reveal";
 
 export function ProblemStatement() {
   return (
     <section id="pelajari" className="bg-[#10b981] px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="problem-heading">
-      <motion.div
-        className="container mx-auto"
-        variants={staggerContainer}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, amount: 0.2 }}
-      >
+      <Reveal className="container mx-auto">
         <div className="mb-12 grid grid-cols-1 items-start justify-between gap-x-12 gap-y-8 md:mb-16 md:grid-cols-2 md:gap-x-12 lg:mb-20 lg:gap-x-20">
           <motion.div variants={staggerItemLeft}>
             <p className="mb-3 font-semibold text-white md:mb-4">Masalah</p>
@@ -59,7 +54,7 @@ export function ProblemStatement() {
           className="w-full rounded-lg object-cover"
           alt="Ilustrasi permasalahan arisan tradisional"
         />
-      </motion.div>
+      </Reveal>
     </section>
   );
 }
