@@ -50,7 +50,7 @@ export function Navbar() {
           />
         </a>
         <div className="flex items-center justify-center gap-2 lg:gap-4">
-          <Button
+          {/* <Button
             title="Masuk"
             size="sm"
             variant="secondary-alt"
@@ -67,7 +67,7 @@ export function Navbar() {
             href={routes.app}
           >
             Coba Sekarang
-          </Button>
+          </Button> */}
           <button
             className="-mr-2 flex size-12 flex-col items-center justify-center justify-self-end rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#10b981] lg:mr-0"
             onClick={useActive.toggleMenu}
@@ -127,11 +127,11 @@ export function Navbar() {
                   Cara kerja
                 </a>
                 <a
-                  href="#testimoni"
-                  onClick={(e) => handleAnchorClick(e, 'testimoni', useActive.toggleMenu)}
+                  href="#gallery"
+                  onClick={(e) => handleAnchorClick(e, 'gallery', useActive.toggleMenu)}
                   className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
                 >
-                  Testimoni
+                  Gallery
                 </a>
                 <a
                   href="#faq"
@@ -145,7 +145,7 @@ export function Navbar() {
                   onClick={(e) => handleAnchorClick(e, 'tentang-kami', useActive.toggleMenu)}
                   className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
                 >
-                  Tentang kami
+                  Tentang
                 </a>
                 <a
                   href="#hubungi"
@@ -155,7 +155,7 @@ export function Navbar() {
                   Hubungi
                 </a>
               </div>
-              <div className="flex min-h-18 items-center justify-between gap-x-4">
+              {/* <div className="flex min-h-18 items-center justify-between gap-x-4">
                 <div className="flex items-center gap-x-4">
                   <button
                     type="button"
@@ -191,7 +191,7 @@ export function Navbar() {
                     <BiLogoYoutube className="size-6" />
                   </a>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

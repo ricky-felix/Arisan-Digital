@@ -101,7 +101,7 @@ const slides = [
 export function Gallery() {
   const carousel = useCarousel();
   return (
-    <section id="testimoni" className="overflow-hidden bg-background-primary py-16 md:py-24 lg:py-28" aria-labelledby="gallery-heading">
+    <section id="gallery" className="overflow-hidden bg-background-primary py-16 md:py-24 lg:py-28" aria-labelledby="gallery-heading">
       <Reveal className="grid auto-cols-fr grid-cols-1 items-center gap-12 md:gap-16 lg:grid-cols-2 lg:gap-0">
         <div className="flex lg:justify-self-end">
           <div className="reveal-left mx-[5%] w-full max-w-md lg:mb-24 lg:ml-[5vw] lg:mr-20">

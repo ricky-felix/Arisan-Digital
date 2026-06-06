@@ -18,7 +18,7 @@ const screens = [
   { slug: "buat-arisan", path: "/screens/buat-arisan" },
   { slug: "buat-patungan", path: "/screens/buat-patungan" },
   { slug: "dompet", path: "/screens/dompet" },
-  { slug: "anggota", path: "/screens/anggota" },
+  { slug: "anggota", path: "/screens/grup" },
   { slug: "notifikasi", path: "/screens/notifikasi" },
   { slug: "bukti", path: "/screens/bukti" },
   { slug: "profil", path: "/screens/profil" },
