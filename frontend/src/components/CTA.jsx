@@ -1,28 +1,9 @@
 "use client";
 
 import { Button } from "./Button";
-import { motion } from "framer-motion";
 import React from "react";
 import { routes } from "../config";
 import { Reveal } from "./Reveal";
-
-const slideFromLeft = {
-  initial: { x: "-50%", opacity: 0 },
-  animate: {
-    x: "0%",
-    opacity: 1,
-    transition: { type: "spring", bounce: 0, duration: 0.7 },
-  },
-};
-
-const slideFromRight = {
-  initial: { x: "50%", opacity: 0 },
-  animate: {
-    x: "0%",
-    opacity: 1,
-    transition: { type: "spring", bounce: 0, duration: 0.7 },
-  },
-};
 
 export function CTA() {
   return (
@@ -30,20 +11,17 @@ export function CTA() {
       <div className="container mx-auto">
         <Reveal className="mx-auto w-full max-w-3xl text-center">
           <h2 id="cta-heading" className="overflow-hidden">
-            <motion.span
-              variants={slideFromLeft}
-              className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
-            >
+            <span className="reveal-slide-left block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl">
               Mulai gunakan
-            </motion.span>
+            </span>
           </h2>
           <h2 id="cta-heading" className="overflow-hidden">
-            <motion.span
-              variants={slideFromLeft}
-              className="block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
+            <span
+              className="reveal-slide-left block text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
+              style={{ "--reveal-delay": "0.1s" }}
             >
               Arisan Digital
-            </motion.span>
+            </span>
           </h2>
           <p className="text-base text-white md:text-lg">
             Coba Arisan Digital dan buat grup pertamamu dalam beberapa menit

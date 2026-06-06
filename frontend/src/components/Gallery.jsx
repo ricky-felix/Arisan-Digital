@@ -8,8 +8,6 @@ import {
   CarouselPrevious,
 } from "@relume_io/relume-ui";
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { staggerItemLeft, staggerItemRight } from "../utils/animations";
 import { Reveal } from "./Reveal";
 
 const useCarousel = () => {
@@ -106,16 +104,16 @@ export function Gallery() {
     <section id="testimoni" className="overflow-hidden bg-background-primary py-16 md:py-24 lg:py-28" aria-labelledby="gallery-heading">
       <Reveal className="grid auto-cols-fr grid-cols-1 items-center gap-12 md:gap-16 lg:grid-cols-2 lg:gap-0">
         <div className="flex lg:justify-self-end">
-          <motion.div className="mx-[5%] w-full max-w-md lg:mb-24 lg:ml-[5vw] lg:mr-20" variants={staggerItemLeft}>
+          <div className="reveal-left mx-[5%] w-full max-w-md lg:mb-24 lg:ml-[5vw] lg:mr-20">
             <h2 id="gallery-heading" className="mb-5 text-5xl font-bold leading-tight text-text-primary md:mb-6 md:text-7xl lg:text-8xl">
               Lihat aplikasi
             </h2>
             <p className="text-base text-text-primary md:text-lg">
               Antarmuka yang bersih dan mudah digunakan di setiap perangkat.
             </p>
-          </motion.div>
+          </div>
         </div>
-        <motion.div variants={staggerItemRight}>
+        <div className="reveal-right" style={{ "--reveal-delay": "0.1s" }}>
           <Carousel
           setApi={carousel.setApi}
           opts={{ loop: true, align: "start" }}
@@ -167,7 +165,7 @@ export function Gallery() {
             </div>
           </div>
         </Carousel>
-        </motion.div>
+        </div>
       </Reveal>
     </section>
   );

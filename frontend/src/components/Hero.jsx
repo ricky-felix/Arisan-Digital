@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "./Button";
-import { AnimatePresence, motion } from "framer-motion";
 import { routes } from "../config";
 
 const TAB_DURATION = 5;
@@ -131,16 +130,12 @@ export function Hero() {
         </div>
       ))}
 
-      {/* Text content — AnimatePresence only for copy, no image re-mount */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={tab.value}
-          className="absolute inset-0 flex flex-col items-center justify-center"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-        >
+      {/* Text content — keyed by tab so the CSS entrance replays on change;
+          no image re-mount. */}
+      <div
+        key={tab.value}
+        className="hero-text-in absolute inset-0 flex flex-col items-center justify-center"
+      >
           <div className="relative z-10 px-4 py-8 pb-24 sm:px-6 sm:py-12 sm:pb-28 md:px-[5%] md:py-16 md:pb-32 lg:py-20">
             <div className="mx-auto max-w-2xl text-center">
               <h1 className="mb-3 text-2xl font-bold leading-tight text-neutral-white sm:mb-4 sm:text-3xl sm:leading-snug md:mb-5 md:text-5xl lg:text-6xl">
@@ -158,8 +153,7 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </motion.div>
-      </AnimatePresence>
+      </div>
 
       {/* Tab triggers */}
       <div
@@ -185,12 +179,10 @@ export function Hero() {
             </span>
             <div className="absolute inset-0 top-auto h-0.5 w-full bg-neutral-white/20 sm:h-1">
               {activeIndex === index && (
-                <motion.div
+                <div
                   key={tickKey}
-                  className="h-full w-full origin-left bg-neutral-white"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: TAB_DURATION, ease: "linear" }}
+                  className="hero-progress h-full w-full bg-neutral-white"
+                  style={{ animationDuration: `${TAB_DURATION}s` }}
                 />
               )}
             </div>

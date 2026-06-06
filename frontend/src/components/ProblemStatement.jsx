@@ -2,8 +2,6 @@
 
 import { Button } from "./Button";
 import React from "react";
-import { motion } from "framer-motion";
-import { staggerItemLeft, staggerItemRight, staggerItemScale, buttonHover, buttonTap } from "../utils/animations";
 import { Reveal } from "./Reveal";
 
 export function ProblemStatement() {
@@ -11,13 +9,13 @@ export function ProblemStatement() {
     <section id="pelajari" className="bg-[#10b981] px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="problem-heading">
       <Reveal className="container mx-auto">
         <div className="mb-12 grid grid-cols-1 items-start justify-between gap-x-12 gap-y-8 md:mb-16 md:grid-cols-2 md:gap-x-12 lg:mb-20 lg:gap-x-20">
-          <motion.div variants={staggerItemLeft}>
+          <div className="reveal-left">
             <p className="mb-3 font-semibold text-white md:mb-4">Masalah</p>
             <h2 id="problem-heading" className="text-5xl font-bold leading-tight text-white md:text-7xl lg:text-8xl">
               Arisan tradisional butuh solusi modern
             </h2>
-          </motion.div>
-          <motion.div variants={staggerItemRight}>
+          </div>
+          <div className="reveal-right" style={{ "--reveal-delay": "0.1s" }}>
             <p className="mb-5 text-base text-white md:mb-6 md:text-lg">
               Buku catatan hilang, giliran terlewat, uang tidak terhitung.
               Arisan membutuhkan cara yang lebih baik untuk mengelola
@@ -35,7 +33,7 @@ export function ProblemStatement() {
               </li>
             </ul>
             <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
-              <motion.div whileHover={buttonHover} whileTap={buttonTap}>
+              <div className="hover-lift inline-block">
                 <Button
                   title="Coba Sekarang"
                   variant="secondary"
@@ -44,14 +42,14 @@ export function ProblemStatement() {
                 >
                   Coba Sekarang
                 </Button>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-        <motion.img
-          variants={staggerItemScale}
+        <img
           src="/pictures/problem.webp"
-          className="w-full rounded-lg object-cover"
+          className="reveal-scale w-full rounded-lg object-cover"
+          style={{ "--reveal-delay": "0.2s" }}
           alt="Ilustrasi permasalahan arisan tradisional"
         />
       </Reveal>

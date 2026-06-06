@@ -1,18 +1,13 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { staggerContainer, staggerItem, cardHover } from "../utils/animations";
 import { Reveal } from "./Reveal";
 
 export function HowToUse() {
   return (
     <section id="cara-kerja" className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="how-to-use-heading">
       <Reveal className="container mx-auto">
-        <motion.div
-          className="mx-auto mb-12 w-full max-w-lg text-center md:mb-16 lg:mb-20"
-          variants={staggerItem}
-        >
+        <div className="reveal-up mx-auto mb-12 w-full max-w-lg text-center md:mb-16 lg:mb-20">
           <p className="mb-3 font-semibold text-text-primary md:mb-4">Langkah</p>
           <h2 id="how-to-use-heading" className="mb-5 text-5xl font-bold leading-tight text-text-primary md:mb-6 md:text-7xl lg:text-8xl">
             Tiga langkah sederhana
@@ -21,15 +16,11 @@ export function HowToUse() {
             Mulai dari nol hingga arisan yang berjalan lancar dalam hitungan
             menit.
           </p>
-        </motion.div>
-        <motion.div
-          className="grid auto-cols-fr grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3"
-          variants={staggerContainer}
-        >
-          <motion.div
-            className="flex flex-col border border-border-primary bg-background-primary"
-            variants={staggerItem}
-            whileHover={cardHover}
+        </div>
+        <div className="grid auto-cols-fr grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
+          <div
+            className="reveal-up hover-card flex flex-col border border-border-primary bg-background-primary"
+            style={{ "--reveal-delay": "0.1s" }}
           >
             <div className="flex flex-1 flex-col justify-center p-6 md:p-8">
               <div>
@@ -46,11 +37,10 @@ export function HowToUse() {
                 alt="Ilustrasi membuat grup arisan"
               />
             </div>
-          </motion.div>
-          <motion.div
-            className="flex flex-col border border-border-primary bg-background-primary"
-            variants={staggerItem}
-            whileHover={cardHover}
+          </div>
+          <div
+            className="reveal-up hover-card flex flex-col border border-border-primary bg-background-primary"
+            style={{ "--reveal-delay": "0.2s" }}
           >
             <div className="flex flex-1 flex-col justify-center p-6 md:p-8">
               <div>
@@ -67,11 +57,10 @@ export function HowToUse() {
                 alt="Ilustrasi pencatatan kontribusi"
               />
             </div>
-          </motion.div>
-          <motion.div
-            className="flex flex-col border border-border-primary bg-background-primary"
-            variants={staggerItem}
-            whileHover={cardHover}
+          </div>
+          <div
+            className="reveal-up hover-card flex flex-col border border-border-primary bg-background-primary"
+            style={{ "--reveal-delay": "0.3s" }}
           >
             <div className="flex flex-1 flex-col justify-center p-6 md:p-8">
               <div>
@@ -91,8 +80,8 @@ export function HowToUse() {
                 alt="Ilustrasi kelola giliran arisan"
               />
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </Reveal>
     </section>
   );

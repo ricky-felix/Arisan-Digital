@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "./Button";
-import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -76,112 +75,21 @@ export function Navbar() {
             aria-expanded={useActive.isMenuOpen}
             aria-controls="mobile-menu"
           >
-            <span className="relative flex size-6 flex-col items-center justify-center">
-              <motion.span
-                className="absolute top-[3px] h-0.5 w-full bg-white"
-                animate={useActive.animateMenu.menu}
-                variants={{
-                  open: {
-                    width: 0,
-                    transition: { duration: 0.1, ease: "easeIn" },
-                  },
-                  close: {
-                    width: "100%",
-                    transition: { duration: 0.1, delay: 0.3, ease: "linear" },
-                  },
-                }}
-              />
-              <motion.span
-                className="absolute h-0.5 w-full bg-white"
-                animate={useActive.animateMenu.menu}
-                variants={{
-                  open: {
-                    rotate: 135,
-                    transition: {
-                      duration: 0.3,
-                      delay: 0.1,
-                      ease: "easeInOut",
-                    },
-                  },
-                  close: {
-                    rotate: 0,
-                    transition: { duration: 0.3, ease: "easeInOut" },
-                  },
-                  openSecond: {
-                    rotate: 45,
-                    transition: {
-                      duration: 0.3,
-                      delay: 0.1,
-                      ease: "easeInOut",
-                    },
-                  },
-                  closeSecond: {
-                    rotate: 0,
-                    transition: { duration: 0.3, ease: "easeInOut" },
-                  },
-                }}
-              />
-              <motion.span
-                className="absolute h-0.5 w-full bg-white"
-                animate={useActive.animateMenu.menu2}
-                variants={{
-                  open: {
-                    rotate: 135,
-                    transition: {
-                      duration: 0.3,
-                      delay: 0.1,
-                      ease: "easeInOut",
-                    },
-                  },
-                  close: {
-                    rotate: 0,
-                    transition: { duration: 0.3, ease: "easeInOut" },
-                  },
-                  openSecond: {
-                    rotate: 45,
-                    transition: {
-                      duration: 0.3,
-                      delay: 0.1,
-                      ease: "easeInOut",
-                    },
-                  },
-                  closeSecond: {
-                    rotate: 0,
-                    transition: { duration: 0.3, ease: "easeInOut" },
-                  },
-                }}
-              />
-              <motion.span
-                className="absolute bottom-[3px] h-0.5 w-full bg-white"
-                animate={useActive.animateMenu.menu}
-                variants={{
-                  open: {
-                    width: 0,
-                    transition: { duration: 0.1, ease: "easeIn" },
-                  },
-                  close: {
-                    width: "100%",
-                    transition: { duration: 0.1, delay: 0.3, ease: "linear" },
-                  },
-                }}
-              />
+            <span className={`hamburger relative flex size-6 flex-col items-center justify-center${useActive.isMenuOpen ? " open" : ""}`}>
+              <span className="bar bar-edge absolute top-[3px] h-0.5 w-full bg-white" />
+              <span className="bar bar-mid absolute h-0.5 w-full bg-white" />
+              <span className="bar bar-mid2 absolute h-0.5 w-full bg-white" />
+              <span className="bar bar-edge absolute bottom-[3px] h-0.5 w-full bg-white" />
             </span>
           </button>
         </div>
       </div>
-      <AnimatePresence>
-        {useActive.isMenuOpen && (
+      {useActive.isMenuOpen && (
           <div
             id="mobile-menu"
             className="absolute inset-x-0 top-full h-[calc(100vh-4rem)] w-full overflow-hidden md:h-[calc(100vh-4.5rem)]"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="flex h-full flex-col overflow-auto bg-[#10b981] px-[5%] pt-0.5"
-            >
+            <div className="nav-menu-panel flex h-full flex-col overflow-auto bg-[#10b981] px-[5%] pt-0.5">
               <div className="my-auto grid max-w-[50rem] grid-cols-1 gap-x-10 gap-y-4 py-4 sm:grid-cols-2 md:py-0">
                 <a
                   href="#beranda"
@@ -284,10 +192,9 @@ export function Navbar() {
                   </a>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         )}
-      </AnimatePresence>
     </nav>
   );
 }

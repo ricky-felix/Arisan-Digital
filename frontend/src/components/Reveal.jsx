@@ -1,56 +1,69 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { staggerContainer } from "../utils/animations";
+import React, { useEffect, useRef, useState } from "react";
 
 /**
  * Scroll-reveal container that plays its entrance exactly once and never blinks.
  *
- * Uses the `useInView` hook instead of the `whileInView` prop. The difference
- * matters on mobile: the first scroll gesture collapses the browser address bar,
- * which resizes the visual viewport. That resize fires while the entering
- * section sits right at the `amount` threshold, so `whileInView` sees the element
- * drop back under the threshold and then cross it again (enter -> leave -> enter)
- * and replays the entrance — a visible blink. `whileInView`'s internal `once`
- * latch does not reliably win that race.
+ * A single IntersectionObserver watches the group; the first time it crosses the
+ * `amount` threshold it adds the `is-visible` class and disconnects. Descendant
+ * elements tagged with the CSS reveal classes (`reveal-up`, `reveal-left`,
+ * `reveal-right`, `reveal-scale`, `reveal-slide-left` — see index.css) transition
+ * to their resting state together.
  *
- * `useInView` with `once: true` latches to `true` on the first crossing and then
- * disconnects its observer; the value lives in React state and can never flip
- * back on a later resize or re-render, so the reveal runs once and stays put.
+ * This replaces the previous framer-motion implementation. Because the observer
+ * fires once and is then torn down, the entrance can never replay on a later
+ * resize — which on mobile (address-bar collapse resizing the visual viewport)
+ * was what made the old `whileInView` reveal fire twice and blink.
  *
- * Drop-in for the previous outer container:
- *   <motion.div variants={staggerContainer} initial="initial"
- *     whileInView="animate" viewport={{ once: true, amount: 0.2 }}>
- * becomes
- *   <Reveal>
- *
- * Children using `variants={staggerItem}` (etc.) still inherit the animation
- * state via framer-motion variant propagation, exactly as before.
+ * Usage:
+ *   <Reveal className="container mx-auto">
+ *     <div className="reveal-left">…</div>
+ *     <div className="reveal-right" style={{ "--reveal-delay": "0.1s" }}>…</div>
+ *   </Reveal>
  */
 export function Reveal({
   children,
-  className,
-  variants = staggerContainer,
+  className = "",
   amount = 0.2,
-  as = "div",
+  as: Tag = "div",
   ...rest
 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount });
-  const MotionTag = motion[as];
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // If IntersectionObserver is unavailable, reveal immediately so content is
+    // never stuck hidden.
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        if (entries[0].isIntersecting) {
+          setVisible(true);
+          obs.disconnect(); // once — latched, can never revert (no blink)
+        }
+      },
+      { threshold: amount }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [amount]);
 
   return (
-    <MotionTag
+    <Tag
       ref={ref}
-      className={className}
-      variants={variants}
-      initial="initial"
-      animate={inView ? "animate" : "initial"}
+      className={`reveal-group${visible ? " is-visible" : ""}${className ? ` ${className}` : ""}`}
       {...rest}
     >
       {children}
-    </MotionTag>
+    </Tag>
   );
 }
 

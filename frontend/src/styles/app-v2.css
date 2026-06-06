@@ -245,9 +245,9 @@
   100% { transform: translate(0, 0) scale(1); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .v2-home .card-blob { animation: none; }
-}
+/* Note: the v2 app intentionally keeps its animations under reduced-motion
+   (see the .v2-screen exemption in index.css), so the card-blob drift is left
+   running here on purpose. */
 
 /* Card chips */
 .v2-home .card-chips {
@@ -1305,20 +1305,11 @@
 .v2-anggota .mem-badge.unpaid  { background: #fee2e2; color: var(--danger); }
 .v2-anggota .mem-badge.giliran { background: #fef3c7; color: #92400e; }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .v2-anggota .orbit-inner { animation: none !important; }
-  .v2-anggota .orbit-ring.revolving { animation: none !important; }
-  .v2-anggota .ring-rotate-1,
-  .v2-anggota .ring-rotate-2 { animation: none !important; }
-  .v2-anggota .orbit-av.giliran { animation: none !important; }
-  .v2-anggota .pot-fill { animation: none !important; height: 67%; }
-  /* Home deck */
-  .v2-home .paid-check { animation: none !important; opacity: 1; }
-  .v2-home .swipe-hint { animation: none !important; opacity: 0; }
-  /* Notifications chat bubbles */
-  .v2-notifikasi .bub-row { animation: none !important; opacity: 1; transform: none !important; }
-}
+/* Reduced motion: the v2 app deliberately keeps its motion always-on. Its
+   animations (orbit spin, member dance, pot fill, ring rotation, glow pulse,
+   chat-bubble entrances, swipe hint) are core to the experience, so they are
+   exempted from the global reduced-motion kill-switch in index.css and are NOT
+   disabled here. */
 
 
 /* =============================================================

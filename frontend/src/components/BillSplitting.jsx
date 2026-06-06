@@ -2,17 +2,8 @@
 
 import { Button } from "./Button";
 import React from "react";
-import { motion } from "framer-motion";
 import { BiReceipt, BiGroup, BiWallet } from "react-icons/bi";
 import { RxCheck } from "react-icons/rx";
-import {
-  staggerContainer,
-  staggerItem,
-  staggerItemLeft,
-  staggerItemRight,
-  buttonHover,
-  buttonTap,
-} from "../utils/animations";
 import { Reveal } from "./Reveal";
 
 const splitCards = [
@@ -45,7 +36,7 @@ export function BillSplitting() {
     >
       <Reveal className="container mx-auto">
         <div className="mb-12 grid grid-cols-1 items-start gap-x-12 gap-y-8 md:mb-16 md:grid-cols-2 lg:mb-20 lg:gap-x-20">
-          <motion.div variants={staggerItemLeft}>
+          <div className="reveal-left">
             <span className="mb-4 inline-block rounded-full bg-[#7c5cfc] px-4 py-1 text-sm font-semibold text-white">
               Baru
             </span>
@@ -55,15 +46,15 @@ export function BillSplitting() {
             >
               Sekarang bisa bagi tagihan
             </h2>
-          </motion.div>
-          <motion.div variants={staggerItemRight}>
+          </div>
+          <div className="reveal-right" style={{ "--reveal-delay": "0.1s" }}>
             <p className="mb-6 text-base text-text-primary md:text-lg">
               Selain mengelola arisan, Arisan Digital kini hadir dengan fitur
               bagi tagihan. Patungan makan bareng, split biaya liburan, atau bagi
               ongkos bersama jadi gampang dan adil tanpa ribet hitung manual.
             </p>
             <div className="flex flex-wrap items-center gap-4">
-              <motion.div whileHover={buttonHover} whileTap={buttonTap}>
+              <div className="hover-lift inline-block">
                 <Button
                   variant="primary"
                   href="#fitur"
@@ -71,22 +62,19 @@ export function BillSplitting() {
                 >
                   Lihat Fitur
                 </Button>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div
-          variants={staggerContainer}
-          className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8"
-        >
-          {splitCards.map((card) => {
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+          {splitCards.map((card, i) => {
             const Icon = card.icon;
             return (
-              <motion.div
+              <div
                 key={card.title}
-                variants={staggerItem}
-                className="flex flex-col items-start rounded-lg border border-border-primary bg-background-primary p-6 md:p-8"
+                className="reveal-up flex flex-col items-start rounded-lg border border-border-primary bg-background-primary p-6 md:p-8"
+                style={{ "--reveal-delay": `${0.1 + i * 0.1}s` }}
               >
                 <div className="mb-5 flex size-14 items-center justify-center rounded-lg bg-[#ad8cf8] text-white">
                   <Icon className="size-7" aria-hidden="true" />
@@ -95,15 +83,12 @@ export function BillSplitting() {
                   {card.title}
                 </h3>
                 <p className="text-base text-text-primary">{card.description}</p>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
 
-        <motion.div
-          variants={staggerItem}
-          className="mx-auto mt-12 max-w-3xl rounded-lg border border-border-primary bg-[#10b981] p-8 md:mt-16 md:p-10"
-        >
+        <div className="reveal-up mx-auto mt-12 max-w-3xl rounded-lg border border-border-primary bg-[#10b981] p-8 md:mt-16 md:p-10">
           <p className="mb-4 text-lg font-semibold text-white md:text-xl">
             Kenapa pakai fitur bagi tagihan?
           </p>
@@ -119,7 +104,7 @@ export function BillSplitting() {
               </li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       </Reveal>
     </section>
   );
