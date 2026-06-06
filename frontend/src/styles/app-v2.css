@@ -1361,6 +1361,10 @@
   box-shadow: 0 12px 40px rgba(0,0,0,.35);
   animation: v2FadeIn .22s ease both;
 }
+.v2-home .coach-header {
+  font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--emerald); margin-bottom: 10px;
+}
 .v2-home .coach-dots { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
 .v2-home .coach-dot { height: 6px; width: 6px; border-radius: 99px; background: var(--line); transition: width .2s, background .2s; }
 .v2-home .coach-dot.active { width: 20px; background: var(--emerald); }

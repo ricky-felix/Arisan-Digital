@@ -157,6 +157,7 @@ export default function CoachMarks({ onDone }) {
       {layout && (
         <div className="coach-tip" style={tipStyle}>
           <div className="coach-card">
+            <div className="coach-header">Cara Menggunakan</div>
             <div className="coach-dots">
               {STEPS.map((s, idx) => (
                 <span key={s.key} className={`coach-dot${idx === i ? " active" : ""}`} />
