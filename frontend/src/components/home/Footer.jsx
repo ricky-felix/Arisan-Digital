@@ -114,8 +114,6 @@ export function Footer() {
                   Dukungan
                 </a>
               </li>
-            </ul>
-            <ul>
               <li className="py-2 text-sm font-semibold">
                 <a
                   href="#faq"
@@ -134,6 +132,8 @@ export function Footer() {
                   Hubungi kami
                 </a>
               </li>
+            </ul>
+            <ul>
               <li className="py-2 text-sm font-semibold">
                 <a
                   href="#"
