@@ -189,6 +189,7 @@ function AppRoutes() {
         {import.meta.env.DEV && (
           <>
             <Route path="/screens/beranda"     element={<HomeDeck />} />
+            <Route path="/screens/beranda-kosong" element={<HomeDeck cards={[]} />} />
             <Route path="/screens/notifikasi"  element={<Notifikasi />} />
             <Route path="/screens/dompet"      element={<Dompet />} />
             <Route path="/screens/anggota"     element={<MembersOrbit />} />

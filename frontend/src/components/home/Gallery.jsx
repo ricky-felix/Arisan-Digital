@@ -41,7 +41,7 @@ const useCarousel = () => {
 
 const slides = [
   {
-    src: "/pictures/app/beranda.png",
+    src: "/pictures/app/beranda-kosong.png",
     alt: "Beranda Arisan Digital: satu kartu fokus menampilkan iuran berikutnya, giliran penerima, dan tombol bayar langsung",
     title: "Beranda",
     caption:

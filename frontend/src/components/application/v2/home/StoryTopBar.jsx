@@ -1,4 +1,5 @@
 import { MenuDots, Bell, ChevronLeft } from "../icons";
+import AvatarContent from "../AvatarContent";
 
 /**
  * StoryTopBar — the fixed top bar rendered over the card deck.
@@ -35,7 +36,7 @@ export default function StoryTopBar({ onList, onNotif, onProfile }) {
           type="button"
           onClick={onProfile}
         >
-          RF
+          <AvatarContent iconSize={18} />
         </button>
       </div>
     </div>

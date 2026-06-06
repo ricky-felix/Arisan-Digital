@@ -15,8 +15,9 @@ import { ALL_CARDS } from "../../../components/application/v2/home/data";
 import StoryTopBar from "../../../components/application/v2/home/StoryTopBar";
 import SegFilter from "../../../components/application/v2/home/SegFilter";
 import StoryCard from "../../../components/application/v2/home/StoryCard";
+import EmptyCard from "../../../components/application/v2/home/EmptyCard";
 
-export default function HomeDeck() {
+export default function HomeDeck({ cards = ALL_CARDS }) {
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,7 +46,7 @@ export default function HomeDeck() {
 
   // Filtered visible cards — by type (arisan/patungan) or by status
   // (tenggat = nearing/passed deadline, selesai = completed).
-  const visibleCards = ALL_CARDS.filter(c => {
+  const visibleCards = cards.filter(c => {
     switch (filter) {
       case "arisan":
       case "patungan":
@@ -111,8 +112,13 @@ export default function HomeDeck() {
 
   // Background color drives the screen bg (visible behind the card deck on
   // mobile) — mirrors the card gradient so settled/urgent/type stay consistent.
+  // With no cards (empty filter / no tagihan) there's no domain to mirror, so
+  // fall back to the emerald→lavender brand gradient (the "no single domain /
+  // Arisan Digital itself" mark, same as the compose-pill icon).
   const activeCard = visibleCards[safeIdx];
-  const bgCardColor = activeCard?.settled
+  const bgCardColor = visibleCards.length === 0
+    ? "linear-gradient(165deg, #059669 0%, #10b981 45%, #a78bfa 100%)" // profile-banner gradient
+    : activeCard?.settled
     ? "#374151"
     : activeCard?.urgent
     ? "#7f1d1d"
@@ -169,10 +175,16 @@ export default function HomeDeck() {
           </button>
 
           {visibleCards.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">🔍</div>
-              <div className="empty-text">Tidak ada item di filter ini</div>
-            </div>
+            cards.length === 0 ? (
+              // Account genuinely empty (no arisan/patungan) — welcoming card.
+              <EmptyCard onCta={() => setComposeOpen(true)} />
+            ) : (
+              // A filter is active but yields nothing while other cards exist.
+              <div className="empty-state">
+                <div className="empty-icon">🔍</div>
+                <div className="empty-text">Tidak ada item di filter ini</div>
+              </div>
+            )
           ) : (
             visibleCards.map((card, idx) => (
               <StoryCard

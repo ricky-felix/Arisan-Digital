@@ -48,6 +48,14 @@ const STEPS = [
     tipTo: ".story-topbar-right",
     tipSide: "below",
   },
+  {
+    key: "done",
+    title: "Selamat mencoba!",
+    body: "Ada pertanyaan atau butuh bantuan? Hubungi kami lewat email di bawah, atau cari Arisan Digital di halaman Profil.",
+    targets: [],
+    tipSide: "center",
+    email: "arisandigital@outlook.com",
+  },
 ];
 
 const TIP_MAX = 320; // tooltip max width (px)
@@ -115,6 +123,10 @@ export default function CoachMarks({ onDone }) {
     else setI((n) => n + 1);
   }
 
+  function back() {
+    setI((n) => Math.max(0, n - 1));
+  }
+
   const tip = layout?.tip;
   const tipStyle =
     tip?.side === "below"
@@ -125,8 +137,27 @@ export default function CoachMarks({ onDone }) {
 
   return (
     <div className="coach-overlay" ref={overlayRef}>
-      {/* Dim backdrop — tap anywhere to advance */}
-      <div className="coach-backdrop" onClick={next} />
+      {/* Dim backdrop with holes cut out over the highlighted target(s) —
+          tap anywhere to advance */}
+      <svg className="coach-backdrop" onClick={next}>
+        <defs>
+          <mask id="coach-mask">
+            <rect width="100%" height="100%" fill="white" />
+            {layout?.spots.map((s, idx) => (
+              <rect
+                key={idx}
+                x={s.left - PAD}
+                y={s.top - PAD}
+                width={s.width + PAD * 2}
+                height={s.height + PAD * 2}
+                rx="14"
+                fill="black"
+              />
+            ))}
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="rgba(10,15,25,.62)" mask="url(#coach-mask)" />
+      </svg>
 
       {/* Highlight rings around the measured target(s) */}
       {layout?.spots.map((s, idx) => (
@@ -166,17 +197,30 @@ export default function CoachMarks({ onDone }) {
 
             <div className="coach-title">{step.title}</div>
             <div className="coach-body">{step.body}</div>
+            {step.email && (
+              <a className="coach-contact" href={`mailto:${step.email}`}>
+                {step.email}
+              </a>
+            )}
 
             <div className="coach-actions">
               <button type="button" className="coach-skip" onClick={onDone}>
                 Lewati
               </button>
-              <button type="button" className="coach-next" onClick={next}>
-                {isLast ? "Selesai" : "Lanjut"}
-                {!isLast && (
-                  <ChevronRight size={14} stroke="currentColor" strokeWidth={2.75} />
+              <div className="coach-nav">
+                {i > 0 && (
+                  <button type="button" className="coach-back" onClick={back}>
+                    <ChevronLeft size={14} stroke="currentColor" strokeWidth={2.75} />
+                    Sebelum
+                  </button>
                 )}
-              </button>
+                <button type="button" className="coach-next" onClick={next}>
+                  {isLast ? "Selesai" : "Lanjut"}
+                  {!isLast && (
+                    <ChevronRight size={14} stroke="currentColor" strokeWidth={2.75} />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

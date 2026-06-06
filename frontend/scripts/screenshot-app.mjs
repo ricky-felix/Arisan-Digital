@@ -14,6 +14,7 @@ const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "p
 
 const screens = [
   { slug: "beranda", path: "/screens/beranda" },
+  { slug: "beranda-kosong", path: "/screens/beranda-kosong" },
   { slug: "buat-arisan", path: "/screens/buat-arisan" },
   { slug: "buat-patungan", path: "/screens/buat-patungan" },
   { slug: "dompet", path: "/screens/dompet" },
@@ -42,7 +43,11 @@ const composer = await browser.newPage({
   deviceScaleFactor: 2,
 });
 
-for (const { slug, path } of screens) {
+// Optional: set ONLY=slug1,slug2 to regenerate just those screens.
+const only = (process.env.ONLY || "").split(",").map(s => s.trim()).filter(Boolean);
+const targets = only.length ? screens.filter(s => only.includes(s.slug)) : screens;
+
+for (const { slug, path } of targets) {
   const desktop = await capture(path, { width: 1440, height: 900 }, 2);
   const mobile = await capture(path, { width: 390, height: 844 }, 3);
 

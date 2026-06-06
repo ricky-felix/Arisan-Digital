@@ -20,7 +20,14 @@ import MenuSection from "../../../components/application/v2/profil/MenuSection";
 export default function Profil() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { signOut } = useAuth();
+  const { signOut, profile, isAnonymous } = useAuth();
+
+  // Registered users show their own name/phone; guests (anonymous or the
+  // default "Tamu" placeholder) fall back to a generic "Guest" identity.
+  const name = profile?.name?.trim();
+  const isGuest = isAnonymous || !name || name === "Tamu";
+  const displayName = isGuest ? "Guest" : name;
+  const displayPhone = isGuest ? "" : profile?.phone || "";
 
   const handleLogout = async () => {
     try {
@@ -47,8 +54,8 @@ export default function Profil() {
       <div className="v2-inner" style={{ overflowY: "auto" }}>
 
         <ProfileHero
-          name="Ricky Felix"
-          phone="+62 812 3456 7890"
+          name={displayName}
+          phone={displayPhone}
           joined="Bergabung sejak Januari 2024"
           onBack={() => navigate("/app")}
           onEdit={() => toast("Edit profil — segera hadir")}

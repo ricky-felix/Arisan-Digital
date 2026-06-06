@@ -189,6 +189,12 @@ export const X = (p) => (
   </Svg>
 );
 
+export const Sparkle = (p) => (
+  <Svg {...p}>
+    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" />
+  </Svg>
+);
+
 export const Calendar = (p) => (
   <Svg {...p}>
     <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -263,6 +269,13 @@ export const Link = (p) => (
   <Svg {...p}>
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </Svg>
+);
+
+export const Copy = (p) => (
+  <Svg {...p}>
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
   </Svg>
 );
 

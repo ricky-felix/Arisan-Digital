@@ -9,7 +9,7 @@ const TAB_DURATION = 5;
 const TABS = [
   {
     value: "tab-one",
-    text: "Teman Kerja",
+    text: "Teman",
     heading: "Arisan jadi mudah, transparan, dan aman untuk semua",
     description:
       "Kelola putaran tabungan bersama teman dengan satu WebApp. Tidak ada lagi buku catatan, tidak ada lagi kebingungan.",
@@ -20,7 +20,7 @@ const TABS = [
     image: {
       src: "/pictures/teman-kerja.webp",
       mobileSrc: null,
-      alt: "Ilustrasi arisan digital dengan teman kerja - WebApp yang menampilkan pencatatan otomatis dan transparan",
+      alt: "Ilustrasi arisan digital dengan Teman - WebApp yang menampilkan pencatatan otomatis dan transparan",
     },
   },
   {
@@ -58,7 +58,7 @@ const TABS = [
   {
     value: "tab-four",
     text: "Bisnis",
-    heading: "Arisan modern untuk teman, keluarga, komunitas, dan bisnis anda",
+    heading: "Arisan & Tagihan Modern untuk teman, keluarga, komunitas, dan bisnis anda",
     description:
       "Mulai grup arisan dalam menit, bukan hari. Semua orang tahu posisinya dan kapan harus bayar.",
     buttons: [

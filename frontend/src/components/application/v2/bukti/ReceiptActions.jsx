@@ -42,7 +42,7 @@ export default function ReceiptActions({
     >
       <button
         type="button"
-        className="flex w-full items-center justify-center gap-2 rounded-[14px] border-none px-4 py-3.75 text-[15px] font-extrabold tracking-[-0.01em] text-white transition-[transform,opacity] duration-100 active:scale-[.98]"
+        className="flex w-full items-center justify-center gap-2 rounded-[14px] border-none px-4 py-4 text-[15px] font-extrabold tracking-[-0.01em] text-white transition-[transform,opacity] duration-100 active:scale-[.98]"
         style={{
           background: primaryBtnBg,
           boxShadow: `0 4px 16px ${primaryBtnShadow}`,
@@ -54,7 +54,7 @@ export default function ReceiptActions({
       </button>
       <button
         type="button"
-        className="flex w-full items-center justify-center gap-2 rounded-[14px] border-[1.5px] border-solid px-4 py-3 text-[14px] font-bold tracking-[-0.01em] transition-opacity duration-150 active:scale-[.98]"
+        className="flex w-full items-center justify-center gap-2 rounded-[14px] border-[1.5px] border-solid px-4 py-3.25 text-[14px] font-extrabold tracking-[-0.01em] transition-opacity duration-150 active:scale-[.98]"
         style={{
           background: secondaryBtnBg,
           borderColor: secondaryBtnBorder,

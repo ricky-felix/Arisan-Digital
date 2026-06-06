@@ -11,7 +11,7 @@
 export default function DetailRow({ label, children, last = false, valueClass = "", valueStyle }) {
   return (
     <div
-      className={`flex items-start justify-between gap-3 py-[9px]${
+      className={`flex items-start justify-between gap-3 py-[14px]${
         last ? "" : " border-b border-line-soft"
       }`}
     >
@@ -19,7 +19,7 @@ export default function DetailRow({ label, children, last = false, valueClass = 
         {label}
       </span>
       <span
-        className={`text-[13px] font-bold text-ink-1 text-right leading-[1.35]${
+        className={`text-[13px] font-bold text-ink-1 text-right leading-[1.55]${
           valueClass ? " " + valueClass : ""
         }`}
         style={valueStyle}

@@ -1,4 +1,5 @@
 import { ChevronLeft, Calendar } from "../icons";
+import AvatarContent from "../AvatarContent";
 
 /**
  * ProfileHero — gradient hero with decorative blobs, a back/edit top bar, and
@@ -41,12 +42,12 @@ export default function ProfileHero({ name, phone, joined, onBack, onEdit }) {
       {/* Avatar + identity */}
       <div className="relative z-5 mx-auto flex max-w-[620px] flex-col items-center pt-1">
         <div className="mb-3.5 grid h-20 w-20 place-items-center rounded-full border-[3px] border-white/55 bg-white/22 text-[28px] font-extrabold text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)] backdrop-blur-[6px] lg:h-24 lg:w-24 lg:text-[32px]">
-          RF
+          <AvatarContent iconSize={38} />
         </div>
         <div className="mb-1.5 text-[22px] font-extrabold leading-none tracking-[-0.03em] text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.12)] lg:text-[26px]">
           {name}
         </div>
-        <div className="mb-1.25 text-[13px] font-semibold text-white/85">{phone}</div>
+        {phone && <div className="mb-1.25 text-[13px] font-semibold text-white/85">{phone}</div>}
         <div className="inline-flex items-center gap-1.25 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-bold tracking-[0.01em] text-white/90 backdrop-blur-xs">
           <Calendar size={11} strokeWidth={2.5} />
           {joined}

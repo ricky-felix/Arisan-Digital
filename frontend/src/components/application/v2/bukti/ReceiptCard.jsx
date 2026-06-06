@@ -15,9 +15,11 @@
 //   rowUntuk       {string} – "Untuk" row value; may contain "\n" for line breaks.
 //   rowLabel       {string} – Label for the amount row ("Jumlah" or "Bagianmu").
 //   rowJenis       {string} – Jenis value in the reference sub-card.
+//   refNo          {string} – Reference/transaction number in the sub-card.
+//   onCopyRef      {function} – Click handler to copy refNo to the clipboard.
 //   accentColor    {string} – CSS color for accented values (amount, method, ref).
 
-import { Check } from "../icons";
+import { Check, Copy } from "../icons";
 import DetailRow from "./DetailRow";
 
 // Splits a string on "\n" and injects <br /> between lines.
@@ -39,6 +41,8 @@ export default function ReceiptCard({
   rowUntuk,
   rowLabel,
   rowJenis,
+  refNo,
+  onCopyRef,
   accentColor,
 }) {
   return (
@@ -58,16 +62,19 @@ export default function ReceiptCard({
 
         {/* Brand row — bukti-brand-row: flex items-center gap-[9px] mb-[18px] relative z-1 */}
         <div className="relative z-1 mb-4.5 flex items-center gap-2.25">
-          {/* bukti-logo: w-8 h-8 rounded-[9px] bg-white/20 border-[1.5px] border-white/35 backdrop-blur grid place-items-center */}
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] border-[1.5px] border-white/35 bg-white/20 backdrop-blur-xs">
-            {/* bukti-logo-letter: text-[18px] font-extrabold text-white tracking-[-0.04em] */}
-            <span className="text-[18px] font-extrabold leading-none tracking-[-0.04em] text-white">A</span>
+          {/* bukti-logo: w-8 h-8 white tile so the multicolor mark stays legible on the gradient banner */}
+          <div className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-[9px] border-[1.5px] border-white/35 bg-white p-1">
+            <img
+              src="/Arisan-Digital-Logo-icon.png"
+              alt="Arisan Digital"
+              className="h-full w-full object-contain"
+            />
           </div>
           <div>
             {/* bukti-wordmark: text-[14px] font-extrabold text-white tracking-[-0.01em] */}
             <div className="text-[14px] font-extrabold tracking-[-0.01em] text-white">Arisan Digital</div>
             {/* bukti-wordmark-sub: text-[9px] font-semibold text-white/65 tracking-[0.04em] uppercase */}
-            <div className="text-[9px] font-semibold uppercase tracking-[0.04em] text-white/65">Platform Keuangan Sosial</div>
+            <div className="text-[9px] font-semibold uppercase tracking-[0.04em] text-white/65">WebApp Arisan & Tagihan Modern, Transparan & Aman</div>
           </div>
           {/* bukti-type-chip: ml-auto rounded-full px-[10px] py-1 bg-white/20 border border-white/30 text-[9px] font-extrabold text-white tracking-[0.1em] uppercase backdrop-blur */}
           <div className="ml-auto rounded-full border border-white/30 bg-white/20 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-widest text-white backdrop-blur-xs">
@@ -153,10 +160,18 @@ export default function ReceiptCard({
         <div>
           {/* bukti-meta-label: text-[9px] font-bold text-ink-3 uppercase tracking-[0.06em] mb-0.5 */}
           <div className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-ink-3">No. Referensi</div>
-          {/* bukti-meta-val: text-[12px] font-bold text-ink-1 tracking-[-0.01em] */}
-          <div className="text-[12px] font-bold tracking-[-0.01em]" style={{ color: accentColor }}>
-            TRX-AD-20260605-0042
-          </div>
+          {/* bukti-meta-val: text-[12px] font-bold text-ink-1 tracking-[-0.01em] —
+              click to copy the reference number to the clipboard */}
+          <button
+            type="button"
+            onClick={onCopyRef}
+            aria-label="Salin no. referensi"
+            className="inline-flex items-center gap-1.5 text-[12px] font-bold tracking-[-0.01em] transition-opacity active:opacity-60"
+            style={{ color: accentColor }}
+          >
+            {refNo}
+            <Copy size={12} stroke="currentColor" strokeWidth={2} />
+          </button>
         </div>
         <div>
           <div className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-ink-3">Jenis</div>
@@ -166,10 +181,12 @@ export default function ReceiptCard({
 
       {/* Branded footer — bukti-footer: px-5 pt-[14px] pb-[18px] flex items-center justify-center gap-1.5 */}
       <div className="flex items-center justify-center gap-1.5 px-5 pt-3.5 pb-4.5">
-        {/* bukti-footer-logo: w-4 h-4 rounded-1 grid place-items-center text-[9px] font-black text-white — gradient via custom class */}
-        <div className="bukti-footer-logo-gradient grid h-4 w-4 place-items-center rounded-sm text-[9px] font-black text-white">
-          A
-        </div>
+        {/* bukti-footer-logo: w-4 h-4 brand mark */}
+        <img
+          src="/Arisan-Digital-Logo-icon.png"
+          alt="Arisan Digital"
+          className="h-4 w-4 object-contain"
+        />
         {/* bukti-footer-text: text-[10px] text-ink-3 font-semibold tracking-[0.01em] */}
         <span className="text-[10px] font-semibold tracking-[0.01em] text-ink-3">
           Dibuat dengan Arisan Digital

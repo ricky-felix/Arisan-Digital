@@ -1123,6 +1123,8 @@
 .v2-home .card-patungan { background: linear-gradient(165deg, #3b0764 0%, #4c1d95 30%, #6d28d9 60%, #8b5cf6 80%, #a78bfa 100%); }
 .v2-home .card-urgent  { background: linear-gradient(165deg, #450a0a 0%, #7f1d1d 30%, #b91c1c 65%, #ef4444 85%, #f87171 100%); }
 .v2-home .card-settled  { background: linear-gradient(165deg, #374151 0%, #4b5563 40%, #6b7280 80%); }
+/* Empty-deck welcome card — identical to the profile-banner gradient. */
+.v2-home .card-empty   { background: linear-gradient(165deg, #059669 0%, #10b981 45%, #a78bfa 100%); }
 .v2-home .card-blob {
   position: absolute; border-radius: 50%;
   pointer-events: none; will-change: transform;
@@ -1222,6 +1224,9 @@
 .v2-home .card-cta.patungan-cta { color: #4c1d95; }
 .v2-home .card-cta.urgent-cta   { color: #b91c1c; }
 .v2-home .card-cta.settled-cta  { color: #374151; opacity: .7; cursor: default; }
+.v2-home .card-cta.empty-cta    { color: #059669; }
+/* Hero is a phrase here, not a currency amount — give it room to breathe. */
+.v2-home .card-hero-amount.empty-hero { font-size: 40px; margin-bottom: 12px; }
 .v2-home .settled-cta {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   border-radius: 14px; border: none;
@@ -1312,7 +1317,7 @@
 .v2-home .empty-state {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(165deg, #1f2937 0%, #374151 100%);
+  /* No own background — the .v2-screen bg (brand gradient when empty) shows through. */
 }
 .v2-home .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .v2-home .empty-text { font-size: 15px; font-weight: 700; color: rgba(255,255,255,.7); }
@@ -1330,8 +1335,7 @@
 .v2-home .coach-overlay { position: absolute; inset: 0; z-index: 45; }
 .v2-home .coach-backdrop {
   position: absolute; inset: 0;
-  background: rgba(10,15,25,.62);
-  -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+  width: 100%; height: 100%;
 }
 .v2-home .coach-spot {
   position: absolute; pointer-events: none;
@@ -1370,12 +1374,28 @@
 .v2-home .coach-dot.active { width: 20px; background: var(--emerald); }
 .v2-home .coach-title { font-size: 15px; font-weight: 800; letter-spacing: -.01em; color: var(--ink-1); }
 .v2-home .coach-body { margin-top: 4px; font-size: 13px; font-weight: 500; line-height: 1.5; color: var(--ink-3); }
+.v2-home .coach-contact {
+  display: inline-block; margin-top: 8px;
+  font-size: 13px; font-weight: 700; color: var(--emerald);
+  text-decoration: none; word-break: break-all;
+}
+.v2-home .coach-contact:hover { text-decoration: underline; }
 .v2-home .coach-actions { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; }
 .v2-home .coach-skip {
   border: none; background: none; cursor: pointer; padding: 4px;
   font-size: 13px; font-weight: 600; color: var(--ink-3); transition: color .15s;
 }
 .v2-home .coach-skip:hover { color: var(--ink-1); }
+.v2-home .coach-nav { display: flex; align-items: center; gap: 8px; }
+.v2-home .coach-back {
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid var(--line); cursor: pointer; border-radius: 12px;
+  background: white; color: var(--ink-2);
+  padding: 8px 14px; font-size: 13px; font-weight: 700;
+  transition: background .15s, transform .1s;
+}
+.v2-home .coach-back:hover { background: var(--line-soft); }
+.v2-home .coach-back:active { transform: scale(.97); }
 .v2-home .coach-next {
   display: flex; align-items: center; gap: 6px;
   border: none; cursor: pointer; border-radius: 12px;
@@ -1808,6 +1828,7 @@
     padding-right: 0;
   }
 .v2-home .card-hero-amount { font-size: 72px; }
+.v2-home .card-hero-amount.empty-hero { font-size: 56px; }
 .v2-home .card-badge       { font-size: 12px; padding: 7px 15px; }
 .v2-home .card-eyebrow     { font-size: 14px; }
 .v2-home .card-due-line    { font-size: 15px; }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import { useToast } from "../../../context/ToastContext";
@@ -13,6 +14,24 @@ export default function BuktiTransfer() {
 
   // Variant: ?type=arisan → emerald/arisan, default → lavender/patungan
   const isArisan = params.get("type") === "arisan";
+
+  // Reference number — randomly generated per receipt via UUID. Lazy-initialized
+  // so it stays stable across re-renders. Prefix encodes the product domain:
+  // ADA = Arisan Digital Arisan, ADP = Arisan Digital Patungan. (TODO: replace
+  // with the real transaction ID once the payment backend returns one.)
+  const [refNo] = useState(
+    () => `TRX-${isArisan ? "ADA" : "ADP"}-${crypto.randomUUID().split("-")[0].toUpperCase()}`,
+  );
+
+  // Copy the reference number to the clipboard with a confirmation toast.
+  const copyRef = async () => {
+    try {
+      await navigator.clipboard.writeText(refNo);
+      toast("No. referensi disalin");
+    } catch {
+      toast("Gagal menyalin no. referensi");
+    }
+  };
 
   const {
     headerGradient,
@@ -98,7 +117,7 @@ export default function BuktiTransfer() {
             w-full max-w-120 flex flex-col
             lg:max-w-160 lg:mx-auto
         */}
-        <div className="flex w-full max-w-120 flex-col lg:mx-auto lg:max-w-160">
+        <div className="flex w-full max-w-120 flex-col lg:mx-auto">
 
           <ReceiptCard
             headerGradient={headerGradient}
@@ -108,6 +127,8 @@ export default function BuktiTransfer() {
             rowUntuk={rowUntuk}
             rowLabel={rowLabel}
             rowJenis={rowJenis}
+            refNo={refNo}
+            onCopyRef={copyRef}
             accentColor={accentColor}
           />
 
