@@ -70,7 +70,7 @@ export function AppHomepage() {
                   <div className="text-[17px] font-bold tracking-tight mt-0.5">{groups.length}</div>
                 </div>
                 <div>
-                  <div className="text-[11px] text-[var(--ink-2)]">Iuran Berikutnya</div>
+                  <div className="text-[11px] text-[var(--ink-2)]">Iuran Arisan Berikutnya</div>
                   <div className="text-[17px] font-bold tracking-tight mt-0.5">{nextBill ? formatRupiah(nextBill.amount) : "—"}</div>
                   {nextBill && <div className="text-[11px] text-[var(--ink-3)]">Jatuh tempo {nextBill.due.getDate()} {MONTHS_SHORT[nextBill.due.getMonth()]}</div>}
                 </div>

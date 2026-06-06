@@ -77,7 +77,7 @@ export default function CreateArisanPage() {
           <Field label="Deskripsi (opsional)">
             <input className="app-input" placeholder="Contoh: Arisan rekan kerja" value={form.description} onChange={set("description")} />
           </Field>
-          <Field label="Iuran per Ronde">
+          <Field label="Iuran Arisan per Ronde">
             <div style={{ position: "relative" }}>
               <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--ink-2)", fontSize: 14 }}>Rp</span>
               <input className="app-input" type="number" inputMode="numeric" placeholder="500000" value={form.amount} onChange={set("amount")} style={{ paddingLeft: 38 }} />

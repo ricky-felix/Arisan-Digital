@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import { ChevronLeft, ChevronRight, Users, QrJoin } from "../../../components/v2/icons";
+import { ChevronLeft, ChevronRight, Users, QrJoin } from "../../../components/application/v2/icons";
 import { useToast } from "../../../context/ToastContext";
 import { createGroup, hasCreatedSomething, useAuth, useAccountPrompt } from "../v1/mockData";
 import { formatRupiah } from "../../../utils/formatRupiah";
@@ -13,6 +13,14 @@ import { formatRupiah } from "../../../utils/formatRupiah";
  * details. On submit we create the group and route straight to the
  * invite screen so the owner can share it. Layout is responsive — the
  * content centers in a column that widens on desktop.
+ *
+ * Tailwind migration: all v2-buat-prefixed classes replaced with Tailwind
+ * utilities. The hero gradient (linear-gradient) is applied via a style
+ * prop; decorative blobs that were ::before/::after pseudo-elements are
+ * now real <div> nodes with pointer-events-none.
+ *
+ * The hero gradient uses an inline style (linear-gradient) and decorative
+ * blobs are real <div> nodes, so no custom CSS classes are needed.
  */
 export default function BuatArisan() {
   const navigate = useNavigate();
@@ -60,83 +68,143 @@ export default function BuatArisan() {
   };
 
   return (
-    <div className="v2-screen v2-buat em">
-      <div className="buat-scroll">
+    <div className="v2-screen">
+      {/* Full-bleed scrollable column — hides native scrollbar */}
+      <div className="relative flex min-h-svh w-full flex-1 flex-col overflow-y-auto bg-app-bg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-        {/* Header */}
-        <div className="buat-nav">
-          <button className="buat-nav-btn" onClick={() => navigate("/app")} aria-label="Kembali" type="button">
+        {/* Sticky header — full-width surface, content padded to centered column */}
+        <div className="sticky top-0 z-10 flex min-h-14 w-full shrink-0 items-center gap-3 border-b border-line-soft bg-surface px-[max(20px,calc(50%-240px))] lg:px-[max(20px,calc(50%-280px))]">
+          <button
+            className="grid h-8.5 w-8.5 shrink-0 cursor-pointer place-items-center rounded-[10px] border-none bg-gray-soft text-ink-1 transition-colors hover:bg-line"
+            onClick={() => navigate("/app")}
+            aria-label="Kembali"
+            type="button"
+          >
             <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
           </button>
-          <span className="buat-nav-title">Buat Arisan</span>
+          <span className="flex-1 text-[17px] font-extrabold tracking-[-0.02em] text-ink-1">
+            Buat Arisan
+          </span>
         </div>
 
-        <div className="buat-body">
+        {/* Body — centered content column */}
+        <div className="mx-auto flex w-full max-w-120 flex-1 flex-col gap-3.5 px-4 pb-6 pt-4 lg:max-w-140 lg:gap-4 lg:pt-6">
 
-          {/* Live preview hero */}
-          <div className="buat-hero">
-            <div className="buat-hero-icon">
+          {/*
+            Live preview hero — emerald gradient with two decorative blob circles.
+            The gradient is inline because it uses the emerald accent and differs
+            from the lavender sibling. Blobs replace the ::before/::after pseudo-
+            elements so no custom CSS is needed here.
+          */}
+          <div
+            className="relative overflow-hidden rounded-card px-5 py-5 text-white shadow-[0_8px_24px_rgba(17,24,39,.12)]"
+            style={{ background: "linear-gradient(145deg,#059669 0%,#10b981 60%,#34d399 100%)" }}
+          >
+            {/* Blob top-right */}
+            <div className="pointer-events-none absolute -right-6 -top-6 h-30 w-30 rounded-full bg-white/12" />
+            {/* Blob bottom-center-right */}
+            <div className="pointer-events-none absolute -bottom-9 right-11 h-22.5 w-22.5 rounded-full bg-white/8" />
+
+            <div className="relative mb-3.5 grid h-10.5 w-10.5 place-items-center rounded-lg bg-white/20 backdrop-blur-[6px]">
               <Users size={22} stroke="white" strokeWidth={2} />
             </div>
-            <div className="buat-hero-eyebrow">{form.name.trim() || "Arisan Baru"}</div>
-            <div className="buat-hero-amount">{amountNum > 0 ? formatRupiah(amountNum) : "Rp 0"}</div>
-            <div className="buat-hero-sub">
-              Iuran {form.frequency === "weekly" ? "Mingguan" : "Bulanan"} · Giliran {form.method === "random" ? "Acak" : "Urut"}
+            <div className="relative overflow-hidden text-ellipsis whitespace-nowrap text-xs font-bold tracking-[0.01em] opacity-90">
+              {form.name.trim() || "Arisan Baru"}
+            </div>
+            <div className="relative mt-0.5 text-[32px] font-extrabold tracking-[-0.03em] lg:text-[36px]">
+              {amountNum > 0 ? formatRupiah(amountNum) : "Rp 0"}
+            </div>
+            <div className="relative mt-1 text-xs opacity-85">
+              Arisan {form.frequency === "weekly" ? "Mingguan" : "Bulanan"} · Giliran {form.method === "random" ? "Acak" : "Urut"}
             </div>
           </div>
 
-          {/* Detail */}
-          <div className="buat-card">
-            <div className="field">
-              <label className="field-label">Nama Arisan</label>
+          {/* Form card */}
+          <div className="rounded-card border border-line-soft bg-surface p-4 shadow-[0_1px_2px_rgba(17,24,39,.04),0_1px_1px_rgba(17,24,39,.03)]">
+
+            {/* Nama Arisan */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-ink-1">Nama Arisan</label>
               <input className="v2-input" placeholder="Contoh: Arisan Kantor Lt. 3" value={form.name} onChange={set("name")} autoFocus />
             </div>
 
-            <div className="field">
-              <label className="field-label">Deskripsi <span className="opt">(opsional)</span></label>
+            {/* Deskripsi */}
+            <div className="mt-3.5 flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-ink-1">
+                Deskripsi <span className="font-medium text-ink-3">(opsional)</span>
+              </label>
               <input className="v2-input" placeholder="Contoh: Arisan rekan kerja" value={form.description} onChange={set("description")} />
             </div>
 
-            <div className="field">
-              <label className="field-label">Iuran per Ronde</label>
-              <div className="amount-wrap">
-                <span className="amount-prefix">Rp</span>
-                <input className="v2-input" type="number" inputMode="numeric" placeholder="500000" value={form.amount} onChange={set("amount")} />
+            {/* Iuran per Ronde — Rp prefix absolutely positioned inside the input */}
+            <div className="mt-3.5 flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-ink-1">Iuran per Ronde</label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] font-bold text-ink-3">
+                  Rp
+                </span>
+                {/* v2-input kept; pl/text/font overrides via Tailwind important modifier */}
+                <input className="v2-input pl-10.5! text-lg! font-bold!" type="number" inputMode="numeric" placeholder="500000" value={form.amount} onChange={set("amount")} />
               </div>
             </div>
 
-            <div className="field">
-              <div className="field-row2">
-                <div className="subfield">
-                  <label className="field-label">Frekuensi</label>
-                  <Seg value={form.frequency} onChange={(v) => setForm((f) => ({ ...f, frequency: v }))}
-                    options={[{ v: "monthly", l: "Bulanan" }, { v: "weekly", l: "Mingguan" }]} />
-                </div>
-                <div className="subfield">
-                  <label className="field-label">Metode Giliran</label>
-                  <Seg value={form.method} onChange={(v) => setForm((f) => ({ ...f, method: v }))}
-                    options={[{ v: "manual", l: "Urut" }, { v: "random", l: "Acak" }]} />
-                </div>
+            {/* Frekuensi + Metode Giliran side by side */}
+            <div className="mt-3.5 grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink-1">Frekuensi</label>
+                <Seg
+                  value={form.frequency}
+                  onChange={(v) => setForm((f) => ({ ...f, frequency: v }))}
+                  options={[{ v: "monthly", l: "Bulanan" }, { v: "weekly", l: "Mingguan" }]}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-ink-1">Metode Giliran</label>
+                <Seg
+                  value={form.method}
+                  onChange={(v) => setForm((f) => ({ ...f, method: v }))}
+                  options={[{ v: "manual", l: "Urut" }, { v: "random", l: "Acak" }]}
+                />
               </div>
             </div>
 
-            <div className="field">
-              <label className="field-label">Tanggal Mulai</label>
+            {/* Tanggal Mulai */}
+            <div className="mt-3.5 flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-ink-1">Tanggal Mulai</label>
               <input className="v2-input" type="date" value={form.startDate} onChange={set("startDate")} />
             </div>
           </div>
 
-          {/* Members-join-via-invite note */}
-          <div className="buat-note">
-            <QrJoin size={18} stroke="currentColor" strokeWidth={2} />
-            <span>Anggota bergabung lewat <strong>link undangan</strong> atau <strong>QR</strong> setelah arisan dibuat. Kamu jadi admin &amp; anggota pertama.</span>
+          {/* Members-join-via-invite note — emerald tint background */}
+          <div className="flex items-start gap-2.5 rounded-lg bg-brand-primary-tint px-3.5 py-3.25 text-[12.5px] font-medium leading-[1.45] text-brand-primary-hover">
+            <QrJoin size={18} stroke="currentColor" strokeWidth={2} className="mt-px shrink-0" />
+            <span>
+              Anggota bergabung lewat <strong className="font-extrabold">link undangan</strong> atau <strong className="font-extrabold">QR</strong> setelah arisan dibuat. Kamu jadi admin &amp; anggota pertama.
+            </span>
           </div>
 
         </div>
 
-        {/* Sticky action */}
-        <div className="buat-footer">
-          <button className="buat-submit" disabled={!canSubmit || saving} onClick={submit} type="button">
+        {/*
+          Sticky action footer.
+          The gradient fade (bg-app-bg → transparent) is applied via an inline
+          style because it uses env(safe-area-inset-bottom) together with calc()
+          in the padding, which Tailwind cannot express without a custom class.
+          bg-linear-to-t from-app-bg is used for the visual fade; safe-area
+          bottom padding uses CSS directly so notch devices are respected.
+        */}
+        <div
+          className="sticky bottom-0 flex w-full shrink-0 gap-2.5 bg-linear-to-t from-app-bg to-transparent pt-3.5"
+          style={{
+            padding: "14px max(16px, calc(50% - 240px + 16px)) calc(16px + env(safe-area-inset-bottom, 0px))",
+          }}
+        >
+          <button
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-none bg-brand-primary p-4 text-[15px] font-extrabold tracking-[-0.01em] text-white shadow-[0_10px_22px_var(--color-brand-primary-tint)] transition-[filter,transform] hover:not-disabled:brightness-105 active:not-disabled:scale-[.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+            disabled={!canSubmit || saving}
+            onClick={submit}
+            type="button"
+          >
             {saving ? "Menyimpan…" : "Buat & Undang"}
             {!saving && <ChevronRight size={18} stroke="white" strokeWidth={2.5} />}
           </button>
@@ -147,11 +215,25 @@ export default function BuatArisan() {
   );
 }
 
+/**
+ * Seg — inline segmented control for binary options.
+ * Active option gets surface background + subtle shadow lift.
+ */
 function Seg({ value, onChange, options }) {
   return (
-    <div className="seg">
+    <div className="flex gap-0.5 rounded-lg bg-gray-soft p-0.75">
       {options.map((o) => (
-        <button key={o.v} type="button" className={`seg-opt${value === o.v ? " active" : ""}`} onClick={() => onChange(o.v)}>
+        <button
+          key={o.v}
+          type="button"
+          onClick={() => onChange(o.v)}
+          className={
+            "flex-1 cursor-pointer rounded-[9px] border-none py-2.25 font-[inherit] text-[13px] font-bold transition-all " +
+            (value === o.v
+              ? "bg-surface text-ink-1 shadow-[0_1px_3px_rgba(0,0,0,.1)]"
+              : "bg-transparent text-ink-2")
+          }
+        >
           {o.l}
         </button>
       ))}

@@ -2,12 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, Users, Split } from "../../../components/v2/icons";
-import { INVITE } from "../../../components/v2/undang/data";
+import { ChevronLeft, Users, Split } from "../../../components/application/v2/icons";
+import { INVITE } from "../../../components/application/v2/undang/data";
 
 /**
  * Gabung — the invitee's landing screen when opening an invite link.
  * Previews the group, takes a name (no signup), and joins.
+ *
+ * Custom CSS (flat classes, NOT written to app-v2.css — returned in task response):
+ *   .gabung-hero-grad          — arisan green gradient (160deg)
+ *   .gabung-hero-grad-patungan — patungan purple gradient (160deg)
+ *   Both include a desktop padding-top override via @media (min-width:1024px).
  */
 export default function Gabung() {
   const navigate = useNavigate();
@@ -26,58 +31,89 @@ export default function Gabung() {
   }
 
   return (
-    <div className={`v2-screen v2-gabung${isArisan ? "" : " patungan"}`}>
-      <div className="gabung-scroll">
+    <div className="v2-screen">
+      {/* Scroll wrapper: full-width, full viewport-height, app-bg, scrollable, no scrollbar */}
+      <div className="w-full min-h-svh bg-app-bg overflow-y-auto overflow-x-hidden flex flex-col items-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
         {/* Gradient invite hero */}
-        <div className="gabung-hero">
-          <div className="gabung-hero-blob g1" />
-          <div className="gabung-hero-blob g2" />
+        <div className={`relative overflow-hidden w-full px-5 pb-7 pt-5 flex flex-col items-center text-center text-white ${isArisan ? "gabung-hero-grad" : "gabung-hero-grad-patungan"}`}>
+          {/* Decorative blob g1: 200×200, top:-70 right:-50 */}
+          <div className="pointer-events-none absolute -top-17.5 -right-12.5 w-50 h-50 rounded-full bg-white/8" />
+          {/* Decorative blob g2: 160×160, bottom:-60 left:-50 */}
+          <div className="pointer-events-none absolute -bottom-15 -left-12.5 w-40 h-40 rounded-full bg-white/5" />
 
-          <button type="button" className="gabung-back" onClick={() => navigate(-1)} aria-label="Kembali">
+          {/* Back button: absolute top-left, backdrop-blur */}
+          <button
+            type="button"
+            className="absolute top-4 left-4 w-9 h-9 rounded-[10px] border-none cursor-pointer bg-white/18 grid place-items-center z-1 backdrop-blur-[6px]"
+            onClick={() => navigate(-1)}
+            aria-label="Kembali"
+          >
             <ChevronLeft size={18} stroke="white" strokeWidth={2.5} />
           </button>
 
-          <div className="gabung-hero-icon">
+          {/* Icon — backdrop-blurred rounded square */}
+          <div className="w-16 h-16 rounded-[20px] mt-4 mb-3.5 bg-white/18 grid place-items-center relative z-1 backdrop-blur-[6px]">
             {isArisan
               ? <Users size={26} stroke="white" strokeWidth={2} />
               : <Split size={26} stroke="white" strokeWidth={2} />}
           </div>
-          <div className="gabung-hero-eyebrow">Kamu diundang ke {group.typeLabel}</div>
-          <div className="gabung-hero-name">{group.name}</div>
-          <div className="gabung-hero-tagline">{group.tagline}</div>
 
-          <div className="gabung-avs">
-            {joined.slice(0, 4).map(m => (
-              <div className="gabung-av" key={m.initials} style={{ background: m.color }}>{m.initials}</div>
+          {/* Text block */}
+          <div className="text-[12px] font-bold opacity-85 relative z-1">Kamu diundang ke {group.typeLabel}</div>
+          <div className="text-[26px] font-extrabold tracking-[-0.02em] mt-1 relative z-1">{group.name}</div>
+          <div className="text-[13px] opacity-80 mt-1 relative z-1">{group.tagline}</div>
+
+          {/* Stacked member avatars */}
+          <div className="flex mt-4 relative z-1">
+            {joined.slice(0, 4).map((m, i) => (
+              <div
+                key={m.initials}
+                className={`w-9 h-9 rounded-full border-2 border-white/85 grid place-items-center text-white text-[12px] font-bold${i === 0 ? "" : " -ml-2"}`}
+                style={{ background: m.color }}
+              >
+                {m.initials}
+              </div>
             ))}
-            {group.members > 4 && <div className="gabung-av more">+{group.members - 4}</div>}
+            {group.members > 4 && (
+              <div className="w-9 h-9 rounded-full -ml-2 border-2 border-white/85 grid place-items-center text-white text-[12px] font-bold bg-white/25">
+                +{group.members - 4}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="gabung-col">
+        {/* Content column: centered, max-width 460px */}
+        <div className="w-full max-w-115 px-4 pb-10 flex flex-col gap-4">
 
-          {/* Key facts — overlaps the hero bottom edge */}
-          <div className="gabung-facts">
-            <div className="gabung-fact">
-              <div className="gabung-fact-label">Iuran</div>
-              <div className="gabung-fact-val">{group.iuran}<span>{group.cadence}</span></div>
+          {/* Key facts card — overlaps the hero bottom edge by 38px */}
+          <div className="flex bg-surface border border-line-soft rounded-card p-3.5 -mt-9.5 relative z-2 shadow-[0_6px_20px_rgba(17,24,39,0.08)]">
+            {/* Iuran */}
+            <div className="flex-1 text-center min-w-0">
+              <div className="text-[10px] font-bold uppercase tracking-[0.04em] text-ink-3">Iuran</div>
+              <div className="text-[18px] font-extrabold text-ink-1 mt-0.75 tracking-[-0.02em]">
+                {group.iuran}<span className="text-[11px] font-semibold text-ink-3">{group.cadence}</span>
+              </div>
             </div>
-            <div className="gabung-fact">
-              <div className="gabung-fact-label">Anggota</div>
-              <div className="gabung-fact-val">{group.members}<span>/{group.capacity}</span></div>
+            {/* Anggota */}
+            <div className="flex-1 text-center min-w-0 border-l border-line-soft">
+              <div className="text-[10px] font-bold uppercase tracking-[0.04em] text-ink-3">Anggota</div>
+              <div className="text-[18px] font-extrabold text-ink-1 mt-0.75 tracking-[-0.02em]">
+                {group.members}<span className="text-[11px] font-semibold text-ink-3">/{group.capacity}</span>
+              </div>
             </div>
-            <div className="gabung-fact">
-              <div className="gabung-fact-label">Admin</div>
-              <div className="gabung-fact-val sm">{group.admin}</div>
+            {/* Admin */}
+            <div className="flex-1 text-center min-w-0 border-l border-line-soft">
+              <div className="text-[10px] font-bold uppercase tracking-[0.04em] text-ink-3">Admin</div>
+              <div className="text-[13px] font-extrabold text-ink-1 mt-0.75 tracking-[-0.02em]">{group.admin}</div>
             </div>
           </div>
 
-          {/* Name (no signup required) */}
-          <label className="gabung-field">
-            <span className="gabung-field-label">Masuk sebagai</span>
+          {/* Name field (no signup required) */}
+          <label className="flex flex-col gap-1.75">
+            <span className="text-[12px] font-bold text-ink-2">Masuk sebagai</span>
             <input
-              className="gabung-input"
+              className="w-full border-[1.5px] border-line rounded-[13px] px-3.5 py-3.5 text-[15px] font-[inherit] text-ink-1 outline-none bg-surface transition-[border-color,box-shadow] duration-150 focus:border-brand-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]"
               placeholder="Nama kamu"
               value={name}
               onChange={e => setName(e.target.value)}
@@ -85,11 +121,16 @@ export default function Gabung() {
             />
           </label>
 
-          <button type="button" className="gabung-cta" onClick={join}>
+          {/* CTA button */}
+          <button
+            type="button"
+            className={`w-full border-none cursor-pointer text-white text-[16px] font-extrabold py-4 rounded-[14px] ${isArisan ? "bg-brand-primary shadow-[0_6px_18px_rgba(16,185,129,0.32)]" : "bg-brand-secondary-dark shadow-[0_6px_18px_rgba(139,92,246,0.32)]"}`}
+            onClick={join}
+          >
             Gabung Sekarang
           </button>
 
-          <div className="gabung-note">
+          <div className="text-[11.5px] text-ink-3 text-center leading-normal">
             Tanpa perlu daftar akun. Dengan bergabung kamu setuju ikut iuran {group.iuran}{group.cadence}.
           </div>
 

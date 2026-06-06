@@ -9,7 +9,7 @@ export default function QuickActions({ onBuat, onBayar, onJadwal, showAnalitik }
       </button>
       <button className="app-pill" onClick={onBayar}>
         <span className="ico violet"><Icon name="wallet" size={14} /></span>
-        Bayar Iuran
+        Bayar Iuran Arisan
       </button>
       <button className="app-pill" onClick={onJadwal}>
         <span className="ico amber"><Icon name="calendar" size={14} /></span>

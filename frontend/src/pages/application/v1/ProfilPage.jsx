@@ -164,7 +164,7 @@ export function ProfilPage() {
             <Icon name="chevron-right" size={16} style={{ color: "var(--ink-3)" }} />
           </SettingRow>
           <Divider />
-          <SettingRow ico="info" label="Versi Aplikasi" sub="MVP · Arisan Digital" iconBg="var(--gray-soft)" iconColor="var(--ink-2)" />
+          <SettingRow ico="info" label="Versi WebApp" sub="MVP · Arisan Digital" iconBg="var(--gray-soft)" iconColor="var(--ink-2)" />
           <Divider />
           <SettingRow ico="link" label="Syarat & Ketentuan" iconBg="var(--gray-soft)" iconColor="var(--ink-2)" onClick={() => {}}>
             <Icon name="chevron-right" size={16} style={{ color: "var(--ink-3)" }} />

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import PaySheet from "../../../components/v2/PaySheet";
+import PaySheet from "../../../components/application/v2/PaySheet";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, Users, Split, Check, Clock } from "../../../components/v2/icons";
-import NotifBubble    from "../../../components/v2/notifikasi/NotifBubble";
-import GroupLabel     from "../../../components/v2/notifikasi/GroupLabel";
-import ReminderButton from "../../../components/v2/notifikasi/ReminderButton";
-import SuggestBar     from "../../../components/v2/notifikasi/SuggestBar";
+import { ChevronLeft, Users, Split, Check, Clock } from "../../../components/application/v2/icons";
+import NotifBubble    from "../../../components/application/v2/notifikasi/NotifBubble";
+import GroupLabel     from "../../../components/application/v2/notifikasi/GroupLabel";
+import ReminderButton from "../../../components/application/v2/notifikasi/ReminderButton";
+import SuggestBar     from "../../../components/application/v2/notifikasi/SuggestBar";
 
 // Renders the correct 8×8 icon for an arisan/patungan tag badge.
 const TagIcon = ({ type }) =>

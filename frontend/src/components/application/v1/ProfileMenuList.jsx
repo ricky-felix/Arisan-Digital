@@ -59,7 +59,7 @@ export default function ProfileMenuList({ onSignOut }) {
         <div className="app-setting-row">
           <div className="ico violet"><Icon name="globe" size={16} /></div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600 }}>Bahasa Aplikasi</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>Bahasa WebApp</div>
             <div style={{ fontSize: 12, color: "var(--ink-2)" }}>{lang === "ID" ? "Bahasa Indonesia" : "English"}</div>
           </div>
           <div className="app-segmented">
@@ -93,7 +93,7 @@ export default function ProfileMenuList({ onSignOut }) {
       {/* About */}
       <div className="app-eyebrow" style={{ margin: "16px 0 8px" }}>Tentang</div>
       <div className="app-settings-group" style={{ marginBottom: 16 }}>
-        <SettingLink ico="info" label="Versi Aplikasi" sub="v2.4.1 · Build 1042" gray />
+        <SettingLink ico="info" label="Versi WebApp" sub="v2.4.1 · Build 1042" gray />
         <SettingLink ico="link" label="Syarat & Ketentuan" gray />
         <SettingLink ico="lock" label="Kebijakan Privasi" gray />
       </div>

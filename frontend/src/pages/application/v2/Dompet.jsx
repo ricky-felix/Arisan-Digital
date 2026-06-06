@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import { ChevronLeft, Users, Home, Split, Wallet } from "../../../components/v2/icons";
-import WalletCard from "../../../components/v2/dompet/WalletCard";
-import PanelRow from "../../../components/v2/dompet/PanelRow";
-import { ARISAN_CARD, PATUNGAN_CARD, DOMPET_CARD } from "../../../components/v2/dompet/data";
+import { ChevronLeft, Users, Home, Split, Wallet } from "../../../components/application/v2/icons";
+import WalletCard from "../../../components/application/v2/dompet/WalletCard";
+import PanelRow from "../../../components/application/v2/dompet/PanelRow";
+import { ARISAN_CARD, PATUNGAN_CARD, DOMPET_CARD } from "../../../components/application/v2/dompet/data";
 
 export default function Dompet() {
   const navigate = useNavigate();

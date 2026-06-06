@@ -1,10 +1,10 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, Share } from "../../../components/v2/icons";
-import { getBuktiVariant } from "../../../components/v2/bukti/variants";
-import ReceiptCard from "../../../components/v2/bukti/ReceiptCard";
-import ReceiptActions from "../../../components/v2/bukti/ReceiptActions";
+import { ChevronLeft, Share } from "../../../components/application/v2/icons";
+import { getBuktiVariant } from "../../../components/application/v2/bukti/variants";
+import ReceiptCard from "../../../components/application/v2/bukti/ReceiptCard";
+import ReceiptActions from "../../../components/application/v2/bukti/ReceiptActions";
 
 export default function BuktiTransfer() {
   const navigate = useNavigate();
@@ -31,28 +31,61 @@ export default function BuktiTransfer() {
   } = getBuktiVariant(isArisan);
 
   return (
-    <div className="v2-screen v2-bukti">
+    <div className="v2-screen">
       {/*
-        v2-inner is intentionally NOT used here — this screen has its own
-        centered narrow-column layout that constrains header + card + buttons
-        together inside a max-480px column, sitting on a full-bleed bg-app-bg.
+        v2-inner is intentionally NOT used here — this screen owns its own
+        full-bleed scroll area with a centered 480px column.
       */}
-      <div className="bukti-scroll-area">
 
-        {/* ── 1. Full-width sticky header bar (consistent with other pages) ── */}
-        <div className="bukti-nav">
+      {/*
+        bukti-scroll-area:
+          w-full min-h-svh bg-app-bg overflow-y-auto overflow-x-hidden
+          flex flex-col items-center pb-30 scrollbar-none
+          lg:pb-12
+      */}
+      <div
+        className={[
+          "flex w-full min-h-svh flex-col items-center overflow-x-hidden overflow-y-auto",
+          "bg-app-bg pb-30",
+          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "lg:pb-12",
+        ].join(" ")}
+      >
+
+        {/*
+          bukti-nav:
+            w-full sticky top-0 z-10 min-h-14 flex items-center gap-3
+            bg-surface border-b border-line-soft flex-shrink-0 px-5
+            min-[481px]:px-5  (tablet: same, from @media 481px rule)
+            lg:sticky lg:top-0 lg:z-10 lg:min-h-14
+            lg:px-[max(clamp(24px,5vw,64px),calc(50%-600px))]
+        */}
+        <div
+          className={[
+            "sticky top-0 z-10 flex w-full min-h-14 shrink-0 items-center gap-3",
+            "bg-surface border-b border-line-soft px-5",
+            "min-[481px]:px-5",
+            "lg:px-[max(clamp(24px,5vw,64px),calc(50%-600px))]",
+          ].join(" ")}
+        >
+          {/* bukti-nav-btn: w-8.5 h-8.5 rounded-[10px] bg-gray-soft grid place-items-center text-ink-1 cursor-pointer transition-colors hover:bg-line */}
           <button
             type="button"
-            className="bukti-nav-btn"
+            className="grid h-8.5 w-8.5 shrink-0 cursor-pointer place-items-center rounded-[10px] bg-gray-soft text-ink-1 transition-colors hover:bg-line"
             onClick={() => navigate(-1)}
             aria-label="Kembali"
           >
             <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
           </button>
-          <span className="bukti-nav-title">Bukti Transfer</span>
+
+          {/* bukti-nav-title: flex-1 text-[17px] font-extrabold text-ink-1 tracking-[-0.02em] */}
+          <span className="flex-1 text-[17px] font-extrabold tracking-[-0.02em] text-ink-1">
+            Bukti Transfer
+          </span>
+
           <button
             type="button"
-            className="bukti-nav-btn"
+            className="grid h-8.5 w-8.5 shrink-0 cursor-pointer place-items-center rounded-[10px] bg-gray-soft text-ink-1 transition-colors hover:bg-line"
             onClick={() => toast("Bukti transfer dibagikan")}
             aria-label="Bagikan bukti transfer"
           >
@@ -60,10 +93,13 @@ export default function BuktiTransfer() {
           </button>
         </div>
 
-        {/* ── Bill column ── */}
-        <div className="bukti-col">
+        {/*
+          bukti-col:
+            w-full max-w-120 flex flex-col
+            lg:max-w-160 lg:mx-auto
+        */}
+        <div className="flex w-full max-w-120 flex-col lg:mx-auto lg:max-w-160">
 
-          {/* ── 2. Receipt card ── */}
           <ReceiptCard
             headerGradient={headerGradient}
             amount={amount}
@@ -75,7 +111,6 @@ export default function BuktiTransfer() {
             accentColor={accentColor}
           />
 
-          {/* ── 3. Action buttons ── */}
           <ReceiptActions
             primaryBtnBg={primaryBtnBg}
             primaryBtnShadow={primaryBtnShadow}
@@ -89,8 +124,8 @@ export default function BuktiTransfer() {
           {/* Bottom spacer */}
           <div className="h-8" />
 
-        </div>{/* /bukti-col */}
-      </div>{/* /bukti-scroll-area */}
+        </div>
+      </div>
     </div>
   );
 }

@@ -25,6 +25,7 @@ import HomeDeck from "./pages/application/v2/HomeDeck";
 import Notifikasi from "./pages/application/v2/Notifikasi";
 import Dompet from "./pages/application/v2/Dompet";
 import MembersOrbit from "./pages/application/v2/MembersOrbit";
+import GroupDetail from "./pages/application/v2/GroupDetail";
 import Profil from "./pages/application/v2/Profil";
 import BuktiTransfer from "./pages/application/v2/BuktiTransfer";
 import Undang from "./pages/application/v2/Undang";
@@ -73,7 +74,7 @@ function AuthSetupScreen({ error }) {
       <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h1 className="text-lg font-bold text-gray-900">Perlu satu langkah setup</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Aplikasi memakai sesi anonim Supabase agar bisa dipakai tanpa login.
+          WebApp memakai sesi anonim Supabase agar bisa dipakai tanpa login.
           Aktifkan dulu di dashboard Supabase:
           <br />
           <span className="font-medium text-gray-800">
@@ -164,6 +165,7 @@ function AppRoutes() {
         <Route path="/app/notifikasi" element={<ProtectedRoute><Notifikasi /></ProtectedRoute>} />
         <Route path="/app/dompet" element={<ProtectedRoute><Dompet /></ProtectedRoute>} />
         <Route path="/app/anggota" element={<ProtectedRoute><MembersOrbit /></ProtectedRoute>} />
+        <Route path="/app/grup" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
         <Route path="/app/profil" element={<ProtectedRoute><Profil /></ProtectedRoute>} />
         <Route path="/app/bukti" element={<ProtectedRoute><BuktiTransfer /></ProtectedRoute>} />
         <Route path="/app/undang" element={<ProtectedRoute><Undang /></ProtectedRoute>} />
@@ -190,6 +192,7 @@ function AppRoutes() {
             <Route path="/screens/notifikasi"  element={<Notifikasi />} />
             <Route path="/screens/dompet"      element={<Dompet />} />
             <Route path="/screens/anggota"     element={<MembersOrbit />} />
+            <Route path="/screens/grup"        element={<GroupDetail />} />
             <Route path="/screens/profil"      element={<Profil />} />
             <Route path="/screens/buat-arisan"   element={<BuatArisan />} />
             <Route path="/screens/buat-patungan" element={<BuatPatungan />} />

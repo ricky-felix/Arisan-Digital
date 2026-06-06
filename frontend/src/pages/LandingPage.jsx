@@ -1,14 +1,14 @@
 import React from "react";
-import { Navbar } from "../components/Navbar";
-import { Hero } from "../components/Hero";
-import { ProblemStatement } from "../components/ProblemStatement";
-import { HowToUse } from "../components/HowToUse";
-import { Features } from "../components/Features";
-import { BillSplitting } from "../components/BillSplitting";
-import { Gallery } from "../components/Gallery";
-import { FAQs } from "../components/FAQs";
-import { CTA } from "../components/CTA";
-import { Footer } from "../components/Footer";
+import { Navbar } from "../components/home/Navbar";
+import { Hero } from "../components/home/Hero";
+import { ProblemStatement } from "../components/home/ProblemStatement";
+import { HowToUse } from "../components/home/HowToUse";
+import { Features } from "../components/home/Features";
+import { BillSplitting } from "../components/home/BillSplitting";
+import { Gallery } from "../components/home/Gallery";
+import { FAQs } from "../components/home/FAQs";
+import { CTA } from "../components/home/CTA";
+import { Footer } from "../components/home/Footer";
 
 export default function LandingPage() {
   return (

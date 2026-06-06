@@ -1,23 +1,47 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import PaySheet from "../../../components/v2/PaySheet";
-import ComposeSheet from "../../../components/v2/ComposeSheet";
+import PaySheet from "../../../components/application/v2/PaySheet";
+import ComposeSheet from "../../../components/application/v2/ComposeSheet";
+import CoachMarks from "../../../components/application/v2/CoachMarks";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, ChevronRight } from "../../../components/v2/icons";
-import { ALL_CARDS } from "../../../components/v2/home/data";
-import StoryTopBar from "../../../components/v2/home/StoryTopBar";
-import SegFilter from "../../../components/v2/home/SegFilter";
-import StoryCard from "../../../components/v2/home/StoryCard";
+
+// First-run coach-mark gate. Defaults to "seen" if storage is unavailable so a
+// private-mode visitor is never trapped, and skips the dev /screens/* capture
+// routes so headless screenshots stay deterministic.
+const COACH_KEY = "arisan.v2.coachSeen";
+import { ChevronLeft, ChevronRight } from "../../../components/application/v2/icons";
+import { ALL_CARDS } from "../../../components/application/v2/home/data";
+import StoryTopBar from "../../../components/application/v2/home/StoryTopBar";
+import SegFilter from "../../../components/application/v2/home/SegFilter";
+import StoryCard from "../../../components/application/v2/home/StoryCard";
 
 export default function HomeDeck() {
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [filter, setFilter] = useState("semua");
   const [currentIdx, setCurrentIdx] = useState(0);
   const [paidCards, setPaidCards] = useState({});
   const [paySheet, setPaySheet] = useState({ open: false, card: null });
   const [composeOpen, setComposeOpen] = useState(false);
+  const [coachOpen, setCoachOpen] = useState(() => {
+    if (location.pathname.startsWith("/screens")) return false;
+    try {
+      return localStorage.getItem(COACH_KEY) !== "1";
+    } catch {
+      return false;
+    }
+  });
+
+  function closeCoach() {
+    try {
+      localStorage.setItem(COACH_KEY, "1");
+    } catch {
+      /* private mode — flag just won't persist */
+    }
+    setCoachOpen(false);
+  }
 
   // Filtered visible cards — by type (arisan/patungan) or by status
   // (tenggat = nearing/passed deadline, selesai = completed).
@@ -157,7 +181,7 @@ export default function HomeDeck() {
                 isPaid={!!paidCards[card.id]}
                 cardClass={getCardClass(idx)}
                 onCta={() => handleCta(card)}
-                onOpen={() => navigate("/app/anggota")}
+                onOpen={() => navigate("/app/grup")}
               />
             ))
           )}
@@ -185,6 +209,9 @@ export default function HomeDeck() {
           onClose={() => setComposeOpen(false)}
         />
 
+        {/* First-run guided tour — overlays the deck, shares its coordinates */}
+        {coachOpen && <CoachMarks onDone={closeCoach} />}
+
       </div>
 
       {/* Pay sheet (portal-like, fixed) */}
@@ -197,7 +224,7 @@ export default function HomeDeck() {
           destName={paySheet.card.destName}
           destType={paySheet.card.destType}
           onPaid={handlePaid}
-          onDest={() => { closePaySheet(); navigate("/app/anggota"); }}
+          onDest={() => { closePaySheet(); navigate("/app/grup"); }}
         />
       )}
     </div>
