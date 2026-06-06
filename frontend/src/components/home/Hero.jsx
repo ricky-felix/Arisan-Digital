@@ -30,7 +30,7 @@ const TABS = [
     description:
       "Kelola putaran tabungan bersama teman tanpa ribet. Satu WebApp untuk semua yang kamu butuhkan.",
     buttons: [
-      { title: "Test WehApp", href: routes.app },
+      { title: "Test WebApp", href: routes.app },
       { title: "Lihat Fitur", variant: "secondary-alt", href: routes.app },
     ],
     image: {
@@ -58,11 +58,11 @@ const TABS = [
   {
     value: "tab-four",
     text: "Bisnis",
-    heading: "Arisan & Tagihan Modern untuk teman, keluarga, komunitas, dan bisnis anda",
+    heading: "Arisan Modern untuk teman, keluarga, komunitas, dan bisnis anda",
     description:
       "Mulai grup arisan dalam menit, bukan hari. Semua orang tahu posisinya dan kapan harus bayar.",
     buttons: [
-      { title: "Daftar Sekarang", href: routes.app },
+      { title: "Buka WebApp", href: routes.app },
       { title: "Hubungi Kami", variant: "secondary-alt", href: routes.app },
     ],
     image: {

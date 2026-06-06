@@ -58,7 +58,7 @@ export function Navbar() {
             onClick={() => navigate(routes.login)}
           >
             Masuk
-          </Button>
+          </Button> */}
           <Button
             title="Coba Sekarang"
             size="sm"
@@ -67,7 +67,7 @@ export function Navbar() {
             href={routes.app}
           >
             Coba Sekarang
-          </Button> */}
+          </Button>
           <button
             className="-mr-2 flex size-12 flex-col items-center justify-center justify-self-end rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#10b981] lg:mr-0"
             onClick={useActive.toggleMenu}
@@ -155,9 +155,9 @@ export function Navbar() {
                   Hubungi
                 </a>
               </div>
-              {/* <div className="flex min-h-18 items-center justify-between gap-x-4">
+              <div className="flex min-h-18 items-center justify-between gap-x-4">
                 <div className="flex items-center gap-x-4">
-                  <button
+                  {/* <button
                     type="button"
                     className="inline-flex items-center justify-center gap-2 border-0 bg-transparent p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-xl"
                     onClick={() => {
@@ -166,7 +166,7 @@ export function Navbar() {
                     }}
                   >
                     Masuk
-                  </button>
+                  </button> */}
                   <a
                     className="inline-flex items-center justify-center gap-2 border-0 p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:text-xl"
                     href={routes.app}
@@ -174,8 +174,9 @@ export function Navbar() {
                     Coba Sekarang
                   </a>
                 </div>
-                <div className="flex items-center gap-3">
-                  <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Facebook">
+              <div className="flex items-center gap-3">
+                <p className="text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2">Social Media Coming Soon</p>
+                  {/* <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Facebook">
                     <BiLogoFacebookCircle className="size-6" />
                   </a>
                   <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Instagram">
@@ -189,9 +190,9 @@ export function Navbar() {
                   </a>
                   <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="YouTube">
                     <BiLogoYoutube className="size-6" />
-                  </a>
+                  </a> */}
                 </div>
-              </div> */}
+              </div>
             </div>
           </div>
         )}

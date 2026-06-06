@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "./components/application/AppLayout";
@@ -10,6 +10,7 @@ import { AccountPromptProvider } from "./context/AccountPromptContext";
 // website
 import LandingPage from "./pages/LandingPage";
 import { LoginOrRegister } from "./pages/LoginOrRegister";
+import NotFound from "./pages/NotFound";
 
 // v1 screens
 import { AppHomepage } from "./pages/application/v1/AppHomepage";
@@ -33,6 +34,7 @@ import GabungMasuk from "./pages/application/v2/GabungMasuk";
 import Gabung from "./pages/application/v2/Gabung";
 import BuatArisan from "./pages/application/v2/BuatArisan";
 import BuatPatungan from "./pages/application/v2/BuatPatungan";
+import NotFoundApp from "./pages/application/v2/NotFoundApp";
 
 // ── Landing + modal overlay on /login ────────────────────────
 // Both "/" and "/login" render this SAME component, so React keeps the
@@ -56,15 +58,72 @@ function LandingShell() {
   );
 }
 
+// ── Pre-launch access gate ────────────────────────────────────
+// The landing page ("/") stays public for marketing. The app screens
+// (/app/*) are hidden behind a shared access code until launch, so only
+// people we hand the code to can see v1/v2. This is client-side
+// obfuscation (the code ships in the bundle) — enough to keep the app
+// out of sight of casual LinkedIn visitors, NOT real security. For true
+// protection, gate server-side / behind real auth.
+const APP_ACCESS_CODE = import.meta.env.VITE_APP_ACCESS_CODE || "arisan_patungan_2026";
+const APP_ACCESS_KEY = "arisan_app_access";
+
+function AppGate({ children }) {
+  const [unlocked, setUnlocked] = useState(
+    () => !APP_ACCESS_CODE || localStorage.getItem(APP_ACCESS_KEY) === "1"
+  );
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+
+  if (unlocked) return children;
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (code.trim() === APP_ACCESS_CODE) {
+      localStorage.setItem(APP_ACCESS_KEY, "1");
+      setUnlocked(true);
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="flex min-h-svh items-center justify-center bg-gray-50 p-6">
+      <form onSubmit={submit} className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h1 className="text-lg font-bold text-gray-900">Akses terbatas</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          WebApp Arisan Digital masih dalam tahap pratayang. Masukkan kode akses untuk melanjutkan.
+        </p>
+        <input
+          type="password"
+          value={code}
+          autoFocus
+          onChange={(e) => { setCode(e.target.value); setError(false); }}
+          placeholder="Kode akses"
+          className="mt-4 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#10b981] focus:outline-none focus:ring-2 focus:ring-[#10b981]/30"
+        />
+        {error && <p className="mt-2 text-xs text-red-500">Kode salah, coba lagi.</p>}
+        <button
+          type="submit"
+          className="mt-4 w-full rounded-lg bg-[#10b981] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0d9e6e] focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:ring-offset-2"
+        >
+          Masuk
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ── App routes are open in this MVP (no login). We just wait for
 //    the anonymous session to bootstrap, and surface a setup hint if
-//    anonymous auth hasn't been enabled in Supabase yet. ─────────
+//    anonymous auth hasn't been enabled in Supabase yet. The whole app
+//    sits behind <AppGate> until launch. ───────────────────────────
 function ProtectedRoute({ children }) {
   const { user, loading, authError } = useAuth();
   if (loading) return <AppLoadingScreen />;
   if (authError) return <AuthSetupScreen error={authError} />;
   if (!user) return <AppLoadingScreen />;
-  return children;
+  return <AppGate>{children}</AppGate>;
 }
 
 // ── Shown when the anonymous session can't be created ─────────
@@ -157,7 +216,7 @@ function AppRoutes() {
       <Routes>
         {/* Public — same element for both paths keeps LandingPage mounted */}
         <Route path="/" element={<LandingShell />} />
-        <Route path="/login" element={<LandingShell />} />
+        {/* <Route path="/login" element={<LandingShell />} /> */}
 
         {/* App routes (open — anonymous session, no login) */}
         {/* v2 screens replace /app, /app/notifikasi, /app/profil */}
@@ -183,6 +242,9 @@ function AppRoutes() {
         <Route path="/app/patungan/rutin" element={<ProtectedRoute><AppLayout title="Patungan"><PatunganPage /></AppLayout></ProtectedRoute>} />
         <Route path="/app/patungan/:billId" element={<ProtectedRoute><BillDetailPage /></ProtectedRoute>} />
 
+        {/* In-app 404 — any unknown /app/* path, still behind the access gate */}
+        <Route path="/app/*" element={<ProtectedRoute><NotFoundApp /></ProtectedRoute>} />
+
         {/* Dev-only unguarded routes for headless screenshot capture at 390×844.
             No auth, no AppLayout — each screen renders standalone / full-viewport.
             Exact slugs required by scripts/screenshot-app.mjs. */}
@@ -201,8 +263,8 @@ function AppRoutes() {
           </>
         )}
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Fallback — marketing 404 for any unknown public route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <ScrollToTop />
     </>

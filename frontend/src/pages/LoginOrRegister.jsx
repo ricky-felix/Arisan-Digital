@@ -122,7 +122,7 @@ export function LoginOrRegister({ onClose, onSuccess, reason, defaultTab = "logi
                   onClick={() => setTab("register")}
                   className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
                 >
-                  Daftar sekarang
+                  Buka WebApp
                 </button>
               </>
             ) : (

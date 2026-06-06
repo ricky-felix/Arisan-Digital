@@ -269,7 +269,7 @@ export function RegisterForm({ onSuccess }) {
             <span>Mendaftarkan...</span>
           </>
         ) : (
-          "Daftar Sekarang"
+          "Buka WebApp"
         )}
       </button>
 
