@@ -84,31 +84,25 @@ export function Footer() {
                   onClick={(e) => handleAnchorClick(e, 'bagi-tagihan')}
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
-                  Bagi tagihan
+                  Tagihan
                 </a>
               </li>
               <li className="py-2 text-sm font-semibold">
                 <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open('#', '_blank');
-                  }}
+                  href="#pelajari"
+                  onClick={(e) => handleAnchorClick(e, 'pelajari')}
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
-                  Unduh
+                  Pelajari
                 </a>
               </li>
               <li className="py-2 text-sm font-semibold">
                 <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open('#', '_blank');
-                  }}
+                  href="#gallery"
+                  onClick={(e) => handleAnchorClick(e, 'gallery')}
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
-                  Daftar
+                  Gallery
                 </a>
               </li>
               <li className="py-2 text-sm font-semibold">
@@ -148,7 +142,7 @@ export function Footer() {
                   }}
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
-                  Blog
+                  Blog (Coming Soon)
                 </a>
               </li>
               <li className="py-2 text-sm font-semibold">
@@ -159,7 +153,7 @@ export function Footer() {
                   }}
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
-                  Komunitas
+                  Komunitas (Coming Soon)
                 </a>
               </li>
               <li className="py-2 text-sm font-semibold">
@@ -168,7 +162,7 @@ export function Footer() {
                   onClick={(e) => handleAnchorClick(e, 'hubungi')}
                   className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2"
                 >
-                  Ikuti kami
+                  Ikuti kami (Coming Soon)
                 </a>
               </li>
             </ul>
