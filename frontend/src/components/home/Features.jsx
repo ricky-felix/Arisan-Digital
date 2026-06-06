@@ -271,7 +271,7 @@ export function Features() {
                 Privasi dan Proteksi Terjamin
               </h3>
               <p className="text-base text-white md:text-lg">
-                Data arisan kamu aman terlindungi dengan enkripsi tingkat bank. Informasi pribadi dan finansial semua anggota dijaga ketat. Cuma anggota grup yang bisa akses data arisan. Privacy kamu prioritas kami, jadi bisa arisan dengan tenang tanpa khawatir data bocor.
+                Data arisan kamu aman terlindungi dengan enkripsi. Informasi pribadi dan finansial semua anggota dijaga ketat. Cuma anggota grup yang bisa akses data arisan. Privacy kamu prioritas kami, jadi bisa arisan dengan tenang tanpa khawatir data bocor.
               </p>
             </FeatureCard>
           </div>
