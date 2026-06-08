@@ -44,7 +44,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { ensureProfile, updateProfile as updateProfileRow } from "../lib/data";
+import { usersService } from "../services/users.service";
 import { parseIdentifier } from "../utils/identifier";
 
 const AuthContext = createContext(null);
@@ -58,11 +58,22 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Hydrate from any persisted session (localStorage / cookie).
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session ?? null);
-      if (data.session?.user) {
-        ensureProfile(data.session.user.id)
-          .then(setProfile)
-          .catch(() => {});
+      const s = data.session ?? null;
+      // C4: anonymous sessions are no longer used. A leftover pre-C4 anonymous
+      // session would otherwise slip past <ProtectedRoute> and surface the user
+      // as a guest ("Tamu"). Terminate it and stay logged-out.
+      if (s?.user?.is_anonymous) {
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setLoading(false);
+        return;
+      }
+      setSession(s);
+      if (s?.user) {
+        // Load the profile from the backend (GET /users/me). The profile row is
+        // created by the handle_new_user DB trigger from the registered name —
+        // the frontend never writes it, so there is no guest/"Tamu" placeholder.
+        usersService.getMe().then(setProfile).catch(() => setProfile(null));
       }
       setLoading(false);
     });
@@ -70,9 +81,15 @@ export function AuthProvider({ children }) {
     // Keep in sync with Supabase's own state changes (token refresh, sign-out
     // from another tab, etc.).
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      if (s?.user?.is_anonymous) {
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setProfile(null);
+        return;
+      }
       setSession(s ?? null);
       if (s?.user) {
-        ensureProfile(s.user.id).then(setProfile).catch(() => {});
+        usersService.getMe().then(setProfile).catch(() => setProfile(null));
       } else {
         setProfile(null);
       }
@@ -169,13 +186,15 @@ export function AuthProvider({ children }) {
   // ── updateProfile ─────────────────────────────────────────────────────────
   async function updateProfile(updates) {
     if (!session?.user) return;
-    await updateProfileRow(session.user.id, updates);
-    setProfile((prev) => ({ ...prev, ...updates }));
+    // PATCH /users/me — returns the updated row; fall back to a local merge.
+    const updated = await usersService.updateMe(updates);
+    setProfile((prev) => updated ?? { ...prev, ...updates });
   }
 
   // ── Derived values ────────────────────────────────────────────────────────
   const user = session?.user ?? null;
-  const isAuthenticated = !!session;
+  // Anonymous sessions don't count as authenticated (C4 — guest accounts removed).
+  const isAuthenticated = !!session && !user?.is_anonymous;
 
   // ── Backward-compatibility shims ─────────────────────────────────────────
   // isAnonymous: always false — anonymous sessions were removed in C4.

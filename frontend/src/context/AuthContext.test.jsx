@@ -1,7 +1,8 @@
 /**
  * AuthContext — unit tests
  *
- * Mocks supabase auth and lib/data so the context logic is tested in isolation.
+ * Mocks supabase auth and the backend users service so the context logic is
+ * tested in isolation.
  * Covers: initial loading state, authenticated/unauthenticated hydration,
  * login(), register() (email + phone), logout(), and updateProfile().
  */
@@ -22,15 +23,17 @@ vi.mock('../lib/supabase', () => {
   return { supabase: { auth: mockAuth } };
 });
 
-vi.mock('../lib/data', () => ({
-  ensureProfile: vi.fn(),
-  updateProfile: vi.fn(),
+vi.mock('../services/users.service', () => ({
+  usersService: {
+    getMe: vi.fn(),
+    updateMe: vi.fn(),
+  },
 }));
 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { supabase } from '../lib/supabase';
-import { ensureProfile, updateProfile } from '../lib/data';
+import { usersService } from '../services/users.service';
 import { AuthProvider, useAuth } from './AuthContext';
 
 // Helper consumer that reads from useAuth and surfaces error/state via DOM
@@ -72,8 +75,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   // Default: no session
   supabase.auth.getSession.mockResolvedValue({ data: { session: null } });
-  ensureProfile.mockResolvedValue({ id: 'u1', name: 'Budi' });
-  updateProfile.mockResolvedValue(undefined);
+  supabase.auth.signOut.mockResolvedValue({ error: null });
+  usersService.getMe.mockResolvedValue({ id: 'u1', name: 'Budi' });
+  usersService.updateMe.mockResolvedValue({ id: 'u1', name: 'Budi' });
 });
 
 describe('AuthProvider', () => {
@@ -91,7 +95,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user').textContent).toBe('null');
   });
 
-  it('hydrates user from existing session on mount', async () => {
+  it('hydrates user from existing session on mount and loads the profile from the backend', async () => {
     supabase.auth.getSession.mockResolvedValue({
       data: {
         session: {
@@ -108,7 +112,31 @@ describe('AuthProvider', () => {
 
     expect(screen.getByTestId('authenticated').textContent).toBe('true');
     expect(screen.getByTestId('user').textContent).toBe('u1');
-    expect(ensureProfile).toHaveBeenCalledWith('u1');
+    // Profile comes from GET /users/me (backend); the frontend never writes it,
+    // so the real name from the handle_new_user trigger is what shows — no guest.
+    expect(usersService.getMe).toHaveBeenCalled();
+  });
+
+  it('rejects a leftover anonymous session (C4 — no guest accounts)', async () => {
+    supabase.auth.getSession.mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'tok',
+          user: { id: 'anon1', is_anonymous: true },
+        },
+      },
+    });
+
+    renderWithProvider();
+    await waitFor(() =>
+      expect(screen.getByTestId('loading').textContent).toBe('false')
+    );
+
+    // The anonymous session is signed out and never treated as authenticated.
+    expect(supabase.auth.signOut).toHaveBeenCalled();
+    expect(screen.getByTestId('authenticated').textContent).toBe('false');
+    expect(screen.getByTestId('user').textContent).toBe('null');
+    expect(usersService.getMe).not.toHaveBeenCalled();
   });
 
   it('throws from useAuth when used outside AuthProvider', () => {

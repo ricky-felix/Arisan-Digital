@@ -2,7 +2,8 @@
 // Supabase-backed data layer for the Arisan Digital MVP.
 //
 // The browser talks to Supabase directly (no NestJS backend). The
-// current user is an anonymous Supabase auth user; every row is
+// current user is a real authenticated Supabase user (email/phone +
+// password — anonymous sessions were removed in C4); every row is
 // scoped to them by RLS. Members & participants are stored as plain
 // names (see supabase/migration-mvp.sql).
 // ─────────────────────────────────────────────────────────────
@@ -50,13 +51,28 @@ function markHasCreated() {
 }
 
 // ── profile (users table) ─────────────────────────────────────
-export async function ensureProfile(userId, name = "Tamu") {
+export async function ensureProfile(userId, name) {
   const { data } = await supabase.from("users").select("*").eq("id", userId).maybeSingle();
-  if (data) return data;
+  if (data) {
+    // Reconcile a placeholder guest row with the real name once we know it.
+    // At sign-up the client can race ahead of the handle_new_user DB trigger
+    // and insert name="Tamu"; the trigger's real-name insert is then dropped
+    // by ON CONFLICT DO NOTHING. When a real name is now available, heal it.
+    if (name && name !== "Tamu" && (!data.name || data.name === "Tamu")) {
+      const { data: updated } = await supabase
+        .from("users")
+        .update({ name })
+        .eq("id", userId)
+        .select("*")
+        .maybeSingle();
+      return updated ?? { ...data, name };
+    }
+    return data;
+  }
   // Upsert (ignore duplicates) so concurrent bootstraps don't race on the PK.
   const { error } = await supabase
     .from("users")
-    .upsert({ id: userId, name }, { onConflict: "id", ignoreDuplicates: true });
+    .upsert({ id: userId, name: name || "Tamu" }, { onConflict: "id", ignoreDuplicates: true });
   if (error && error.code !== "23505") throwIf(error, "ensureProfile");
   const { data: row } = await supabase.from("users").select("*").eq("id", userId).maybeSingle();
   return row;
