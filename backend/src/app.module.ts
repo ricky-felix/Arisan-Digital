@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 import { SupabaseModule } from './supabase/supabase.module';
 
 // ── Identity & auth ──────────────────────────────────────────────
-import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 
 // ── Arisan core ──────────────────────────────────────────────────
@@ -46,7 +45,6 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     ScheduleModule.forRoot(),
     SupabaseModule,
 
-    AuthModule,
     UsersModule,
 
     GroupsModule,

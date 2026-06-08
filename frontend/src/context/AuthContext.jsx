@@ -45,7 +45,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { usersService } from "../services/users.service";
-import { authService } from "../services/auth.service";
 import { parseIdentifier } from "../utils/identifier";
 
 const AuthContext = createContext(null);
@@ -104,14 +103,13 @@ export function AuthProvider({ children }) {
    * Register a new account. Both email and phone number are required; email +
    * password is the auth credential, the phone number is stored on the profile.
    *
-   * Email is always the signUp credential (signUp accepts either an email OR a
-   * phone, never both). The phone is passed in user metadata so the
-   * handle_new_user DB trigger can populate users.phone. Immediately afterwards
-   * we call the backend (authService.syncPhone) to also promote that phone onto
-   * the top-level auth.users.phone field — confirmed via the admin API — so that
-   * phone + password login works. Without this step, phone login can never
-   * succeed because Supabase looks users up by auth.users.phone, which signUp
-   * leaves null.
+   * Email is the only login credential for now (phone login is a future
+   * feature). signUp accepts either an email OR a phone, never both, so email is
+   * the credential and the phone is passed in user metadata; the handle_new_user
+   * DB trigger copies it into users.phone for display/profile use. The phone is
+   * deliberately NOT promoted onto auth.users.phone — until phone login ships
+   * there is no reason to, and leaving it off keeps the phone from becoming a
+   * login credential.
    *
    * @param {{ email: string, phone: string, password: string, name: string }} opts
    * @throws Error with a user-friendly Indonesian message.
@@ -133,20 +131,6 @@ export function AuthProvider({ children }) {
     });
     if (error) throw error;
 
-    // ── Promote the phone onto the auth record (enables phone login) ──────
-    // signUp only stored the phone in user metadata; copy it to
-    // auth.users.phone (confirmed) via the backend admin API. Best-effort:
-    // a failure here must not block an otherwise-successful registration, and
-    // it must run before the confirmation-pending throw below so the phone is
-    // attached even when there is no session yet.
-    if (data.user) {
-      try {
-        await authService.syncPhone(data.user.id);
-      } catch {
-        // Non-fatal — the account exists and the profile still has the phone.
-      }
-    }
-
     // ── Confirmation-pending case ─────────────────────────────────────────
     // When "Confirm email" is ENABLED in Supabase, signUp returns a user
     // object but session is null — the user must click the confirmation link
@@ -164,25 +148,25 @@ export function AuthProvider({ children }) {
 
   // ── login ─────────────────────────────────────────────────────────────────
   /**
-   * Sign in with email or phone + password.
+   * Sign in with email + password.
    *
-   * @param {{ identifier: string, password: string }} opts
+   * Email is the only supported login credential for now — phone login is a
+   * future feature (it would require promoting the phone onto auth.users and
+   * enabling the Supabase Phone provider). Until then we only accept email.
+   *
+   * @param {{ identifier: string, password: string }} opts — `identifier` is an email
    * @throws Error with a user-friendly Indonesian message.
    */
   async function login({ identifier, password }) {
     const parsed = parseIdentifier(identifier);
-    if (!parsed) {
-      throw new Error("Masukkan email atau nomor HP yang valid.");
+    if (parsed?.type !== "email") {
+      throw new Error("Masukkan alamat email yang valid.");
     }
 
-    let signInArgs;
-    if (parsed.type === "email") {
-      signInArgs = { email: parsed.email, password };
-    } else {
-      signInArgs = { phone: parsed.phone, password };
-    }
-
-    const { error } = await supabase.auth.signInWithPassword(signInArgs);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: parsed.email,
+      password,
+    });
     if (error) throw error;
   }
 

@@ -212,7 +212,13 @@ describe('login()', () => {
     expect(thrownError.message).toBe('Invalid credentials');
   });
 
-  it('throws with Indonesian message for invalid identifier', async () => {
+  // Login is email-only for now (phone login is a future feature). Both a
+  // garbage identifier AND a valid phone number must be rejected before any
+  // signInWithPassword call is made.
+  it.each([
+    ['garbage identifier', 'not-valid-at-all'],
+    ['a valid phone number', '081234567890'],
+  ])('rejects %s with an email-only message', async (_label, identifier) => {
     let thrownError;
     function CapturingConsumer() {
       const { login } = useAuth();
@@ -220,7 +226,7 @@ describe('login()', () => {
         <button
           onClick={async () => {
             try {
-              await login({ identifier: 'not-valid-at-all', password: 'pw' });
+              await login({ identifier, password: 'pw' });
             } catch (e) {
               thrownError = e;
             }
@@ -241,7 +247,8 @@ describe('login()', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Invalid Login' }));
 
-    expect(thrownError.message).toContain('email atau nomor HP yang valid');
+    expect(thrownError.message).toContain('alamat email yang valid');
+    expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled();
   });
 });
 

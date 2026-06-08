@@ -90,24 +90,9 @@ function PasswordStrengthBar({ password }) {
   );
 }
 
-// ── Identifier field hint ─────────────────────────────────────────────────────
-// Shows inline feedback as the user types — email detected / phone detected /
-// invalid — so they know the field accepted their input.
-function IdentifierHint({ value }) {
-  if (!value) return null;
-  const parsed = parseIdentifier(value);
-  if (!parsed) {
-    return <p className="mt-1 text-xs text-red-500">Format tidak dikenali. Masukkan email atau nomor HP.</p>;
-  }
-  if (parsed.type === "email") {
-    return <p className="mt-1 text-xs text-emerald-600">Email terdeteksi.</p>;
-  }
-  return <p className="mt-1 text-xs text-emerald-600">Nomor HP: {parsed.phone}</p>;
-}
-
-// ── Typed field hint (register form) ──────────────────────────────────────────
-// The register form has dedicated Email and Nomor HP fields (both required), so
-// each one validates against a single expected type rather than accepting either.
+// ── Typed field hint ──────────────────────────────────────────────────────────
+// Both the login Email field and the register Email/Nomor HP fields validate
+// against a single expected type rather than accepting either.
 function TypedHint({ value, expect }) {
   if (!value) return null;
   const parsed = parseIdentifier(value);
@@ -134,7 +119,7 @@ function LoginForm({ onSuccess }) {
   const [pending, setPending] = useState(false);
 
   const identifierParsed = parseIdentifier(identifier);
-  const canSubmit = !!identifierParsed && password.length >= 1 && !pending;
+  const canSubmit = identifierParsed?.type === "email" && password.length >= 1 && !pending;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -145,7 +130,7 @@ function LoginForm({ onSuccess }) {
       await login({ identifier, password });
       onSuccess();
     } catch (err) {
-      setError(err.message ?? "Gagal masuk. Periksa email/nomor HP dan kata sandi.");
+      setError(err.message ?? "Gagal masuk. Periksa email dan kata sandi.");
     } finally {
       setPending(false);
     }
@@ -155,17 +140,17 @@ function LoginForm({ onSuccess }) {
     <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
       <div>
         <InputField
-          label="Email atau Nomor HP"
-          type="text"
-          placeholder="nama@email.com atau 0812..."
+          label="Email"
+          type="email"
+          placeholder="nama@email.com"
           id="login-identifier"
           required
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
-          autoComplete="username"
+          autoComplete="email"
           inputMode="email"
         />
-        <IdentifierHint value={identifier} />
+        <TypedHint value={identifier} expect="email" />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -468,7 +453,7 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
             </h1>
             <p className="mt-0.5 text-sm text-gray-500">
               {tab === "login"
-                ? "Masuk dengan email atau nomor HP dan kata sandimu."
+                ? "Masuk dengan email dan kata sandimu."
                 : "Daftar dengan email dan nomor HP, lalu buat kata sandi."}
             </p>
           </div>
