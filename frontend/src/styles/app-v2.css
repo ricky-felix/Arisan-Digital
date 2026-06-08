@@ -200,6 +200,25 @@
 }
 @keyframes v2SheetUp { from{transform:translateY(100%);} to{transform:translateY(0);} }
 
+/* Desktop / tablet: a bottom sheet reads as a mobile affordance stuck to the
+   bottom of a wide screen. Past phone width, present it as a centered modal
+   dialog instead — all corners rounded, vertically centred, scrollable, and
+   the grab-handle hidden (pointer devices don't drag sheets). */
+@media (min-width: 700px) {
+  .v2-sheet-backdrop { align-items: center; }
+  .v2-sheet {
+    border-radius: 24px;
+    max-height: min(88vh, 760px);
+    overflow-y: auto;
+    animation: v2SheetPop .22s cubic-bezier(.34,1.1,.64,1);
+  }
+  .v2-sheet .sheet-grabber { display: none; }
+}
+@keyframes v2SheetPop {
+  from { opacity: 0; transform: translateY(12px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .v2-sheet .sheet-grabber {
   width: 36px; height: 4px; border-radius: 99px;
   background: var(--line); margin: 12px auto 20px;
@@ -2033,3 +2052,272 @@
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+/* =============================================================
+   PAYMENT METHOD SELECTOR — peer/payer bottom sheet
+   Scoped under .v2-payment-selector to avoid collisions.
+   ============================================================= */
+
+/* ── Sheet structure overrides ─────────────────────────────── */
+.v2-payment-selector .pms-sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88%;
+  display: flex;
+  flex-direction: column;
+  animation: v2SheetUp .3s cubic-bezier(.34,1.1,.64,1);
+  overflow: hidden;
+}
+
+/* Desktop: centered modal, all-corners rounded, scrollable */
+@media (min-width: 700px) {
+  .v2-payment-selector .pms-sheet {
+    border-radius: 24px;
+    max-height: min(88vh, 760px);
+    animation: v2SheetPop .22s cubic-bezier(.34,1.1,.64,1);
+  }
+  .v2-payment-selector .pms-grabber { display: none; }
+  .v2-payment-selector.v2-sheet-backdrop { align-items: center; }
+}
+
+/* Grabber pill */
+.v2-payment-selector .pms-grabber {
+  width: 36px; height: 4px; border-radius: 999px;
+  background: var(--line); margin: 10px auto 0; flex-shrink: 0;
+}
+
+/* ── Sheet header ──────────────────────────────────────────── */
+.v2-payment-selector .pms-header {
+  padding: 14px 20px 12px; flex-shrink: 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.v2-payment-selector .pms-title {
+  font-size: 15px; font-weight: 800; color: var(--ink-1);
+  letter-spacing: -.02em; margin-bottom: 3px;
+}
+.v2-payment-selector .pms-sub {
+  font-size: 12px; font-weight: 500; color: var(--ink-3); line-height: 1.4;
+}
+
+/* ── Payee identity row ────────────────────────────────────── */
+.v2-payment-selector .pms-payee-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px; border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0;
+}
+.v2-payment-selector .pms-payee-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--lavender-dark); color: white;
+  display: grid; place-items: center;
+  font-size: 14px; font-weight: 800; flex-shrink: 0;
+}
+.v2-payment-selector .pms-payee-info { flex: 1; }
+.v2-payment-selector .pms-payee-name {
+  font-size: 14px; font-weight: 700; color: var(--ink-1);
+}
+.v2-payment-selector .pms-payee-sub {
+  font-size: 11px; font-weight: 500; color: var(--ink-3); margin-top: 1px;
+}
+.v2-payment-selector .pms-amount-chip {
+  font-size: 14px; font-weight: 800; color: var(--lavender-dark);
+  background: var(--lavender-tint); padding: 5px 10px;
+  border-radius: 10px; flex-shrink: 0;
+}
+
+/* ── Scrollable methods list ───────────────────────────────── */
+.v2-payment-selector .pms-scroll {
+  flex: 1; overflow-y: auto; scrollbar-width: none;
+}
+.v2-payment-selector .pms-scroll::-webkit-scrollbar { display: none; }
+.v2-payment-selector .pms-methods-list {
+  padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+
+/* ── Selectable method card ────────────────────────────────── */
+.v2-payment-selector .pms-card {
+  border: 2px solid var(--line); border-radius: 14px;
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s;
+  background: var(--surface);
+}
+.v2-payment-selector .pms-card:hover {
+  border-color: var(--lavender); background: var(--lavender-tint);
+}
+.v2-payment-selector .pms-card.selected {
+  border-color: var(--lavender-dark); background: var(--lavender-tint);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.10);
+}
+
+/* Selection radio ring */
+.v2-payment-selector .pms-radio {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--line); flex-shrink: 0;
+  display: grid; place-items: center;
+  transition: border-color .15s; background: white;
+  position: relative;
+}
+.v2-payment-selector .pms-card.selected .pms-radio {
+  border-color: var(--lavender-dark);
+}
+.v2-payment-selector .pms-card.selected .pms-radio::after {
+  content: ''; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--lavender-dark);
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Type icon tile */
+.v2-payment-selector .pms-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center; flex-shrink: 0;
+  background: var(--lavender-soft); color: var(--lavender-dark);
+}
+.v2-payment-selector .pms-icon.bank  { background: #e0f2fe; color: #0369a1; }
+.v2-payment-selector .pms-icon.qris  { background: #fce7f3; color: #9d174d; }
+
+/* Method info body */
+.v2-payment-selector .pms-body { flex: 1; min-width: 0; }
+.v2-payment-selector .pms-label-row {
+  font-size: 14px; font-weight: 700; color: var(--ink-1);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+
+/* Type chip (E-Wallet / Bank / QRIS) */
+.v2-payment-selector .pms-type-chip {
+  font-size: 10px; font-weight: 700; color: var(--ink-3);
+  background: var(--gray-soft); border-radius: 4px;
+  padding: 1px 5px; flex-shrink: 0;
+}
+
+/* Primary badge (★ UTAMA) */
+.v2-payment-selector .pms-primary-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 1px 6px; border-radius: 99px;
+  background: var(--lavender-soft); color: var(--lavender-dark);
+  font-size: 9px; font-weight: 800; letter-spacing: .05em;
+  text-transform: uppercase; flex-shrink: 0;
+}
+
+/* ── Masked number display — core privacy UX ─────────────────
+   The API sends "••••7890" (last-4 masked server-side).
+   We split: value.slice(0,-4) → mask-dots, value.slice(-4) → mask-last4.
+   Bullet chars (U+2022) render more consistently than asterisks
+   across Android/iOS. ────────────────────────────────────────  */
+.v2-payment-selector .pms-masked-number {
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+  margin-top: 3px; display: flex; align-items: center; gap: 6px;
+  font-variant-numeric: tabular-nums; letter-spacing: .02em;
+}
+.v2-payment-selector .pms-mask-dots {
+  color: var(--ink-3); font-size: 14px; letter-spacing: 1px; line-height: 1;
+}
+.v2-payment-selector .pms-mask-last4 {
+  color: var(--ink-1); font-weight: 700; font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Holder name (full — needed for bank confirmation) */
+.v2-payment-selector .pms-holder {
+  font-size: 11px; font-weight: 600; color: var(--ink-3); margin-top: 2px;
+}
+
+/* ── QRIS thumbnail row ─────────────────────────────────────── */
+.v2-payment-selector .pms-qris-thumb-row {
+  display: flex; align-items: center; gap: 10px; margin-top: 8px;
+  padding: 8px 10px; background: var(--gray-soft); border-radius: 8px;
+}
+.v2-payment-selector .pms-qris-thumb {
+  width: 44px; height: 44px; border-radius: 6px; flex-shrink: 0;
+  background: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 100%);
+  display: grid; place-items: center;
+  font-size: 9px; font-weight: 700; color: var(--ink-3); text-align: center;
+  overflow: hidden;
+}
+.v2-payment-selector .pms-qris-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.v2-payment-selector .pms-qris-thumb-info { flex: 1; }
+.v2-payment-selector .pms-qris-thumb-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-2);
+}
+.v2-payment-selector .pms-qris-thumb-hint {
+  font-size: 10px; font-weight: 500; color: var(--ink-3); margin-top: 2px;
+}
+
+/* ── Privacy note ──────────────────────────────────────────── */
+.v2-payment-selector .pms-privacy-note {
+  margin: 0 16px 12px; background: var(--line-soft);
+  border-radius: 10px; padding: 8px 12px;
+  display: flex; align-items: flex-start; gap: 8px; flex-shrink: 0;
+}
+.v2-payment-selector .pms-privacy-icon {
+  color: var(--ink-3); flex-shrink: 0; margin-top: 1px;
+}
+.v2-payment-selector .pms-privacy-text {
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  line-height: 1.45; margin: 0;
+}
+
+/* ── Empty state (payee has no methods) ───────────────────── */
+.v2-payment-selector .pms-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px 24px; text-align: center; gap: 10px;
+}
+.v2-payment-selector .pms-empty-icon {
+  width: 56px; height: 56px; border-radius: 18px;
+  background: var(--gray-soft); color: var(--ink-3);
+  display: grid; place-items: center; margin-bottom: 4px;
+}
+.v2-payment-selector .pms-empty-title {
+  font-size: 14px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em;
+}
+.v2-payment-selector .pms-empty-desc {
+  font-size: 12px; font-weight: 500; color: var(--ink-3);
+  line-height: 1.5; max-width: 240px; margin: 0;
+}
+
+/* ── Loading skeleton ──────────────────────────────────────── */
+.v2-payment-selector .pms-skeleton {
+  padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.v2-payment-selector .pms-skeleton-card {
+  height: 70px; border-radius: 14px;
+  background: var(--gray-soft); animation: pmsSkeleton 1.4s ease-in-out infinite;
+}
+@keyframes pmsSkeleton {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .55; }
+}
+
+/* ── Action bar (fixed at bottom of sheet) ─────────────────── */
+.v2-payment-selector .pms-actions {
+  padding: 12px 16px 24px; flex-shrink: 0;
+  border-top: 1px solid var(--line-soft);
+}
+.v2-payment-selector .pms-btn-primary {
+  width: 100%; padding: 14px;
+  background: var(--lavender-dark); color: white; border: none;
+  border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  box-shadow: 0 4px 14px rgba(139,92,246,.30);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: transform .1s; margin-bottom: 8px;
+}
+.v2-payment-selector .pms-btn-primary:active { transform: scale(.98); }
+.v2-payment-selector .pms-btn-primary:disabled {
+  opacity: .55; cursor: not-allowed; transform: none;
+}
+.v2-payment-selector .pms-btn-secondary {
+  width: 100%; padding: 11px; background: transparent; border: none;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ink-3);
+  cursor: pointer;
+}
+.v2-payment-selector .pms-btn-close {
+  width: 100%; padding: 13px;
+  background: var(--gray-soft); border: none; border-radius: 14px;
+  font-family: inherit; font-size: 14px; font-weight: 700; color: var(--ink-1);
+  cursor: pointer; transition: background .15s;
+}
+.v2-payment-selector .pms-btn-close:hover { background: var(--line-soft); }

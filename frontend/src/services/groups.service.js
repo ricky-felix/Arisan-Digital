@@ -54,7 +54,7 @@ export const groupMembersService = {
   /**
    * Add a member to a group
    * @param {string} groupId - Group ID
-   * @param {Object} data - Member data
+   * @param {Object} data - Member data ({ user_id, group_role? })
    * @returns {Promise<Object>} Added member
    */
   add: (groupId, data) => api.post(`/groups/${groupId}/members`, data),
@@ -62,20 +62,34 @@ export const groupMembersService = {
   /**
    * Remove a member from a group
    * @param {string} groupId - Group ID
-   * @param {string} memberId - Member ID
+   * @param {string} userId - User ID (backend route is /:userId, not /:memberId)
    * @returns {Promise<void>}
    */
-  remove: (groupId, memberId) => api.delete(`/groups/${groupId}/members/${memberId}`),
+  remove: (groupId, userId) => api.delete(`/groups/${groupId}/members/${userId}`),
 
   /**
-   * Assign giliran (turn order) to a member
+   * Assign giliran (turn order) for one or more members.
+   * Backend: POST /groups/:groupId/members/assign-giliran
+   * Body: { assignments: [{ user_id: string, giliran_order: number }] }
+   *
+   * Previously this was PATCH …/:memberId/giliran — that route does not exist.
+   *
    * @param {string} groupId - Group ID
-   * @param {string} memberId - Member ID
-   * @param {Object} data - Giliran assignment data
-   * @returns {Promise<Object>} Updated member
+   * @param {{ assignments: Array<{ user_id: string, giliran_order: number }> }} data
+   * @returns {Promise<Object>}
    */
-  assignGiliran: (groupId, memberId, data) =>
-    api.patch(`/groups/${groupId}/members/${memberId}/giliran`, data),
+  assignGiliran: (groupId, data) =>
+    api.post(`/groups/${groupId}/members/assign-giliran`, data),
+
+  /**
+   * Randomly shuffle the giliran order for all members in a group.
+   * Backend: POST /groups/:groupId/members/random-shuffle
+   *
+   * @param {string} groupId - Group ID
+   * @returns {Promise<Object>}
+   */
+  randomShuffle: (groupId) =>
+    api.post(`/groups/${groupId}/members/random-shuffle`),
 };
 
 /**
@@ -83,58 +97,125 @@ export const groupMembersService = {
  */
 export const roundsService = {
   /**
-   * Get all rounds for a specific group
+   * Get all rounds for a specific group.
+   * Backend: GET /groups/:groupId/rounds
+   *
+   * Previously used /rounds/group/:groupId — that route does not exist.
+   *
    * @param {string} groupId - Group ID
    * @returns {Promise<Array>} List of rounds
    */
-  list: (groupId) => api.get(`/rounds/group/${groupId}`),
+  list: (groupId) => api.get(`/groups/${groupId}/rounds`),
 
   /**
-   * Get the current active round for a group
+   * Get the current (active) round for a group.
+   * There is no dedicated /current endpoint on the backend.
+   * This helper calls list() and picks the round with status 'active',
+   * falling back to the last round in the array if none is active.
+   *
    * @param {string} groupId - Group ID
-   * @returns {Promise<Object>} Current round details
+   * @returns {Promise<Object|null>} The active round, or null if no rounds exist
    */
-  getCurrent: (groupId) => api.get(`/rounds/group/${groupId}/current`),
+  getCurrent: async (groupId) => {
+    const rounds = await roundsService.list(groupId);
+    if (!Array.isArray(rounds) || rounds.length === 0) return null;
+    return rounds.find(r => r.status === 'active') ?? rounds[rounds.length - 1];
+  },
 
   /**
-   * Set the recipient for a round
+   * Get a single round by ID.
+   * Backend: GET /rounds/:id
+   *
    * @param {string} roundId - Round ID
-   * @param {Object} data - Recipient assignment data
+   * @returns {Promise<Object>} Round details
+   */
+  getById: (roundId) => api.get(`/rounds/${roundId}`),
+
+  /**
+   * Set the recipient for a round.
+   * Backend: PATCH /rounds/:id/recipient
+   * Body: { recipient_id: string (UUID) }
+   *
+   * @param {string} roundId - Round ID
+   * @param {{ recipient_id: string }} data
    * @returns {Promise<Object>} Updated round
    */
   setRecipient: (roundId, data) => api.patch(`/rounds/${roundId}/recipient`, data),
 
   /**
-   * Perform a random draw for a round
+   * Activate a round.
+   * Backend: POST /rounds/:id/activate
+   *
    * @param {string} roundId - Round ID
-   * @returns {Promise<Object>} Draw result with selected recipient
+   * @returns {Promise<Object>} Activated round
    */
-  draw: (roundId) => api.post(`/rounds/${roundId}/draw`),
+  activate: (roundId) => api.post(`/rounds/${roundId}/activate`),
+
+  /**
+   * Mark a round as complete.
+   * Backend: POST /rounds/:id/complete
+   *
+   * @param {string} roundId - Round ID
+   * @returns {Promise<Object>} Completed round
+   */
+  complete: (roundId) => api.post(`/rounds/${roundId}/complete`),
+
+  // NOTE: draw() has been removed. The backend has no /draw endpoint.
+  // Recipient selection is done via setRecipient() (manual) or
+  // groupMembersService.randomShuffle() (random order assignment).
 };
 
 /**
- * Invite links service for managing group invitations
+ * Invite links service for managing group invitations.
+ *
+ * Backend controller: @Controller('invites')
+ * All routes are under /invites (NOT /invite-links — the old prefix no longer exists).
  */
 export const inviteLinksService = {
   /**
-   * Create an invite link for a group
+   * Create an invite link for a group.
+   * Backend: POST /invites
+   * Body: { group_id: string (UUID), max_uses?: number, expires_at?: string (ISO date) }
+   *
+   * Previously posted to /invite-links — that route does not exist.
+   *
    * @param {string} groupId - Group ID
-   * @param {Object} data - Invite link configuration (expiry, max uses, etc.)
-   * @returns {Promise<Object>} Created invite link
+   * @param {{ max_uses?: number, expires_at?: string }} data
+   * @returns {Promise<Object>} Created invite link (includes .token used for redeeming)
    */
-  create: (groupId, data) => api.post(`/invite-links`, { group_id: groupId, ...data }),
+  create: (groupId, data) => api.post(`/invites`, { group_id: groupId, ...data }),
 
   /**
-   * Validate an invite code
-   * @param {string} code - Invite code
-   * @returns {Promise<Object>} Validation result with group details
+   * List all invite links for a group.
+   * Backend: GET /invites/group/:groupId
+   *
+   * @param {string} groupId - Group ID
+   * @returns {Promise<Array>} List of invite links
    */
-  validate: (code) => api.get(`/invite-links/validate/${code}`),
+  listForGroup: (groupId) => api.get(`/invites/group/${groupId}`),
 
   /**
-   * Join a group using an invite code
-   * @param {string} code - Invite code
+   * Revoke (deactivate) an invite link by its record ID.
+   * Backend: PATCH /invites/:id/revoke
+   *
+   * @param {string} id - Invite link record ID
+   * @returns {Promise<Object>} Revoked invite link
+   */
+  revoke: (id) => api.patch(`/invites/${id}/revoke`),
+
+  /**
+   * Redeem an invite token — joins the current user to the group.
+   * Backend: POST /invites/redeem/:token
+   *
+   * This is the single join-by-token action. There is no separate validate
+   * endpoint on the backend; client-side token format checks are done in
+   * useInvite.js before calling this method.
+   *
+   * Previously split into validate() (GET …/validate/:code) and
+   * join() (POST …/join/:code) — neither route exists.
+   *
+   * @param {string} token - Invite token (from the invite link)
    * @returns {Promise<Object>} Joined group details
    */
-  join: (code) => api.post(`/invite-links/join/${code}`),
+  redeem: (token) => api.post(`/invites/redeem/${token}`),
 };

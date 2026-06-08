@@ -13,20 +13,20 @@ function getInitials(name) {
 }
 
 /**
- * AvatarContent — renders the inner content of a profile avatar based on auth
- * state: a registered user gets their initials, a guest (anonymous / unnamed)
- * gets the generic person icon. Styling (size, color, shape) lives on the
- * wrapping element; this only renders the glyph/text.
+ * AvatarContent — renders the inner content of a profile avatar.
+ * All users are now authenticated (Workstream C4 — no anonymous sessions).
+ * A named user gets their initials; a user whose profile hasn't loaded yet
+ * (or has no name set) gets the generic person icon as a temporary fallback.
  *
  * Props:
- *   iconSize {number} – px size for the guest fallback icon
+ *   iconSize {number} – px size for the fallback icon
  */
 export default function AvatarContent({ iconSize = 18 }) {
-  const { profile, isAnonymous } = useAuth();
+  const { profile } = useAuth();
   const name = profile?.name?.trim();
-  const isGuest = isAnonymous || !name || name === "Tamu" || name === "Guest";
 
-  if (isGuest) {
+  // Fallback to person icon while profile is loading or name is unset.
+  if (!name) {
     return <UserSingle size={iconSize} stroke="white" strokeWidth={2.25} />;
   }
   return getInitials(name);

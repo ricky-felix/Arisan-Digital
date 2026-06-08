@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "./components/application/AppLayout";
@@ -35,27 +35,21 @@ import Gabung from "./pages/application/v2/Gabung";
 import BuatArisan from "./pages/application/v2/BuatArisan";
 import BuatPatungan from "./pages/application/v2/BuatPatungan";
 import NotFoundApp from "./pages/application/v2/NotFoundApp";
+// v2 secondary screens (Workstream A)
+import EditProfil from "./pages/application/v2/EditProfil";
+import MetodePembayaran from "./pages/application/v2/MetodePembayaran";
+import KeamananPin from "./pages/application/v2/KeamananPin";
+import Bantuan from "./pages/application/v2/Bantuan";
+import RiwayatTransaksi from "./pages/application/v2/RiwayatTransaksi";
+import Onboarding from "./pages/application/v2/Onboarding";
+import RekeningPayout from "./pages/application/v2/RekeningPayout";
+import Bahasa from "./pages/application/v2/Bahasa";
 
-// ── Landing + modal overlay on /login ────────────────────────
-// Both "/" and "/login" render this SAME component, so React keeps the
-// single <LandingPage /> instance mounted when navigating between them.
-// That stops every framer-motion `whileInView` reveal from replaying
-// (which read as a full-page blink). The login modal is just toggled on
-// top via AnimatePresence based on the current path.
+// ── Landing page shell ────────────────────────────────────────
+// "/" renders the marketing landing page. "/login" redirects to the new
+// real auth route "/masuk" (kept for any old inbound links).
 function LandingShell() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const showLogin = location.pathname === "/login";
-  return (
-    <>
-      <LandingPage />
-      <AnimatePresence>
-        {showLogin && (
-          <LoginOrRegister key="login-modal" onClose={() => navigate("/")} onSuccess={() => navigate("/app")} />
-        )}
-      </AnimatePresence>
-    </>
-  );
+  return <LandingPage />;
 }
 
 // ── Pre-launch access gate ────────────────────────────────────
@@ -114,37 +108,30 @@ function AppGate({ children }) {
   );
 }
 
-// ── App routes are open in this MVP (no login). We just wait for
-//    the anonymous session to bootstrap, and surface a setup hint if
-//    anonymous auth hasn't been enabled in Supabase yet. The whole app
-//    sits behind <AppGate> until launch. ───────────────────────────
+// ── ProtectedRoute ────────────────────────────────────────────
+// Requires a real authenticated session. Unauthenticated users are
+// redirected to /masuk with the originally-requested path preserved as
+// `returnTo` in both the query string and location state, so that after
+// login the user lands exactly where they intended (invite deep-links work).
 function ProtectedRoute({ children }) {
-  const { user, loading, authError } = useAuth();
-  if (loading) return <AppLoadingScreen />;
-  if (authError) return <AuthSetupScreen error={authError} />;
-  if (!user) return <AppLoadingScreen />;
-  return <AppGate>{children}</AppGate>;
-}
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
-// ── Shown when the anonymous session can't be created ─────────
-function AuthSetupScreen({ error }) {
-  return (
-    <div className="flex min-h-svh items-center justify-center bg-gray-50 p-6">
-      <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="text-lg font-bold text-gray-900">Perlu satu langkah setup</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          WebApp memakai sesi anonim Supabase agar bisa dipakai tanpa login.
-          Aktifkan dulu di dashboard Supabase:
-          <br />
-          <span className="font-medium text-gray-800">
-            Authentication → Sign In / Providers → Anonymous
-          </span>
-          , lalu muat ulang halaman ini.
-        </p>
-        <p className="mt-3 rounded-lg bg-gray-50 p-2 font-mono text-xs text-gray-500">{error}</p>
-      </div>
-    </div>
-  );
+  if (loading) return <AppLoadingScreen />;
+
+  if (!isAuthenticated) {
+    // Build the returnTo value from the current path + search.
+    const returnTo = location.pathname + location.search;
+    return (
+      <Navigate
+        to={`/masuk?returnTo=${encodeURIComponent(returnTo)}`}
+        state={{ returnTo }}
+        replace
+      />
+    );
+  }
+
+  return <AppGate>{children}</AppGate>;
 }
 
 // ── Full-screen loading while auth resolves ───────────────────
@@ -174,8 +161,8 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
   const [isVisible, setIsVisible] = useState(false);
 
-  // Only show on landing pages
-  const isLanding = pathname === "/" || pathname === "/login";
+  // Only show on the marketing landing page
+  const isLanding = pathname === "/";
 
   useEffect(() => {
     if (!isLanding) { setIsVisible(false); return; }
@@ -214,20 +201,26 @@ function AppRoutes() {
     <>
       <SkipToContent />
       <Routes>
-        {/* Public — same element for both paths keeps LandingPage mounted */}
+        {/* Public landing page */}
         <Route path="/" element={<LandingShell />} />
-        {/* <Route path="/login" element={<LandingShell />} /> */}
+        {/* Real auth page — required login gate (Workstream C4) */}
+        <Route path="/masuk" element={<LoginOrRegister />} />
+        {/* Legacy /login redirect → /masuk for any old inbound links */}
+        <Route path="/login" element={<Navigate to="/masuk" replace />} />
 
-        {/* App routes (open — anonymous session, no login) */}
-        {/* v2 screens replace /app, /app/notifikasi, /app/profil */}
+        {/* App routes — all gated behind ProtectedRoute (real login required, C4) */}
+        {/* v2 screens: /app, /app/notifikasi, /app/profil, etc. */}
         <Route path="/app" element={<ProtectedRoute><HomeDeck /></ProtectedRoute>} />
         <Route path="/app/notifikasi" element={<ProtectedRoute><Notifikasi /></ProtectedRoute>} />
         <Route path="/app/dompet" element={<ProtectedRoute><Dompet /></ProtectedRoute>} />
         <Route path="/app/anggota" element={<ProtectedRoute><MembersOrbit /></ProtectedRoute>} />
+        <Route path="/app/anggota/:id" element={<ProtectedRoute><MembersOrbit /></ProtectedRoute>} />
         <Route path="/app/grup" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
+        <Route path="/app/grup/:id" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
         <Route path="/app/profil" element={<ProtectedRoute><Profil /></ProtectedRoute>} />
         <Route path="/app/bukti" element={<ProtectedRoute><BuktiTransfer /></ProtectedRoute>} />
         <Route path="/app/undang" element={<ProtectedRoute><Undang /></ProtectedRoute>} />
+        <Route path="/app/undang/:id" element={<ProtectedRoute><Undang /></ProtectedRoute>} />
         <Route path="/app/gabung" element={<ProtectedRoute><GabungMasuk /></ProtectedRoute>} />
         <Route path="/app/gabung/preview" element={<ProtectedRoute><Gabung /></ProtectedRoute>} />
         {/* Legacy / supporting routes — unchanged */}
@@ -241,6 +234,17 @@ function AppRoutes() {
         <Route path="/app/patungan/buat" element={<ProtectedRoute><BuatPatungan /></ProtectedRoute>} />
         <Route path="/app/patungan/rutin" element={<ProtectedRoute><AppLayout title="Patungan"><PatunganPage /></AppLayout></ProtectedRoute>} />
         <Route path="/app/patungan/:billId" element={<ProtectedRoute><BillDetailPage /></ProtectedRoute>} />
+
+        {/* ── Workstream A: secondary profil pages ── */}
+        <Route path="/app/profil/edit"       element={<ProtectedRoute><EditProfil /></ProtectedRoute>} />
+        <Route path="/app/profil/pembayaran" element={<ProtectedRoute><MetodePembayaran /></ProtectedRoute>} />
+        <Route path="/app/profil/keamanan"   element={<ProtectedRoute><KeamananPin /></ProtectedRoute>} />
+        <Route path="/app/profil/bantuan"    element={<ProtectedRoute><Bantuan /></ProtectedRoute>} />
+        <Route path="/app/profil/rekening"   element={<ProtectedRoute><RekeningPayout /></ProtectedRoute>} />
+        <Route path="/app/profil/bahasa"     element={<ProtectedRoute><Bahasa /></ProtectedRoute>} />
+        {/* ── Workstream A: standalone screens ── */}
+        <Route path="/app/riwayat"           element={<ProtectedRoute><RiwayatTransaksi /></ProtectedRoute>} />
+        <Route path="/app/onboarding"        element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
 
         {/* In-app 404 — any unknown /app/* path, still behind the access gate */}
         <Route path="/app/*" element={<ProtectedRoute><NotFoundApp /></ProtectedRoute>} />

@@ -1,8 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, Share, Send, Check, Users, Split } from "../../../components/application/v2/icons";
+import { useInvite } from "../../../hooks/useInvite";
+import { groupsService, groupMembersService } from "../../../services";
+import { Share, Send, Check, Users, Split } from "../../../components/application/v2/icons";
+import ScreenHeader from "../../../components/application/v2/ScreenHeader";
 import FauxQr from "../../../components/application/v2/undang/FauxQr";
 import { INVITE } from "../../../components/application/v2/undang/data";
 
@@ -21,7 +24,79 @@ import { INVITE } from "../../../components/application/v2/undang/data";
 export default function Undang() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { group, link, joined, pending } = INVITE;
+  // Route may include /app/undang/:groupId — fall back to INVITE static data.
+  const { id: groupId } = useParams();
+
+  // Live group metadata and members
+  const [liveGroup, setLiveGroup] = useState(null);
+  const [liveJoined, setLiveJoined] = useState(null);
+
+  useEffect(() => {
+    if (!groupId) return;
+    let cancelled = false;
+    async function load() {
+      try {
+        // TODO(wave2-auth): Supabase session token required.
+        const [groupData, membersData] = await Promise.all([
+          groupsService.getById(groupId),
+          groupMembersService.list(groupId),
+        ]);
+        if (cancelled) return;
+        setLiveGroup(groupData);
+        setLiveJoined(Array.isArray(membersData) ? membersData : null);
+      } catch (err) {
+        console.error('[Undang] failed to load group:', err.message);
+        // Keep static INVITE data as fallback
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [groupId]);
+
+  // Create/refresh the invite link for this group
+  const { invite, createInvite } = useInvite(groupId ?? null);
+
+  useEffect(() => {
+    if (groupId) {
+      // TODO(wave2-auth): Supabase session token required.
+      createInvite().catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId]);
+
+  // Merge live data with static fallback
+  const staticInvite = INVITE;
+  const group = liveGroup
+    ? {
+        name: liveGroup.name,
+        type: liveGroup.group_type ?? 'arisan',
+        typeLabel: (liveGroup.group_type ?? 'arisan') === 'arisan' ? 'Arisan' : 'Patungan',
+        members: liveGroup.member_count ?? staticInvite.group.members,
+        capacity: liveGroup.max_members ?? staticInvite.group.capacity,
+        admin: staticInvite.group.admin,
+      }
+    : staticInvite.group;
+
+  // Joined members list: map API shape → { initials, name, role, color }
+  const COLORS = ['#10b981','#f59e0b','#8b5cf6','#3b82f6','#ec4899','#ef4444'];
+  const joined = liveJoined
+    ? liveJoined.map((m, i) => {
+        const name = m.display_name ?? m.member_name ?? 'Anggota';
+        const initials = name.trim().split(/\s+/).map(p => p[0]).join('').toUpperCase().slice(0, 2);
+        return {
+          initials,
+          name,
+          role: m.role === 'admin' ? 'Admin' : 'Anggota',
+          color: COLORS[i % COLORS.length],
+        };
+      })
+    : staticInvite.joined;
+
+  const pending = liveJoined ? 0 : staticInvite.pending;
+
+  // Invite link: use live invite code if available, else static fallback
+  const link = invite?.link ?? staticInvite.link;
+
   const isArisan = group.type === "arisan";
   const [copied, setCopied] = useState(false);
 
@@ -69,22 +144,8 @@ export default function Undang() {
       */}
       <div className="w-full min-h-svh bg-app-bg overflow-y-auto overflow-x-hidden flex flex-col items-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-        {/* Sticky nav bar — replaces .undang-nav */}
-        <div className="w-full min-h-14 flex items-center gap-3 px-5 bg-surface border-b border-line-soft sticky top-0 z-10 lg:px-[max(clamp(24px,5vw,64px),calc(50%-600px))]">
-          <button
-            type="button"
-            aria-label="Kembali"
-            onClick={() => navigate(-1)}
-            className="w-8.5 h-8.5 rounded-[10px] bg-gray-soft grid place-items-center shrink-0 cursor-pointer text-ink-1 transition-colors hover:bg-line"
-          >
-            <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
-          </button>
-
-          {/* Title — replaces .undang-nav-title */}
-          <span className="flex-1 text-[17px] font-extrabold text-ink-1 tracking-[-0.02em]">
-            Undang Anggota
-          </span>
-
+        {/* Sticky nav bar */}
+        <ScreenHeader title="Undang Anggota" onBack={() => navigate(-1)}>
           <button
             type="button"
             aria-label="Bagikan undangan"
@@ -93,7 +154,7 @@ export default function Undang() {
           >
             <Share size={16} stroke="currentColor" strokeWidth={2} />
           </button>
-        </div>
+        </ScreenHeader>
 
         {/*
           Centered content column — replaces .undang-col:

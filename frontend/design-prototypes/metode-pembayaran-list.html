@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metode Pembayaran — List &amp; Management</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── Accent: lavender (patungan-adjacent, matches payment context) ── */
+:root {
+  --accent:       var(--lavender-dark);
+  --accent-mid:   var(--lavender);
+  --accent-soft:  var(--lavender-soft);
+  --accent-tint:  var(--lavender-tint);
+  --btn-shadow:   rgba(139,92,246,.30);
+}
+
+/* ── Nav bar (mirrors ScreenHeader pattern) ── */
+.nav-bar {
+  background: var(--surface);
+  height: 52px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0;
+  gap: 10px;
+  position: sticky; top: 0; z-index: 20;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; color: var(--ink-1);
+  transition: background .15s;
+}
+.back-btn:hover { background: var(--line); }
+.nav-title { flex: 1; font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; }
+.nav-save-btn {
+  height: 34px; padding: 0 14px;
+  background: var(--accent); border: none; border-radius: 11px;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: white;
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer; flex-shrink: 0;
+  transition: opacity .15s;
+}
+.nav-save-btn:active { opacity: .85; }
+
+/* ── Scrollable content ── */
+.mp-screen {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  background: var(--app-bg);
+  scrollbar-width: none;
+  padding-bottom: 28px;
+}
+.mp-screen::-webkit-scrollbar { display: none; }
+
+/* ── Content column ── */
+.mp-col {
+  padding: 20px 20px 0;
+}
+.mp-eyebrow {
+  font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em;
+  margin-bottom: 4px;
+}
+.mp-sub {
+  font-size: 13px; font-weight: 500; color: var(--ink-3); line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* ── Migration banner (legacy v0 data) ── */
+.migration-banner {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 16px;
+}
+.migration-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: #fef3c7; color: #d97706;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.migration-body { flex: 1; }
+.migration-title {
+  font-size: 12px; font-weight: 800; color: #92400e; margin-bottom: 3px;
+}
+.migration-desc {
+  font-size: 11px; font-weight: 500; color: #b45309; line-height: 1.45;
+  margin-bottom: 8px;
+}
+.migration-btn {
+  font-size: 11px; font-weight: 700; color: #92400e;
+  background: #fde68a; border: none; border-radius: 8px;
+  padding: 5px 10px; cursor: pointer; font-family: inherit;
+}
+
+/* ── Methods list card ── */
+.methods-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-1), var(--sh-2);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+/* ── Single method row ── */
+.method-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  transition: background .1s;
+  position: relative;
+}
+.method-row + .method-row { border-top: 1px solid var(--line-soft); }
+.method-row:hover { background: var(--gray-soft); }
+
+/* Primary radio / selector */
+.primary-radio {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--line);
+  display: grid; place-items: center;
+  flex-shrink: 0; cursor: pointer;
+  transition: border-color .15s;
+  background: white;
+}
+.primary-radio.active {
+  border-color: var(--accent);
+}
+.primary-radio.active::after {
+  content: '';
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Type icon tile */
+.method-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--lavender-soft); color: var(--lavender-dark);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  font-size: 13px; font-weight: 800;
+}
+.method-icon.bank { background: #e0f2fe; color: #0369a1; }
+.method-icon.qris { background: #fce7f3; color: #9d174d; }
+
+/* Method info */
+.method-info { flex: 1; min-width: 0; }
+.method-label {
+  font-size: 14px; font-weight: 700; color: var(--ink-1);
+  display: flex; align-items: center; gap: 6px;
+  line-height: 1.2;
+}
+.primary-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 1px 6px; border-radius: 99px;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+  flex-shrink: 0;
+}
+.method-detail {
+  font-size: 12px; font-weight: 600; color: var(--ink-3); margin-top: 2px;
+  display: flex; align-items: center; gap: 5px;
+}
+.method-type-chip {
+  font-size: 10px; font-weight: 700; color: var(--ink-2);
+  background: var(--gray-soft); border-radius: 4px; padding: 1px 5px;
+}
+
+/* Action buttons */
+.method-actions {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.action-btn {
+  width: 32px; height: 32px; border-radius: 9px;
+  border: none; display: grid; place-items: center;
+  cursor: pointer; transition: background .15s;
+}
+.action-btn.edit { background: var(--lavender-soft); color: var(--lavender-dark); }
+.action-btn.edit:hover { background: var(--accent-soft); }
+.action-btn.delete { background: #fee2e2; color: var(--danger); }
+.action-btn.delete:hover { background: #fecaca; }
+
+/* ── Add method button ── */
+.add-method-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-top: 1px solid var(--line-soft);
+  transition: background .1s;
+}
+.add-method-row:hover { background: var(--gray-soft); }
+.add-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--accent-tint); border: 1.5px dashed var(--accent-mid);
+  display: grid; place-items: center; color: var(--accent);
+  flex-shrink: 0;
+}
+.add-label {
+  font-size: 14px; font-weight: 700; color: var(--accent);
+}
+
+/* ── Empty state ── */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.empty-icon {
+  width: 64px; height: 64px; border-radius: 20px;
+  background: var(--lavender-tint); color: var(--accent);
+  display: grid; place-items: center;
+  margin-bottom: 4px;
+}
+.empty-title {
+  font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em;
+}
+.empty-desc {
+  font-size: 13px; font-weight: 500; color: var(--ink-3); line-height: 1.5;
+  max-width: 260px;
+}
+.empty-add-btn {
+  margin-top: 4px;
+  padding: 12px 24px; border-radius: 14px;
+  background: var(--accent); color: white; border: none;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; letter-spacing: -.01em;
+  display: flex; align-items: center; gap: 7px;
+  transition: opacity .15s;
+  box-shadow: 0 4px 14px var(--btn-shadow);
+}
+.empty-add-btn:active { opacity: .85; }
+
+/* ── Info / consent note ── */
+.info-note {
+  background: var(--accent-tint);
+  border-radius: 14px; padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-top: 16px;
+}
+.info-icon { color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+.info-text {
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  line-height: 1.5;
+}
+.info-text strong { font-weight: 800; }
+
+/* ── Delete confirm modal ── */
+.modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(17,24,39,.50);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: 20px;
+  backdrop-filter: blur(3px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+}
+.modal-backdrop.open { opacity: 1; pointer-events: all; }
+.modal-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  width: 100%;
+  transform: scale(.94) translateY(8px);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-backdrop.open .modal-card { transform: scale(1) translateY(0); }
+.modal-icon-wrap {
+  width: 48px; height: 48px; border-radius: 16px;
+  background: #fee2e2; display: grid; place-items: center;
+  margin: 0 auto 14px; color: var(--danger);
+}
+.modal-title {
+  font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em;
+  text-align: center; margin-bottom: 6px;
+}
+.modal-desc {
+  font-size: 13px; font-weight: 500; color: var(--ink-3); line-height: 1.5;
+  text-align: center; margin-bottom: 20px;
+}
+.modal-actions { display: flex; gap: 10px; }
+.modal-btn-cancel {
+  flex: 1; padding: 12px; border-radius: 12px;
+  background: var(--gray-soft); border: none;
+  font-family: inherit; font-size: 14px; font-weight: 700; color: var(--ink-2);
+  cursor: pointer;
+}
+.modal-btn-danger {
+  flex: 1; padding: 12px; border-radius: 12px;
+  background: var(--danger); border: none;
+  font-family: inherit; font-size: 14px; font-weight: 700; color: white;
+  cursor: pointer;
+}
+
+/* ── Toast ── */
+.mp-toast {
+  position: absolute; bottom: 24px; left: 16px; right: 16px;
+  background: #111827; color: white;
+  border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700; z-index: 300;
+  transform: translateY(12px); opacity: 0;
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+}
+.mp-toast.show { opacity: 1; transform: translateY(0); }
+.mp-toast-icon {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); display: grid; place-items: center;
+}
+.mp-toast-icon.danger { background: var(--danger); }
+
+/* ── Section divider for "showing empty state" toggle ── */
+.state-toggle {
+  display: flex; gap: 6px; margin-bottom: 16px;
+}
+.state-toggle-btn {
+  flex: 1; padding: 7px 10px; border-radius: 10px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  font-family: inherit; font-size: 11px; font-weight: 700; color: var(--ink-2);
+  cursor: pointer; transition: all .15s;
+  text-align: center;
+}
+.state-toggle-btn.active {
+  background: var(--accent); border-color: var(--accent); color: white;
+}
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;gap:40px;flex-wrap:wrap;">
+
+<!-- ═══════════════════════════════════════════
+     FRAME 1: Populated state (2 methods)
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">List — 2 metode disimpan</div>
+  <div class="phone-frame" id="frame1" style="position:relative;">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav bar -->
+    <div class="nav-bar">
+      <button class="back-btn" aria-label="Kembali">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="nav-title">Metode Pembayaran</span>
+    </div>
+
+    <!-- Screen -->
+    <div class="mp-screen">
+      <div class="mp-col">
+        <p class="mp-eyebrow">Cara kamu menerima pembayaran</p>
+        <p class="mp-sub">Anggota grup melihat detail ini saat membayarmu. Detail lengkap terlihat jika bertransaksi dalam grup yang sama.</p>
+
+        <!-- Methods card -->
+        <div class="methods-card">
+
+          <!-- Method 1: BCA (primary) -->
+          <div class="method-row">
+            <div class="primary-radio active" title="Metode utama" aria-label="Utama"></div>
+            <div class="method-icon bank">
+              <!-- Bank icon -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+            </div>
+            <div class="method-info">
+              <div class="method-label">
+                BCA Utama
+                <span class="primary-badge">
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  Utama
+                </span>
+              </div>
+              <div class="method-detail">
+                <span class="method-type-chip">Bank</span>
+                Ricky Felix
+              </div>
+            </div>
+            <div class="method-actions">
+              <button class="action-btn edit" aria-label="Edit" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="action-btn delete" aria-label="Hapus" title="Hapus" onclick="openDeleteModal('frame1')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Method 2: GoPay (not primary) -->
+          <div class="method-row">
+            <div class="primary-radio" title="Jadikan utama" aria-label="Jadikan utama"></div>
+            <div class="method-icon">
+              <!-- Wallet/phone icon for e-wallet -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            </div>
+            <div class="method-info">
+              <div class="method-label">GoPay</div>
+              <div class="method-detail">
+                <span class="method-type-chip">E-Wallet</span>
+                0812 3456 789
+              </div>
+            </div>
+            <div class="method-actions">
+              <button class="action-btn edit" aria-label="Edit" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="action-btn delete" aria-label="Hapus" title="Hapus" onclick="openDeleteModal('frame1')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add new method row -->
+          <div class="add-method-row" onclick="showToast('frame1', 'Membuka form tambah metode…')">
+            <div class="add-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <span class="add-label">Tambah Metode Pembayaran</span>
+          </div>
+
+        </div><!-- /methods-card -->
+
+        <!-- Info / consent note -->
+        <div class="info-note">
+          <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p class="info-text">
+            <strong>Arisan Digital tidak menyimpan atau memproses uangmu.</strong>
+            Detail ini dipakai semata agar anggota grup bisa mentransfer langsung ke rekeningmu — tidak melalui aplikasi.
+          </p>
+        </div>
+
+      </div>
+    </div><!-- /mp-screen -->
+
+    <!-- Delete confirm modal -->
+    <div class="modal-backdrop" id="deleteModal-frame1">
+      <div class="modal-card">
+        <div class="modal-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </div>
+        <div class="modal-title">Hapus Metode Pembayaran?</div>
+        <p class="modal-desc">Hapus metode pembayaran ini? Anggota grup tidak bisa membayar ke rekening ini lagi.</p>
+        <div class="modal-actions">
+          <button class="modal-btn-cancel" onclick="closeDeleteModal('frame1')">Batal</button>
+          <button class="modal-btn-danger" onclick="confirmDelete('frame1')">Hapus</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="mp-toast" id="toast-frame1">
+      <div class="mp-toast-icon" id="toastIcon-frame1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span id="toastMsg-frame1">Metode pembayaran dihapus</span>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 2: Empty state (no methods)
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Empty state — belum ada metode</div>
+  <div class="phone-frame" id="frame2" style="position:relative;">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav bar -->
+    <div class="nav-bar">
+      <button class="back-btn" aria-label="Kembali">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="nav-title">Metode Pembayaran</span>
+    </div>
+
+    <!-- Screen -->
+    <div class="mp-screen">
+      <div class="mp-col">
+        <p class="mp-eyebrow">Cara kamu menerima pembayaran</p>
+        <p class="mp-sub">Tambahkan rekening bank, e-wallet, atau QRIS agar anggota grup bisa langsung membayarmu.</p>
+
+        <!-- Empty state card -->
+        <div class="methods-card">
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="empty-title">Belum ada metode pembayaran</div>
+            <p class="empty-desc">Tambahkan satu agar anggota grup bisa membayarmu langsung tanpa perlu tanya rekening lagi.</p>
+            <button class="empty-add-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah Metode Pertama
+            </button>
+          </div>
+        </div>
+
+        <!-- Info note -->
+        <div class="info-note">
+          <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p class="info-text">
+            <strong>Arisan Digital tidak menyimpan atau memproses uangmu.</strong>
+            Detail ini dipakai semata agar anggota grup bisa mentransfer langsung ke rekeningmu — tidak melalui aplikasi.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 3: Legacy migration banner
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Migration banner (data v0 lama)</div>
+  <div class="phone-frame" id="frame3" style="position:relative;">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav bar -->
+    <div class="nav-bar">
+      <button class="back-btn" aria-label="Kembali">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="nav-title">Metode Pembayaran</span>
+    </div>
+
+    <!-- Screen -->
+    <div class="mp-screen">
+      <div class="mp-col">
+        <p class="mp-eyebrow">Cara kamu menerima pembayaran</p>
+        <p class="mp-sub">Lengkapi detail akun agar anggota grup bisa langsung membayarmu.</p>
+
+        <!-- Migration banner -->
+        <div class="migration-banner">
+          <div class="migration-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="migration-body">
+            <div class="migration-title">Format lama terdeteksi</div>
+            <p class="migration-desc">Kami perbarui format metode pembayaran. Silakan lengkapi detail akun agar anggota grup bisa membayarmu langsung.</p>
+            <button class="migration-btn">Lengkapi Sekarang</button>
+          </div>
+        </div>
+
+        <!-- Stale methods (legacy) — showing partially-migrated state -->
+        <div class="methods-card">
+
+          <!-- Method with incomplete data — needs attention -->
+          <div class="method-row" style="opacity:.7;">
+            <div class="primary-radio" style="border-style:dashed;"></div>
+            <div class="method-icon bank">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+            </div>
+            <div class="method-info">
+              <div class="method-label" style="color:var(--ink-2);">BCA</div>
+              <div class="method-detail" style="color:#d97706;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Detail belum dilengkapi
+              </div>
+            </div>
+            <div class="method-actions">
+              <button class="action-btn edit" aria-label="Lengkapi" title="Lengkapi detail" style="background:#fef3c7;color:#b45309;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- GoPay also incomplete -->
+          <div class="method-row" style="opacity:.7;">
+            <div class="primary-radio" style="border-style:dashed;"></div>
+            <div class="method-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            </div>
+            <div class="method-info">
+              <div class="method-label" style="color:var(--ink-2);">GoPay</div>
+              <div class="method-detail" style="color:#d97706;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Detail belum dilengkapi
+              </div>
+            </div>
+            <div class="method-actions">
+              <button class="action-btn edit" aria-label="Lengkapi" style="background:#fef3c7;color:#b45309;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add new row -->
+          <div class="add-method-row">
+            <div class="add-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <span class="add-label">Tambah Metode Pembayaran</span>
+          </div>
+
+        </div>
+
+        <!-- Info note -->
+        <div class="info-note">
+          <svg class="info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p class="info-text">
+            <strong>Arisan Digital tidak menyimpan atau memproses uangmu.</strong>
+            Detail ini dipakai semata agar anggota grup bisa mentransfer langsung ke rekeningmu.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+</div><!-- /flex row -->
+
+<script>
+function openDeleteModal(frameId) {
+  document.getElementById('deleteModal-' + frameId).classList.add('open');
+}
+function closeDeleteModal(frameId) {
+  document.getElementById('deleteModal-' + frameId).classList.remove('open');
+}
+function confirmDelete(frameId) {
+  closeDeleteModal(frameId);
+  showToast(frameId, 'Metode pembayaran dihapus', true);
+}
+
+let toastTimers = {};
+function showToast(frameId, msg, isDanger) {
+  const toast = document.getElementById('toast-' + frameId);
+  const icon = document.getElementById('toastIcon-' + frameId);
+  document.getElementById('toastMsg-' + frameId).textContent = msg;
+  if (isDanger) icon.classList.add('danger'); else icon.classList.remove('danger');
+  toast.classList.add('show');
+  if (toastTimers[frameId]) clearTimeout(toastTimers[frameId]);
+  toastTimers[frameId] = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

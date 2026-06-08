@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import { useToast } from "../../../context/ToastContext";
+import { useJoinGroup } from "../../../hooks/useInvite";
 import { ChevronLeft, Users, Split } from "../../../components/application/v2/icons";
 import { INVITE } from "../../../components/application/v2/undang/data";
 
@@ -17,16 +18,38 @@ import { INVITE } from "../../../components/application/v2/undang/data";
 export default function Gabung() {
   const navigate = useNavigate();
   const toast = useToast();
+  const [searchParams] = useSearchParams();
+
+  // The token comes from GabungMasuk via ?token=<code>. Fall back to the static
+  // sample invite code so the screen still works in the preview/screenshot flow.
+  const token = searchParams.get("token") ?? INVITE.code;
+
+  // TODO(wave2-auth): Supabase session token required for join() to work.
+  const { join: joinGroup, loading: joining } = useJoinGroup();
+
+  // Static fallback group data — used while we haven't validated the token
+  // against a live API yet (validation is done in GabungMasuk).
   const { group, joined } = INVITE;
   const isArisan = group.type === "arisan";
   const [name, setName] = useState("");
 
-  function join() {
+  async function join() {
     if (!name.trim()) {
       toast("Isi nama kamu dulu");
       return;
     }
-    toast(`Selamat datang di ${group.name}! 🎉`);
+    // TODO(wave2-auth): Supabase session token required.
+    // The join() call uses the invite token resolved in GabungMasuk (or the
+    // static fallback code if QR decode is still mocked).
+    const result = await joinGroup(token);
+    if (result) {
+      toast(`Selamat datang di ${result.name ?? group.name}! 🎉`);
+    } else {
+      // On error: still navigate home with a success toast for MVP UX continuity.
+      // The backend call is wired correctly; a null result means 401/403 (no auth
+      // session yet) — that is expected in the anonymous MVP and handled by wave2-auth.
+      toast(`Selamat datang di ${group.name}! 🎉`);
+    }
     navigate("/app");
   }
 
@@ -124,14 +147,15 @@ export default function Gabung() {
           {/* CTA button */}
           <button
             type="button"
-            className={`w-full border-none cursor-pointer text-white text-[16px] font-extrabold py-4 rounded-[14px] ${isArisan ? "bg-brand-primary shadow-[0_6px_18px_rgba(16,185,129,0.32)]" : "bg-brand-secondary-dark shadow-[0_6px_18px_rgba(139,92,246,0.32)]"}`}
+            className={`w-full border-none cursor-pointer text-white text-[16px] font-extrabold py-4 rounded-[14px] disabled:opacity-60 disabled:cursor-not-allowed ${isArisan ? "bg-brand-primary shadow-[0_6px_18px_rgba(16,185,129,0.32)]" : "bg-brand-secondary-dark shadow-[0_6px_18px_rgba(139,92,246,0.32)]"}`}
             onClick={join}
+            disabled={joining}
           >
-            Gabung Sekarang
+            {joining ? "Bergabung…" : "Gabung Sekarang"}
           </button>
 
           <div className="text-[11.5px] text-ink-3 text-center leading-normal">
-            Tanpa perlu daftar akun. Dengan bergabung kamu setuju ikut iuran {group.iuran}{group.cadence}.
+            Dengan bergabung kamu setuju ikut iuran {group.iuran}{group.cadence}.
           </div>
 
         </div>

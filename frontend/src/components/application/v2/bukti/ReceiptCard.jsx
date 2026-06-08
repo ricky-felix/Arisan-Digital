@@ -18,6 +18,11 @@
 //   refNo          {string} – Reference/transaction number in the sub-card.
 //   onCopyRef      {function} – Click handler to copy refNo to the clipboard.
 //   accentColor    {string} – CSS color for accented values (amount, method, ref).
+//   rowMethod      {Object|null} – Optional. When present, renders a "Ke Rekening"
+//                    row showing the method selected in PaymentMethodSelector.
+//                    Shape: { label: string, masked: string, holder?: string }
+//                    where `masked` is the API value "••••7890".
+//                    Example: { label: "BCA Utama", masked: "••••7890", holder: "Ari Nugraha" }
 
 import { Check, Copy } from "../icons";
 import DetailRow from "./DetailRow";
@@ -44,6 +49,7 @@ export default function ReceiptCard({
   refNo,
   onCopyRef,
   accentColor,
+  rowMethod = null,
 }) {
   return (
     /* bukti-paper: mx-4 mt-4 rounded-[20px] surface bg, complex shadow, overflow-hidden */
@@ -136,6 +142,40 @@ export default function ReceiptCard({
         >
           {amount}
         </DetailRow>
+
+        {/*
+          "Ke Rekening" row — shown when the payer selected a specific
+          payment method via PaymentMethodSelector (Phase 3).
+          Mirrors the design prototype Frame 4:
+            label row  : method.label (e.g. "BCA Utama") in accent color
+            number row : • • • • 7890 (split from masked "••••7890")
+            holder row : a.n. Ari Nugraha (when holder_name present)
+        */}
+        {rowMethod && (
+          <DetailRow label="Ke Rekening">
+            <span style={{ color: accentColor }} className="block font-bold">
+              {rowMethod.label}
+            </span>
+            {rowMethod.masked && (() => {
+              const last4 = rowMethod.masked.slice(-4);
+              return (
+                <span
+                  className="block text-[13px] font-semibold text-ink-1 mt-0.5"
+                  style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '.02em' }}
+                  aria-label={`Nomor berakhiran ${last4}`}
+                >
+                  <span className="text-ink-3" aria-hidden="true">•&nbsp;•&nbsp;•&nbsp;•&nbsp;</span>
+                  <strong>{last4}</strong>
+                </span>
+              );
+            })()}
+            {rowMethod.holder && (
+              <span className="block text-[11px] font-medium text-ink-3 mt-0.5">
+                a.n. {rowMethod.holder}
+              </span>
+            )}
+          </DetailRow>
+        )}
 
         <DetailRow label="Tanggal">
           5 Jun 2026, 09:41 WIB

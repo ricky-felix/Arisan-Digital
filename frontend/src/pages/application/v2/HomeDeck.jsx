@@ -4,7 +4,9 @@ import "../../../styles/app-v2.css";
 import PaySheet from "../../../components/application/v2/PaySheet";
 import ComposeSheet from "../../../components/application/v2/ComposeSheet";
 import CoachMarks from "../../../components/application/v2/CoachMarks";
+import PaymentMethodSelector from "../../../components/application/v2/metodePembayaran/PaymentMethodSelector";
 import { useToast } from "../../../context/ToastContext";
+import { useHomeCards } from "../../../hooks/useGroups";
 
 // First-run coach-mark gate. Defaults to "seen" if storage is unavailable so a
 // private-mode visitor is never trapped, and skips the dev /screens/* capture
@@ -17,7 +19,12 @@ import SegFilter from "../../../components/application/v2/home/SegFilter";
 import StoryCard from "../../../components/application/v2/home/StoryCard";
 import EmptyCard from "../../../components/application/v2/home/EmptyCard";
 
-export default function HomeDeck({ cards = ALL_CARDS }) {
+// HomeDeck accepts an optional `cards` prop (used by Storybook / screenshot
+// routes). When omitted it fetches live data from the API via useHomeCards.
+export default function HomeDeck({ cards: cardsProp }) {
+  // Live data — falls back to ALL_CARDS on API error (see useHomeCards).
+  const { cards: liveCards, loading: cardsLoading } = useHomeCards();
+  const cards = cardsProp ?? liveCards;
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,6 +32,8 @@ export default function HomeDeck({ cards = ALL_CARDS }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [paidCards, setPaidCards] = useState({});
   const [paySheet, setPaySheet] = useState({ open: false, card: null });
+  // PaymentMethodSelector — shown for patungan peer-to-peer pay when payeeUserId is known.
+  const [methodSelector, setMethodSelector] = useState({ open: false, card: null });
   const [composeOpen, setComposeOpen] = useState(false);
   const [coachOpen, setCoachOpen] = useState(() => {
     if (location.pathname.startsWith("/screens")) return false;
@@ -102,12 +111,50 @@ export default function HomeDeck({ cards = ALL_CARDS }) {
 
   function handleCta(card) {
     if (card.ctaType === "pay") {
-      openPaySheet(card);
+      // Patungan peer-to-peer: if the card carries a payeeUserId, show the
+      // PaymentMethodSelector before navigating to BuktiTransfer.
+      // TODO(wire-payee-id): patungan cards from the live API need to include
+      // `payeeUserId` and `payeeName` so the selector can fetch masked methods.
+      if (card.destType === "patungan" && card.payeeUserId) {
+        setMethodSelector({ open: true, card });
+      } else {
+        // Arisan group-wallet pay (or patungan card without payeeUserId yet):
+        // continue with the existing PaySheet confirm flow.
+        openPaySheet(card);
+      }
     } else if (card.ctaType === "remind" || card.ctaType === "collect") {
       fireReminder(card);
     } else if (card.ctaType === "proof") {
       navigate(`/app/bukti?type=${card.type}`);
     }
+  }
+
+  /**
+   * Called by PaymentMethodSelector "Lanjutkan" — navigate to BuktiTransfer
+   * passing the selected method's details as query params so the receipt can
+   * show the "Ke Rekening" row (Frame 4 of the designer prototype).
+   */
+  function handleMethodSelected(selectedMethod) {
+    const card = methodSelector.card;
+    setMethodSelector({ open: false, card: null });
+    if (!card) return;
+    // Build the BuktiTransfer URL with the chosen method encoded as query params.
+    const params = new URLSearchParams({
+      type: card.destType ?? 'patungan',
+      ...(card.billId      && { billId:      card.billId }),
+      ...(card.payeeUserId && { toUserId:    card.payeeUserId }),
+      ...(card.payerUserId && { fromUserId:  card.payerUserId }),
+      ...(card.amount      && { amount:      String(card.amount).replace(/\D/g, '') }),
+      // Selected method details for the receipt "Ke Rekening" row
+      methodId:    selectedMethod.id,
+      methodLabel: selectedMethod.label,
+      // Pass the masked value (account_number for bank, phone for ewallet)
+      methodMasked: selectedMethod.account_number ?? selectedMethod.phone ?? '',
+      ...(selectedMethod.holder_name && { methodHolder: selectedMethod.holder_name }),
+    });
+    navigate(`/app/bukti?${params.toString()}`);
+    // Mark the card as paid in the deck so the "paid" overlay renders immediately.
+    setPaidCards(p => ({ ...p, [card.id]: true }));
   }
 
   // Background color drives the screen bg (visible behind the card deck on
@@ -132,12 +179,16 @@ export default function HomeDeck({ cards = ALL_CARDS }) {
 
         {/* Story segments */}
         <div className="story-bar">
-          {visibleCards.map((c, i) => (
-            <div
-              key={c.id}
-              className={`story-seg${i === safeIdx ? " active" : i < safeIdx ? " past" : ""}`}
-            />
-          ))}
+          {/* While loading, render a single dimmed segment as a placeholder */}
+          {cardsLoading && cardsProp == null
+            ? <div className="story-seg" style={{ opacity: 0.3 }} />
+            : visibleCards.map((c, i) => (
+              <div
+                key={c.id}
+                className={`story-seg${i === safeIdx ? " active" : i < safeIdx ? " past" : ""}`}
+              />
+            ))
+          }
         </div>
 
         <StoryTopBar
@@ -226,7 +277,7 @@ export default function HomeDeck({ cards = ALL_CARDS }) {
 
       </div>
 
-      {/* Pay sheet (portal-like, fixed) */}
+      {/* Pay sheet — arisan group-wallet payments (portal-like, fixed) */}
       {paySheet.open && paySheet.card && (
         <PaySheet
           open={paySheet.open}
@@ -237,6 +288,23 @@ export default function HomeDeck({ cards = ALL_CARDS }) {
           destType={paySheet.card.destType}
           onPaid={handlePaid}
           onDest={() => { closePaySheet(); navigate("/app/grup"); }}
+        />
+      )}
+
+      {/* Payment Method Selector — patungan peer-to-peer payments.
+          Shown when a card carries a payeeUserId (Phase-3 wire-up).
+          TODO(wire-payee-id): arisan cards with ctaType="pay" always pay into
+          a group wallet, so they keep using PaySheet above and never reach here.
+          For patungan cards the live API must supply card.payeeUserId and
+          card.payeeName once the backend bill-detail endpoint is available. */}
+      {methodSelector.open && methodSelector.card && (
+        <PaymentMethodSelector
+          payeeUserId={methodSelector.card.payeeUserId}
+          payeeName={methodSelector.card.payeeName ?? methodSelector.card.destName ?? ''}
+          contextLabel={methodSelector.card.eyebrow ?? ''}
+          amount={methodSelector.card.amount ?? ''}
+          onContinue={handleMethodSelected}
+          onCancel={() => setMethodSelector({ open: false, card: null })}
         />
       )}
     </div>

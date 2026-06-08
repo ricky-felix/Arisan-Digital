@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -35,9 +36,13 @@ import { UsageModule } from './usage/usage.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { StorageModule } from './storage/storage.module';
 
+// ── Scheduler ────────────────────────────────────────────────────
+import { SchedulerModule } from './scheduler/scheduler.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     SupabaseModule,
 
     UsersModule,
@@ -64,6 +69,8 @@ import { StorageModule } from './storage/storage.module';
 
     ContactsModule,
     StorageModule,
+
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

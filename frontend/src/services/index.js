@@ -13,3 +13,5 @@ export * from './bills.service';
 export * from './notifications.service';
 export * from './contacts.service';
 export * from './storage.service';
+export * from './transactions.service';
+export * from './paymentMethods.service';

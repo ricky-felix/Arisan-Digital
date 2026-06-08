@@ -1,10 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import { ChevronLeft, ChevronRight, Users, QrJoin } from "../../../components/application/v2/icons";
+import { ChevronRight, Users, QrJoin } from "../../../components/application/v2/icons";
+import ScreenHeader from "../../../components/application/v2/ScreenHeader";
 import { useToast } from "../../../context/ToastContext";
-import { createGroup, hasCreatedSomething, useAuth, useAccountPrompt } from "../v1/mockData";
+import { useCreateGroup } from "../../../hooks/useCreateGroup";
+// C4: hasCreatedSomething import removed (firstTime logic no longer needed).
+import { useAccountPrompt } from "../../../context/AccountPromptContext";
+// C4: useAuth removed from BuatArisan — isAnonymous no longer used.
 import { formatRupiah } from "../../../utils/formatRupiah";
+
+// Arisan group categories — emerald-accented picker (mirrors the patungan
+// category grid). `id` is persisted; `emoji` + `label` are display-only.
+const CATEGORIES = [
+  { id: "keluarga", label: "Keluarga", emoji: "👨‍👩‍👧" },
+  { id: "kantor", label: "Kantor", emoji: "💼" },
+  { id: "teman", label: "Teman", emoji: "🧑‍🤝‍🧑" },
+  { id: "komunitas", label: "Komunitas", emoji: "🤝" },
+  { id: "sekolah", label: "Sekolah", emoji: "🎓" },
+  { id: "lainnya", label: "Lainnya", emoji: "···" },
+];
 
 /**
  * BuatArisan — v2 create-arisan flow, single step.
@@ -25,12 +40,14 @@ import { formatRupiah } from "../../../utils/formatRupiah";
 export default function BuatArisan() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { isAnonymous } = useAuth();
+  // C4: promptRegister is a no-op (AccountPromptContext neutralised — all
+  // users are authenticated, no deferred registration nudge needed).
   const { promptRegister } = useAccountPrompt();
-  const [saving, setSaving] = useState(false);
+  const { saving, createGroup } = useCreateGroup();
   const [form, setForm] = useState({
     name: "",
     description: "",
+    category: "keluarga",
     amount: "",
     frequency: "monthly",
     method: "manual",
@@ -44,51 +61,36 @@ export default function BuatArisan() {
 
   const submit = async () => {
     if (!canSubmit || saving) return;
-    const firstTime = !hasCreatedSomething();
-    setSaving(true);
-    try {
-      await createGroup({
-        name: form.name.trim(),
-        description: form.description.trim(),
-        amount: amountNum,
-        frequency: form.frequency,
-        method: form.method,
-        startDate: form.startDate,
-        members: [], // members join via the invite link / QR
-      });
+
+    // TODO(wave2-auth): Supabase session token required for createGroup.
+    const group = await createGroup({
+      name: form.name.trim(),
+      description: form.description.trim(),
+      category: form.category,
+      amount: amountNum,
+      frequency: form.frequency,
+      method: form.method,
+      startDate: form.startDate,
+    });
+
+    if (group) {
       toast("Arisan dibuat! Undang anggota sekarang.", "success");
-      navigate("/app/undang");
-      if (firstTime && isAnonymous) {
-        promptRegister("Arisan pertamamu sudah dibuat 🎉 Daftar gratis agar tidak hilang.");
-      }
-    } catch (err) {
-      toast(err.message || "Gagal membuat arisan", "error");
-      setSaving(false);
+      // Navigate to Undang with the new group id so the invite link is auto-created.
+      navigate(group.id ? `/app/undang/${group.id}` : "/app/undang");
+      // C4: promptRegister is a no-op — user is always authenticated now.
+    } else {
+      toast("Gagal membuat arisan. Coba lagi.", "error");
     }
   };
 
   return (
     <div className="v2-screen">
-      {/* Full-bleed scrollable column — hides native scrollbar */}
-      <div className="relative flex min-h-svh w-full flex-1 flex-col overflow-y-auto bg-app-bg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="v2-inner" style={{ overflowY: "auto" }}>
 
-        {/* Sticky header — full-width surface, content padded to centered column */}
-        <div className="sticky top-0 z-10 flex min-h-14 w-full shrink-0 items-center gap-3 border-b border-line-soft bg-surface px-[max(20px,calc(50%-240px))] lg:px-[max(20px,calc(50%-280px))]">
-          <button
-            className="grid h-8.5 w-8.5 shrink-0 cursor-pointer place-items-center rounded-[10px] border-none bg-gray-soft text-ink-1 transition-colors hover:bg-line"
-            onClick={() => navigate("/app")}
-            aria-label="Kembali"
-            type="button"
-          >
-            <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
-          </button>
-          <span className="flex-1 text-[17px] font-extrabold tracking-[-0.02em] text-ink-1">
-            Buat Arisan
-          </span>
-        </div>
+        <ScreenHeader title="Buat Arisan" onBack={() => navigate("/app")} />
 
-        {/* Body — centered content column */}
-        <div className="mx-auto flex w-full max-w-120 flex-1 flex-col gap-3.5 px-4 pb-6 pt-4 lg:max-w-140 lg:gap-4 lg:pt-6">
+        {/* ── Content column ── */}
+        <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col gap-3.5 px-5 pb-6 pt-4 lg:max-w-[600px] lg:gap-4 lg:px-6">
 
           {/*
             Live preview hero — emerald gradient with two decorative blob circles.
@@ -134,6 +136,32 @@ export default function BuatArisan() {
                 Deskripsi <span className="font-medium text-ink-3">(opsional)</span>
               </label>
               <input className="v2-input" placeholder="Contoh: Arisan rekan kerja" value={form.description} onChange={set("description")} />
+            </div>
+
+            {/* Kategori — emerald-accented emoji grid (mirrors patungan) */}
+            <div className="mt-3.5 flex flex-col gap-1.5">
+              <label className="text-[13px] font-bold text-ink-1">Kategori</label>
+              <div className="grid grid-cols-3 gap-2">
+                {CATEGORIES.map((c) => {
+                  const active = form.category === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, category: c.id }))}
+                      className={
+                        "flex cursor-pointer flex-col items-center gap-1 rounded-[10px] border px-1 py-2.5 font-[inherit] text-[12px] font-bold transition-colors " +
+                        (active
+                          ? "border-brand-primary bg-brand-primary-tint text-brand-primary-hover"
+                          : "border-line bg-surface text-ink-2 hover:bg-gray-soft")
+                      }
+                    >
+                      <span className="text-[18px] leading-none">{c.emoji}</span>
+                      {c.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Iuran per Ronde — Rp prefix absolutely positioned inside the input */}
@@ -185,19 +213,10 @@ export default function BuatArisan() {
 
         </div>
 
-        {/*
-          Sticky action footer.
-          The gradient fade (bg-app-bg → transparent) is applied via an inline
-          style because it uses env(safe-area-inset-bottom) together with calc()
-          in the padding, which Tailwind cannot express without a custom class.
-          bg-linear-to-t from-app-bg is used for the visual fade; safe-area
-          bottom padding uses CSS directly so notch devices are respected.
-        */}
+        {/* ── Sticky action footer — aligned to the content column ── */}
         <div
-          className="sticky bottom-0 flex w-full shrink-0 gap-2.5 bg-linear-to-t from-app-bg to-transparent pt-3.5"
-          style={{
-            padding: "14px max(16px, calc(50% - 240px + 16px)) calc(16px + env(safe-area-inset-bottom, 0px))",
-          }}
+          className="sticky bottom-0 mx-auto flex w-full max-w-[480px] shrink-0 gap-2.5 bg-linear-to-t from-app-bg to-transparent px-5 pt-3.5 lg:max-w-[600px] lg:px-6"
+          style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))" }}
         >
           <button
             className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-none bg-brand-primary p-4 text-[15px] font-extrabold tracking-[-0.01em] text-white shadow-[0_10px_22px_var(--color-brand-primary-tint)] transition-[filter,transform] hover:not-disabled:brightness-105 active:not-disabled:scale-[.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"

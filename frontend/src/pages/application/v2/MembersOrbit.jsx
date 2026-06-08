@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import { ChevronLeft } from "../../../components/application/v2/icons";
-import { MEMBERS, DANCE_PARAMS, RADIUS_MOBILE, RADIUS_DESKTOP, ORBIT_DUR, AV_HALF } from "../../../components/application/v2/members/data";
+import ScreenHeader from "../../../components/application/v2/ScreenHeader";
+import { DANCE_PARAMS, RADIUS_MOBILE, RADIUS_DESKTOP, ORBIT_DUR, AV_HALF } from "../../../components/application/v2/members/data";
+import { useMembers } from "../../../hooks/useMembers";
 import Legend from "../../../components/application/v2/members/Legend";
 import SummaryStrip from "../../../components/application/v2/members/SummaryStrip";
 import MemberList from "../../../components/application/v2/members/MemberList";
@@ -21,6 +22,12 @@ import MemberList from "../../../components/application/v2/members/MemberList";
 
 export default function MembersOrbit() {
   const navigate = useNavigate();
+  // Route may include /app/anggota/:groupId
+  const { id: groupId } = useParams();
+
+  // Live members from API — falls back to static MEMBERS on error.
+  const { members: MEMBERS } = useMembers(groupId ?? null);
+
   const [revolving, setRevolving] = useState(false);
   const [ring1Rotate, setRing1Rotate] = useState(false);
   const [entered, setEntered] = useState([]);
@@ -45,14 +52,21 @@ export default function MembersOrbit() {
     return () => ro && ro.disconnect();
   }, []);
 
-  // Staggered entrance
+  // Staggered entrance — re-runs when members list changes (e.g. after API load).
+  // setEntered([]) is called via setTimeout(0) to avoid a synchronous setState
+  // inside an effect body (react-hooks/set-state-in-effect lint rule).
   useEffect(() => {
+    const ids = [];
+    const resetId = setTimeout(() => setEntered([]), 0);
+    ids.push(resetId);
     MEMBERS.forEach((_, i) => {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         setEntered(prev => [...prev, i]);
       }, 80 + i * 55);
+      ids.push(id);
     });
-  }, []);
+    return () => ids.forEach(clearTimeout);
+  }, [MEMBERS]);
 
   function toggleRotate(on) {
     setRevolving(on);
@@ -84,26 +98,8 @@ export default function MembersOrbit() {
     <div className="v2-screen">
       <div className="v2-inner overflow-y-auto">
 
-        {/* Header
-            Mobile:  bg-surface, sticky, min-h-14, px-5, flex items-center gap-3, border-b border-line-soft, z-10, shrink-0
-            Desktop: full-bleed with centered padding via arbitrary value */}
-        <div className="sticky top-0 z-10 flex min-h-14 shrink-0 items-center gap-3 border-b border-line-soft bg-surface px-5 lg:px-[max(clamp(24px,5vw,64px),calc(50%-600px))]">
-          {/* back-btn: 34×34, rounded-[10px], bg-gray-soft, grid place-items-center, text-ink-1 */}
-          <button
-            className="grid h-8.5 w-8.5 shrink-0 cursor-pointer place-items-center rounded-[10px] bg-gray-soft text-ink-1 transition-colors hover:bg-line"
-            aria-label="Kembali"
-            type="button"
-            onClick={() => navigate(-1)}
-          >
-            <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
-          </button>
-          <div>
-            {/* orbit-title: 17px/800/ink-1/tracking-[-0.02em] */}
-            <div className="text-[17px] font-extrabold tracking-[-0.02em] text-ink-1">Keluarga Sari</div>
-            {/* orbit-sub: 11px/500/ink-2 */}
-            <div className="text-[11px] font-medium text-ink-2">12 anggota · orbit bayar/belum</div>
-          </div>
-        </div>
+        {/* Header */}
+        <ScreenHeader title="Keluarga Sari" sub="12 anggota · orbit bayar/belum" onBack={() => navigate(-1)} />
 
         {/* Rotate toggle row
             Mobile:  flex items-center justify-end, pt-[10px] px-5, gap-2

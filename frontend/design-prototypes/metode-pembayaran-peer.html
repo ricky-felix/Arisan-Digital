@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilih Metode Pembayaran — Peer/Payer View</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --accent:       var(--lavender-dark);
+  --accent-mid:   var(--lavender);
+  --accent-soft:  var(--lavender-soft);
+  --accent-tint:  var(--lavender-tint);
+  --btn-shadow:   rgba(139,92,246,.30);
+}
+
+/* ── Base nav (the bill-detail / settlement screen below the sheet) ── */
+.base-nav {
+  background: var(--surface);
+  height: 52px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0; gap: 10px;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; color: var(--ink-1);
+}
+.base-nav-title { flex: 1; font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; }
+
+/* ── Dimmed bill-detail behind the sheet ── */
+.base-screen {
+  flex: 1; overflow-y: auto; background: var(--app-bg);
+  scrollbar-width: none; filter: brightness(.92);
+}
+.base-screen::-webkit-scrollbar { display: none; }
+.base-col { padding: 20px; }
+
+/* Small receipt summary (behind sheet, dimmed) */
+.receipt-mini {
+  background: linear-gradient(135deg, #3b0764 0%, #6d28d9 60%, #a78bfa 100%);
+  border-radius: 16px; padding: 16px;
+  margin-bottom: 14px;
+}
+.rm-label { font-size: 10px; font-weight: 800; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+.rm-title { font-size: 17px; font-weight: 800; color: white; letter-spacing: -.02em; margin-bottom: 10px; }
+.rm-row { display: flex; justify-content: space-between; align-items: center; }
+.rm-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); }
+.rm-amount { font-size: 20px; font-weight: 800; color: white; letter-spacing: -.03em; }
+
+/* ── Sheet overlay ── */
+.sheet-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(17,24,39,.45);
+  display: flex; align-items: flex-end;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+.sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-height: 88%;
+  display: flex; flex-direction: column;
+}
+.grabber {
+  width: 36px; height: 4px; border-radius: 999px;
+  background: var(--line); margin: 10px auto 0; flex-shrink: 0;
+}
+
+/* Sheet header */
+.sheet-header {
+  padding: 14px 20px 12px; flex-shrink: 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.sheet-title {
+  font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em;
+  margin-bottom: 3px;
+}
+.sheet-sub { font-size: 12px; font-weight: 500; color: var(--ink-3); line-height: 1.4; }
+
+/* Payee identity row */
+.payee-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0;
+}
+.payee-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--lavender-dark); color: white;
+  display: grid; place-items: center;
+  font-size: 14px; font-weight: 800; flex-shrink: 0;
+}
+.payee-info { flex: 1; }
+.payee-name { font-size: 14px; font-weight: 700; color: var(--ink-1); }
+.payee-sub { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-top: 1px; }
+.amount-chip {
+  font-size: 14px; font-weight: 800; color: var(--accent);
+  background: var(--accent-tint);
+  padding: 5px 10px; border-radius: 10px; flex-shrink: 0;
+}
+
+/* Methods list in sheet */
+.sheet-scroll {
+  flex: 1; overflow-y: auto;
+  scrollbar-width: none;
+}
+.sheet-scroll::-webkit-scrollbar { display: none; }
+.methods-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Peer method card (masked) */
+.peer-method-card {
+  border: 2px solid var(--line);
+  border-radius: 14px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all .15s;
+  background: var(--surface);
+}
+.peer-method-card:hover { border-color: var(--accent-mid); background: var(--accent-tint); }
+.peer-method-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.10);
+}
+
+/* Selection radio */
+.sel-radio {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--line); flex-shrink: 0;
+  display: grid; place-items: center;
+  transition: border-color .15s; background: white;
+}
+.peer-method-card.selected .sel-radio { border-color: var(--accent); }
+.peer-method-card.selected .sel-radio::after {
+  content: ''; width: 11px; height: 11px; border-radius: 50%; background: var(--accent);
+}
+
+/* Method icon */
+.peer-method-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center; flex-shrink: 0;
+  background: var(--lavender-soft); color: var(--lavender-dark);
+}
+.peer-method-icon.bank { background: #e0f2fe; color: #0369a1; }
+.peer-method-icon.qris { background: #fce7f3; color: #9d174d; }
+
+/* Method detail */
+.peer-method-body { flex: 1; min-width: 0; }
+.peer-method-label {
+  font-size: 14px; font-weight: 700; color: var(--ink-1);
+  display: flex; align-items: center; gap: 6px;
+}
+.primary-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 1px 6px; border-radius: 99px;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+  flex-shrink: 0;
+}
+/* ── MASKED number display — the core privacy UX ── */
+.masked-number {
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+  margin-top: 3px;
+  display: flex; align-items: center; gap: 6px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+.mask-dots {
+  /* Bullet characters render more consistently than CSS content tricks */
+  color: var(--ink-3); font-size: 14px; letter-spacing: 1px;
+  line-height: 1; vertical-align: middle;
+}
+.mask-last4 {
+  color: var(--ink-1); font-weight: 700; font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.method-type-chip {
+  font-size: 10px; font-weight: 700; color: var(--ink-3);
+  background: var(--gray-soft); border-radius: 4px;
+  padding: 1px 5px;
+}
+
+/* Holder name — shown in full (needed for bank confirmation) */
+.holder-name {
+  font-size: 11px; font-weight: 600; color: var(--ink-3); margin-top: 2px;
+}
+
+/* ── QRIS thumbnail block ── */
+.qris-thumb-row {
+  display: flex; align-items: center; gap: 10px; margin-top: 8px;
+  padding: 8px 10px; background: var(--gray-soft); border-radius: 8px;
+}
+.qris-thumb {
+  width: 44px; height: 44px; border-radius: 6px; flex-shrink: 0;
+  background: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 100%);
+  display: grid; place-items: center; font-size: 9px; font-weight: 700; color: var(--ink-3); text-align: center;
+}
+.qris-thumb-info { flex: 1; }
+.qris-thumb-label { font-size: 11px; font-weight: 700; color: var(--ink-2); }
+.qris-thumb-hint { font-size: 10px; font-weight: 500; color: var(--ink-3); margin-top: 2px; }
+
+/* ── Privacy note in sheet ── */
+.privacy-note {
+  margin: 0 16px 12px;
+  background: var(--line-soft); border-radius: 10px;
+  padding: 8px 12px;
+  display: flex; align-items: flex-start; gap: 8px; flex-shrink: 0;
+}
+.privacy-note-icon { color: var(--ink-3); flex-shrink: 0; margin-top: 1px; }
+.privacy-note-text { font-size: 11px; font-weight: 600; color: var(--ink-3); line-height: 1.45; }
+
+/* ── Sheet actions ── */
+.sheet-actions {
+  padding: 12px 16px 24px; flex-shrink: 0;
+  border-top: 1px solid var(--line-soft);
+}
+.sheet-btn-primary {
+  width: 100%; padding: 14px;
+  background: var(--accent); color: white; border: none;
+  border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  box-shadow: 0 4px 14px var(--btn-shadow);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: transform .1s; margin-bottom: 8px;
+}
+.sheet-btn-primary:active { transform: scale(.98); }
+.sheet-btn-secondary {
+  width: 100%; padding: 11px;
+  background: transparent; border: none;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ink-3);
+  cursor: pointer;
+}
+
+/* ── Empty-payee state ── */
+.sheet-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px 24px; text-align: center; gap: 10px;
+}
+.sheet-empty-icon {
+  width: 56px; height: 56px; border-radius: 18px;
+  background: var(--gray-soft); color: var(--ink-3);
+  display: grid; place-items: center; margin-bottom: 4px;
+}
+.sheet-empty-title { font-size: 14px; font-weight: 800; color: var(--ink-1); letter-spacing: -.01em; }
+.sheet-empty-desc { font-size: 12px; font-weight: 500; color: var(--ink-3); line-height: 1.5; max-width: 240px; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;gap:40px;flex-wrap:wrap;">
+
+<!-- ═══════════════════════════════════════════
+     FRAME 1: Sheet open — 2 methods, BCA selected (primary)
+     Masked number clearly shown
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Payer view — pilih metode (BCA dipilih)</div>
+  <div class="phone-frame" id="frame1" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <!-- Dimmed base screen (bill detail) -->
+    <div class="base-nav" style="filter:brightness(.9);">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="base-nav-title">Konfirmasi Pembayaran</span>
+    </div>
+    <div class="base-screen">
+      <div class="base-col">
+        <div class="receipt-mini">
+          <div class="rm-label">Patungan</div>
+          <div class="rm-title">Makan Bali 2026</div>
+          <div class="rm-row">
+            <span class="rm-name">Bayar ke Ari Nugraha</span>
+            <span class="rm-amount">Rp 200.000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sheet overlay -->
+    <div class="sheet-backdrop">
+      <div class="sheet">
+        <div class="grabber"></div>
+
+        <!-- Sheet header -->
+        <div class="sheet-header">
+          <div class="sheet-title">Pilih Metode Pembayaran</div>
+          <p class="sheet-sub">Rekening penerima. Pilih satu lalu transfer secara langsung.</p>
+        </div>
+
+        <!-- Payee identity -->
+        <div class="payee-row">
+          <div class="payee-avatar">AN</div>
+          <div class="payee-info">
+            <div class="payee-name">Ari Nugraha</div>
+            <div class="payee-sub">Makan Bali 2026 · Penerima</div>
+          </div>
+          <div class="amount-chip">Rp 200.000</div>
+        </div>
+
+        <!-- Methods list -->
+        <div class="sheet-scroll">
+          <div class="methods-list">
+
+            <!--
+              DESIGN NOTE — MASKING:
+              account_number from API for peer = "••••7890"
+              We render: [●●●●] [7890] where ●●●● is typographic mask dots.
+              The last 4 digits are rendered in a visually heavier style so the
+              user can confirm "yes, that's the right account" at a glance.
+              Holder name is shown in full (needed for bank transfer confirmation).
+            -->
+
+            <!-- Card 1: BCA (primary) — selected -->
+            <div class="peer-method-card selected">
+              <div class="sel-radio"></div>
+              <div class="peer-method-icon bank">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              </div>
+              <div class="peer-method-body">
+                <div class="peer-method-label">
+                  <span class="method-type-chip">Bank</span>
+                  BCA Utama
+                  <span class="primary-badge">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Utama
+                  </span>
+                </div>
+                <!--
+                  Masked number:  ••••7890
+                  Render pattern: [mask-dots] [mask-last4]
+                  Using "••••" bullet characters (U+2022) for consistent rendering
+                  across Android/iOS. Do NOT use asterisks (*) — they break in some
+                  monospace-fallback scenarios.
+                -->
+                <div class="masked-number">
+                  <span class="mask-dots">•&nbsp;•&nbsp;•&nbsp;•</span>
+                  <span class="mask-last4">7890</span>
+                </div>
+                <div class="holder-name">Ari Nugraha</div>
+              </div>
+            </div>
+
+            <!-- Card 2: GoPay (not primary) — unselected -->
+            <div class="peer-method-card">
+              <div class="sel-radio"></div>
+              <div class="peer-method-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </div>
+              <div class="peer-method-body">
+                <div class="peer-method-label">
+                  <span class="method-type-chip">E-Wallet</span>
+                  GoPay
+                </div>
+                <div class="masked-number">
+                  <span class="mask-dots">•&nbsp;•&nbsp;•&nbsp;•</span>
+                  <span class="mask-last4">6789</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /methods-list -->
+
+          <!-- Privacy note -->
+          <div class="privacy-note">
+            <svg class="privacy-note-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <p class="privacy-note-text">Nomor rekening ditampilkan sebagian (4 digit terakhir) demi privasi. Detail lengkap hanya terlihat oleh pemilik.</p>
+          </div>
+
+        </div><!-- /sheet-scroll -->
+
+        <!-- Actions -->
+        <div class="sheet-actions">
+          <button class="sheet-btn-primary">
+            Lanjutkan ke Upload Bukti
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="sheet-btn-secondary">Batal</button>
+        </div>
+
+      </div><!-- /sheet -->
+    </div><!-- /sheet-backdrop -->
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 2: QRIS method included — show thumbnail
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Payer view — metode QRIS dengan thumbnail</div>
+  <div class="phone-frame" id="frame2" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="base-nav" style="filter:brightness(.9);">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="base-nav-title">Konfirmasi Pembayaran</span>
+    </div>
+    <div class="base-screen">
+      <div class="base-col">
+        <div class="receipt-mini">
+          <div class="rm-label">Arisan</div>
+          <div class="rm-title">Arisan Komplek Putaran 3</div>
+          <div class="rm-row">
+            <span class="rm-name">Bayar ke Sari Dewi</span>
+            <span class="rm-amount">Rp 500.000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-backdrop">
+      <div class="sheet">
+        <div class="grabber"></div>
+
+        <div class="sheet-header">
+          <div class="sheet-title">Pilih Metode Pembayaran</div>
+          <p class="sheet-sub">Rekening penerima. Pilih satu lalu transfer secara langsung.</p>
+        </div>
+
+        <div class="payee-row">
+          <div class="payee-avatar" style="background:var(--emerald-dark);">SD</div>
+          <div class="payee-info">
+            <div class="payee-name">Sari Dewi</div>
+            <div class="payee-sub">Arisan Komplek · Putaran 3</div>
+          </div>
+          <div class="amount-chip" style="background:#ecfdf5;color:var(--emerald-dark);">Rp 500.000</div>
+        </div>
+
+        <div class="sheet-scroll">
+          <div class="methods-list">
+
+            <!-- QRIS card — selected — with thumbnail -->
+            <div class="peer-method-card selected">
+              <div class="sel-radio"></div>
+              <div class="peer-method-icon qris">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" stroke-width="1.8"/></svg>
+              </div>
+              <div class="peer-method-body">
+                <div class="peer-method-label">
+                  <span class="method-type-chip">QRIS</span>
+                  QRIS Pribadi
+                  <span class="primary-badge">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Utama
+                  </span>
+                </div>
+                <!-- QRIS thumbnail row — only for QRIS type when qris_image_path != null -->
+                <div class="qris-thumb-row">
+                  <div class="qris-thumb">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z"/></svg>
+                  </div>
+                  <div class="qris-thumb-info">
+                    <div class="qris-thumb-label">Scan QR untuk transfer</div>
+                    <div class="qris-thumb-hint">Gambar asli — bukan dari Arisan Digital</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BCA (not primary) -->
+            <div class="peer-method-card">
+              <div class="sel-radio"></div>
+              <div class="peer-method-icon bank">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              </div>
+              <div class="peer-method-body">
+                <div class="peer-method-label">
+                  <span class="method-type-chip">Bank</span>
+                  BCA
+                </div>
+                <div class="masked-number">
+                  <span class="mask-dots">•&nbsp;•&nbsp;•&nbsp;•</span>
+                  <span class="mask-last4">2345</span>
+                </div>
+                <div class="holder-name">Sari Dewi</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="privacy-note">
+            <svg class="privacy-note-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <p class="privacy-note-text">Nomor rekening ditampilkan sebagian (4 digit terakhir) demi privasi. Detail lengkap hanya terlihat oleh pemilik.</p>
+          </div>
+
+        </div>
+
+        <div class="sheet-actions">
+          <button class="sheet-btn-primary">
+            Lanjutkan ke Upload Bukti
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="sheet-btn-secondary">Batal</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 3: Empty — payee has no methods
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Penerima belum lengkapi metode</div>
+  <div class="phone-frame" id="frame3" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="base-nav" style="filter:brightness(.9);">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="base-nav-title">Konfirmasi Pembayaran</span>
+    </div>
+    <div class="base-screen">
+      <div class="base-col">
+        <div class="receipt-mini">
+          <div class="rm-label">Patungan</div>
+          <div class="rm-title">Makan Bali 2026</div>
+          <div class="rm-row">
+            <span class="rm-name">Bayar ke Budi Santoso</span>
+            <span class="rm-amount">Rp 150.000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-backdrop">
+      <div class="sheet" style="max-height:68%;">
+        <div class="grabber"></div>
+
+        <div class="sheet-header">
+          <div class="sheet-title">Pilih Metode Pembayaran</div>
+          <p class="sheet-sub">Rekening penerima.</p>
+        </div>
+
+        <div class="payee-row">
+          <div class="payee-avatar" style="background:#6b7280;">BS</div>
+          <div class="payee-info">
+            <div class="payee-name">Budi Santoso</div>
+            <div class="payee-sub">Makan Bali 2026 · Penerima</div>
+          </div>
+          <div class="amount-chip">Rp 150.000</div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="sheet-empty">
+          <div class="sheet-empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="sheet-empty-title">Belum ada metode pembayaran</div>
+          <p class="sheet-empty-desc">Budi Santoso belum menambahkan metode pembayaran. Hubungi langsung untuk mendapatkan detail rekening.</p>
+        </div>
+
+        <div class="sheet-actions" style="padding-top:8px;">
+          <button class="sheet-btn-secondary" style="font-size:14px;font-weight:700;color:var(--ink-1);background:var(--gray-soft);border-radius:14px;padding:13px;">Tutup</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 4: Selected method in BuktiTransfer receipt
+     How the confirmed method shows in the proof screen
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">BuktiTransfer — metode terpilih tampil di receipt</div>
+  <div class="phone-frame" id="frame4" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav bar (mirrors prf-nav from final-proof.html) -->
+    <div style="background:var(--surface);height:52px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line-soft);flex-shrink:0;gap:10px;">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span style="flex:1;font-size:15px;font-weight:800;color:var(--ink-1);letter-spacing:-.02em;">Bukti Transfer</span>
+    </div>
+
+    <!-- Scrollable content -->
+    <div style="flex:1;overflow-y:auto;background:var(--app-bg);padding-bottom:100px;scrollbar-width:none;">
+
+      <!-- Receipt paper (minimal — focus on method row) -->
+      <div style="margin:16px 16px 0;background:var(--surface);border-radius:20px;box-shadow:0 6px 20px rgba(17,24,39,.06),0 0 0 1px rgba(0,0,0,.04);overflow:hidden;">
+
+        <!-- Gradient header -->
+        <div style="background:linear-gradient(165deg,#059669 0%,#10b981 45%,#a78bfa 100%);padding:20px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);border:2.5px solid rgba(255,255,255,.7);display:grid;place-items:center;margin-bottom:10px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.85);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;">Pembayaran Berhasil</div>
+            <div style="font-size:30px;font-weight:800;color:white;letter-spacing:-.04em;">Rp 200.000</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.7);font-weight:600;margin-top:4px;">Bagianmu · Makan Bali 2026</div>
+          </div>
+        </div>
+
+        <!-- Tear edge -->
+        <div style="display:flex;align-items:center;margin:0 -1px;">
+          <div style="width:18px;height:18px;border-radius:50%;background:var(--app-bg);flex-shrink:0;"></div>
+          <div style="flex:1;height:1.5px;background:repeating-linear-gradient(to right,var(--line) 0,var(--line) 6px,transparent 6px,transparent 10px);margin:0 4px;"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:var(--app-bg);flex-shrink:0;"></div>
+        </div>
+
+        <!-- Receipt rows -->
+        <div style="padding:12px 20px 0;">
+
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-soft);">
+            <span style="font-size:11px;font-weight:600;color:var(--ink-3);min-width:76px;">Ke</span>
+            <span style="font-size:13px;font-weight:700;color:var(--ink-1);text-align:right;">Ari Nugraha</span>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-soft);">
+            <span style="font-size:11px;font-weight:600;color:var(--ink-3);min-width:76px;">Jumlah</span>
+            <span style="font-size:18px;font-weight:800;color:var(--lavender-dark);text-align:right;letter-spacing:-.02em;">Rp 200.000</span>
+          </div>
+
+          <!--
+            KEY UX: Selected method shown in receipt.
+            Masked number reinforces what user paid to — acts as a confirmation anchor.
+            Pattern: "BCA Utama · ••••7890"
+            Holder name on next line for bank transfer verification.
+          -->
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-soft);">
+            <span style="font-size:11px;font-weight:600;color:var(--ink-3);min-width:76px;">Ke Rekening</span>
+            <div style="text-align:right;">
+              <div style="font-size:13px;font-weight:700;color:var(--lavender-dark);">BCA Utama</div>
+              <!-- Masked number in receipt context -->
+              <div style="font-size:13px;font-weight:600;color:var(--ink-1);font-variant-numeric:tabular-nums;letter-spacing:.02em;margin-top:1px;">•&nbsp;•&nbsp;•&nbsp;•&nbsp;<strong>7890</strong></div>
+              <div style="font-size:11px;font-weight:500;color:var(--ink-3);margin-top:2px;">a.n. Ari Nugraha</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:9px 0;">
+            <span style="font-size:11px;font-weight:600;color:var(--ink-3);min-width:76px;">Status</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;background:var(--lavender-soft);color:var(--lavender-dark);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Menunggu Konfirmasi
+            </span>
+          </div>
+
+        </div><!-- /rows -->
+
+        <!-- Footer -->
+        <div style="padding:12px 20px 16px;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <div style="width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,var(--emerald),var(--lavender));display:grid;place-items:center;font-size:8px;font-weight:900;color:white;">A</div>
+          <span style="font-size:10px;color:var(--ink-3);font-weight:600;">Dibuat dengan Arisan Digital</span>
+        </div>
+
+      </div><!-- /receipt-paper -->
+
+    </div><!-- /scrollable -->
+
+    <!-- Action bar -->
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 16px 26px;background:linear-gradient(to top,var(--app-bg) 72%,transparent);">
+      <button style="width:100%;padding:15px;background:var(--lavender-dark);color:white;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(139,92,246,.30);margin-bottom:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Bagikan Bukti
+      </button>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+</div><!-- /flex row -->
+</body>
+</html>

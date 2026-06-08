@@ -286,3 +286,24 @@ export const Upload = (p) => (
     <line x1="12" y1="3" x2="12" y2="15" />
   </Svg>
 );
+
+// ── Payment method type icons ─────────────────────────────────
+// Bank / landmark icon — for bank transfer payment methods.
+export const BankIcon = (p) => (
+  <Svg {...p}>
+    <line x1="3" y1="22" x2="21" y2="22" />
+    <line x1="6" y1="18" x2="6" y2="11" />
+    <line x1="10" y1="18" x2="10" y2="11" />
+    <line x1="14" y1="18" x2="14" y2="11" />
+    <line x1="18" y1="18" x2="18" y2="11" />
+    <polygon points="12 2 20 7 4 7" />
+  </Svg>
+);
+
+// QRIS / QR code icon — for QRIS payment methods.
+export const QRCodeIcon = (p) => (
+  <Svg strokeWidth={1.8} {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" />
+  </Svg>
+);

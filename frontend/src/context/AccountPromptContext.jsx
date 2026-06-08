@@ -1,33 +1,34 @@
-import { createContext, useContext, useState, useCallback } from "react";
-import { AnimatePresence } from "framer-motion";
-import { LoginOrRegister } from "../pages/LoginOrRegister";
+/**
+ * AccountPromptContext.jsx — Deferred-registration nudge (NEUTRALISED — C4).
+ *
+ * In the anonymous-auth MVP this context opened a "save your account" modal.
+ * Since Workstream C4 requires login for all users (no anonymous sessions),
+ * the nudge is permanently gated off:
+ *
+ *   - AccountPromptProvider is kept in App.jsx so the import tree doesn't break.
+ *   - promptRegister() is a no-op — the modal is never rendered.
+ *   - Consumers in BuatArisan / BuatPatungan still call promptRegister() after
+ *     creating a group; those calls are silently ignored.
+ *   - The LoginOrRegister import is intentionally removed to avoid a dead
+ *     modal being mounted in the tree.
+ *
+ * If a future workstream needs a contextual upsell (e.g. "upgrade plan"),
+ * this is the right place to restore that pattern with a different target URL.
+ */
+
+import { createContext, useContext, useCallback } from "react";
 
 const AccountPromptContext = createContext(null);
 
-// Lets any screen open the "save your account" (deferred registration)
-// modal — e.g. after creating an arisan, or when an account-only action
-// is attempted while still anonymous.
 export function AccountPromptProvider({ children }) {
-  const [state, setState] = useState({ open: false, reason: null });
-
-  const promptRegister = useCallback((reason = null) => {
-    setState({ open: true, reason });
+  // No-op: every user is already authenticated; there is nothing to prompt for.
+  const promptRegister = useCallback(() => {
+    // Intentional no-op — anonymous sessions removed in Workstream C4.
   }, []);
-  const close = useCallback(() => setState((s) => ({ ...s, open: false })), []);
 
   return (
     <AccountPromptContext.Provider value={{ promptRegister }}>
       {children}
-      <AnimatePresence>
-        {state.open && (
-          <LoginOrRegister
-            defaultTab="register"
-            reason={state.reason}
-            onClose={close}
-            onSuccess={close}
-          />
-        )}
-      </AnimatePresence>
     </AccountPromptContext.Provider>
   );
 }

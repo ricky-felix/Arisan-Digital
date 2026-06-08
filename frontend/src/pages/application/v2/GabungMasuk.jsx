@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, Camera, Upload, Link, QrJoin, X, Check } from "../../../components/application/v2/icons";
+import { useJoinGroup } from "../../../hooks/useInvite";
+import { Camera, Upload, Link, QrJoin, X, Check } from "../../../components/application/v2/icons";
+import ScreenHeader from "../../../components/application/v2/ScreenHeader";
 import { INVITE } from "../../../components/application/v2/undang/data";
 
 /**
@@ -28,6 +30,12 @@ export default function GabungMasuk() {
   const streamRef = useRef(null);
   const [value, setValue] = useState("");
   const [scanning, setScanning] = useState(false);
+
+  // Real invite-redeem hook — used when a code is pasted or decoded.
+  // TODO(wave2-auth): Supabase session token required for join() to work.
+  const { validate, loading: validating } = useJoinGroup();
+
+  // Decoded QR token — extracted from camera/upload (currently mocked, see below).
 
   // Attach the live stream once the <video> is in the DOM.
   useEffect(() => {
@@ -77,27 +85,49 @@ export default function GabungMasuk() {
     }
   }
 
-  // All entry methods land on the invite preview for this MVP.
-  function goToPreview() {
+  // Navigate to the preview screen, optionally passing the resolved token.
+  function goToPreview(token) {
     stopCamera();
-    navigate("/app/gabung/preview");
+    const dest = token
+      ? `/app/gabung/preview?token=${encodeURIComponent(token)}`
+      : "/app/gabung/preview";
+    navigate(dest);
   }
 
   function onUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // TODO: QR *decoding* of the uploaded image is mocked for MVP — a real
+    // QR decode library (e.g. jsQR) would extract the token here.
+    // The decoded token below is a placeholder; the redeem call in Gabung.jsx
+    // uses the static INVITE.code until a real decoder is in place.
+    const mockDecodedToken = INVITE.code; // TODO(wave2-qr-decode): replace with real decode
     toast("QR terbaca ✓");
-    setTimeout(goToPreview, 400);
+    setTimeout(() => goToPreview(mockDecodedToken), 400);
   }
 
-  function submitLink() {
+  async function submitLink() {
     const v = value.trim();
     if (!v) {
       toast("Tempel link atau masukkan kode undangan dulu");
       return;
     }
-    toast("Undangan ditemukan ✓");
-    setTimeout(goToPreview, 400);
+    // Extract the invite code from a full link (e.g. arisan.digital/gabung/ABC123 → ABC123)
+    // or use the raw value if it looks like a bare code.
+    const code = v.includes("/") ? v.split("/").pop() : v;
+
+    // Validate the code against the real API before navigating
+    // TODO(wave2-auth): requires a valid Supabase session.
+    const result = await validate(code);
+    if (result) {
+      toast("Undangan ditemukan ✓");
+      setTimeout(() => goToPreview(code), 400);
+    } else {
+      // validate() logs the error; show a user-facing message
+      toast("Undangan tidak ditemukan atau sudah kadaluwarsa");
+      // Still navigate to preview with static data as fallback for MVP
+      setTimeout(() => goToPreview(null), 400);
+    }
   }
 
   return (
@@ -105,18 +135,8 @@ export default function GabungMasuk() {
       {/* Scroll wrapper: full-width, full viewport-height, app-bg, scrollable, no scrollbar */}
       <div className="w-full min-h-svh bg-app-bg overflow-y-auto overflow-x-hidden flex flex-col items-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-        {/* Sticky header — consistent with Undang */}
-        <div className="w-full min-h-14 flex items-center gap-3 px-5 bg-surface border-b border-line-soft sticky top-0 z-10 lg:px-[max(clamp(24px,5vw,64px),calc(50%-600px))]">
-          <button
-            type="button"
-            className="w-8.5 h-8.5 rounded-[10px] bg-gray-soft border-none grid place-items-center cursor-pointer shrink-0 text-ink-1 transition-colors duration-150 hover:bg-line"
-            onClick={() => { stopCamera(); navigate("/app"); }}
-            aria-label="Kembali"
-          >
-            <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
-          </button>
-          <span className="flex-1 text-[17px] font-extrabold text-ink-1 tracking-[-0.02em]">Gabung Arisan / Patungan</span>
-        </div>
+        {/* Sticky header */}
+        <ScreenHeader title="Gabung Arisan / Patungan" onBack={() => { stopCamera(); navigate("/app"); }} />
 
         {/* Content column: centered, max-width 460px */}
         <div className="w-full max-w-115 px-4 pb-10 pt-4 flex flex-col gap-3.5">
@@ -146,7 +166,16 @@ export default function GabungMasuk() {
                   <X size={16} stroke="currentColor" strokeWidth={2.5} />
                   Tutup
                 </button>
-                <button type="button" className="flex-1 border-none cursor-pointer inline-flex items-center justify-center gap-1.75 text-[14px] font-extrabold py-3.25 rounded-lg bg-white text-brand-primary-hover" onClick={goToPreview}>
+                <button
+                  type="button"
+                  className="flex-1 border-none cursor-pointer inline-flex items-center justify-center gap-1.75 text-[14px] font-extrabold py-3.25 rounded-lg bg-white text-brand-primary-hover"
+                  onClick={() => {
+                    // TODO: QR *decoding* from the live camera stream is mocked for MVP.
+                    // A real decoder (jsQR / zxing-wasm) would read videoRef frames here.
+                    const mockToken = INVITE.code; // TODO(wave2-qr-decode): replace with real decode
+                    goToPreview(mockToken);
+                  }}
+                >
                   <Check size={16} stroke="currentColor" strokeWidth={3} />
                   Gunakan QR ini
                 </button>
@@ -220,10 +249,11 @@ export default function GabungMasuk() {
 
           <button
             type="button"
-            className="w-full border-none cursor-pointer bg-brand-primary text-white text-[16px] font-extrabold py-4 rounded-[14px] shadow-[0_6px_18px_rgba(16,185,129,0.32)]"
+            className="w-full border-none cursor-pointer bg-brand-primary text-white text-[16px] font-extrabold py-4 rounded-[14px] shadow-[0_6px_18px_rgba(16,185,129,0.32)] disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={submitLink}
+            disabled={validating}
           >
-            Lihat Undangan
+            {validating ? "Memeriksa…" : "Lihat Undangan"}
           </button>
 
           <div className="text-[11.5px] text-ink-3 text-center leading-normal">

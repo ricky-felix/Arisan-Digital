@@ -61,8 +61,18 @@ class ApiClient {
     });
   }
 
-  delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
+  put(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  delete(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'DELETE',
+      ...(data !== undefined ? { body: JSON.stringify(data) } : {}),
+    });
   }
 }
 

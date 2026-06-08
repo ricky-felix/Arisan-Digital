@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
-import { ChevronLeft, ChevronRight, Split, QrJoin } from "../../../components/application/v2/icons";
+import { ChevronRight, Split, QrJoin } from "../../../components/application/v2/icons";
+import ScreenHeader from "../../../components/application/v2/ScreenHeader";
 import { useToast } from "../../../context/ToastContext";
-import { createBill, hasCreatedSomething, useAuth, useAccountPrompt } from "../v1/mockData";
+import { useCreateBill } from "../../../hooks/useCreateBill";
+// C4: hasCreatedSomething + useAuth(isAnonymous) removed — all users are authenticated.
+import { useAccountPrompt } from "../../../context/AccountPromptContext";
 import { formatRupiah } from "../../../utils/formatRupiah";
 
 const CATEGORIES = [
@@ -31,9 +34,9 @@ const CATEGORIES = [
 export default function BuatPatungan() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { isAnonymous } = useAuth();
+  // C4: promptRegister is a no-op (AccountPromptContext neutralised).
   const { promptRegister } = useAccountPrompt();
-  const [saving, setSaving] = useState(false);
+  const { saving, createBill } = useCreateBill();
   const [form, setForm] = useState({ title: "", category: "makanan", total: "" });
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -44,49 +47,31 @@ export default function BuatPatungan() {
 
   const submit = async () => {
     if (!canSubmit || saving) return;
-    const firstTime = !hasCreatedSomething();
-    setSaving(true);
-    try {
-      await createBill({
-        title: form.title.trim(),
-        category: form.category,
-        total: totalNum,
-        method: "equal", // split evenly among participants who join
-        participants: [{ name: "Saya" }], // you pay first; others join via invite
-      });
+
+    // TODO(wave2-auth): Supabase session token required for createBill.
+    const bill = await createBill({
+      title: form.title.trim(),
+      category: form.category,
+      total: totalNum,
+    });
+
+    if (bill) {
       toast("Tagihan dibuat! Undang peserta sekarang.", "success");
       navigate("/app/undang");
-      if (firstTime && isAnonymous) {
-        promptRegister("Tagihan pertamamu sudah dibuat 🎉 Daftar gratis agar tidak hilang.");
-      }
-    } catch (err) {
-      toast(err.message || "Gagal membuat tagihan", "error");
-      setSaving(false);
+      // C4: promptRegister is a no-op — user is always authenticated.
+    } else {
+      toast("Gagal membuat tagihan. Coba lagi.", "error");
     }
   };
 
   return (
     <div className="v2-screen">
-      {/* Full-bleed scrollable column — hides native scrollbar */}
-      <div className="flex w-full flex-1 flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative min-h-svh bg-app-bg">
+      <div className="v2-inner" style={{ overflowY: "auto" }}>
 
-        {/* Sticky header — full-width surface, content padded to centered column */}
-        <div className="sticky top-0 z-10 flex w-full shrink-0 min-h-14 items-center gap-3 border-b border-line-soft bg-surface px-[max(20px,calc(50%-240px))] lg:px-[max(20px,calc(50%-280px))]">
-          <button
-            className="grid h-8.5 w-8.5 shrink-0 cursor-pointer place-items-center rounded-[10px] border-none bg-gray-soft text-ink-1 transition-colors hover:bg-line"
-            onClick={() => navigate("/app")}
-            aria-label="Kembali"
-            type="button"
-          >
-            <ChevronLeft size={16} stroke="currentColor" strokeWidth={2.5} />
-          </button>
-          <span className="flex-1 text-[17px] font-extrabold tracking-[-0.02em] text-ink-1">
-            Buat Patungan
-          </span>
-        </div>
+        <ScreenHeader title="Buat Patungan" onBack={() => navigate("/app")} />
 
-        {/* Body — centered content column */}
-        <div className="mx-auto flex w-full max-w-120 flex-1 flex-col gap-3.5 px-4 pb-6 pt-4 lg:max-w-140 lg:gap-4 lg:pt-6">
+        {/* ── Content column ── */}
+        <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col gap-3.5 px-5 pb-6 pt-4 lg:max-w-[600px] lg:gap-4 lg:px-6">
 
           {/*
             Live preview hero — lavender gradient with two decorative blob circles.
@@ -170,19 +155,10 @@ export default function BuatPatungan() {
 
         </div>
 
-        {/*
-          Sticky action footer.
-          The gradient fade (bg-app-bg → transparent) is applied via an inline
-          style because it uses env(safe-area-inset-bottom) together with calc()
-          in the padding, which Tailwind cannot express without a custom class.
-          bg-linear-to-t from-app-bg is used for the visual fade; safe-area
-          bottom padding uses CSS directly so notch devices are respected.
-        */}
+        {/* ── Sticky action footer — aligned to the content column ── */}
         <div
-          className="sticky bottom-0 flex w-full shrink-0 gap-2.5 bg-linear-to-t from-app-bg to-transparent pt-3.5"
-          style={{
-            padding: "14px max(16px, calc(50% - 240px + 16px)) calc(16px + env(safe-area-inset-bottom, 0px))",
-          }}
+          className="sticky bottom-0 mx-auto flex w-full max-w-[480px] shrink-0 gap-2.5 bg-linear-to-t from-app-bg to-transparent px-5 pt-3.5 lg:max-w-[600px] lg:px-6"
+          style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))" }}
         >
           <button
             className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[14px] border-none bg-brand-secondary p-4 text-[15px] font-extrabold tracking-[-0.01em] text-white shadow-[0_10px_22px_var(--color-brand-secondary-tint)] transition-[filter,transform] hover:not-disabled:brightness-105 active:not-disabled:scale-[.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"

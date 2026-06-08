@@ -2,6 +2,10 @@
 
 Guidance for working in `frontend/`. Read this before adding screens, components, or styles so the work stays consistent with the existing v2 app.
 
+## ⛔ Never edit v1
+
+**Do not edit anything under `src/pages/application/v1/` (or other v1 code). v1 is legacy and frozen** — not even small additions like a new form field. The live app is v2; all work goes there. If a request points at a v1 file, flag that it's v1/frozen and offer to make the change in the corresponding v2 screen instead.
+
 ## Stack
 
 - **React** 18.3 + **Vite** 7 (`@vitejs/plugin-react`)
@@ -49,6 +53,22 @@ Port the finalized prototype into the app:
 - Add the route in `src/App.jsx` under `/app/...` and document it.
 - Icons: use/extend `src/components/application/v2/icons.jsx` (thin `<svg>` wrappers, 24×24 viewBox, props spread through). Don't inline raw SVG in pages or pull in an icon library.
 
+## Page headers / navbar — always use `ScreenHeader`
+
+Every v2 sub-page navbar comes from the shared component `src/components/application/v2/ScreenHeader.jsx`. **Do not hand-roll a sticky header** (no per-page `<div className="sticky top-0 …">` bars, no scoped `.ov-header`/`.notif-header` markup). One component = one container, so alignment stays identical everywhere.
+
+```jsx
+import ScreenHeader from "../../../components/application/v2/ScreenHeader";
+
+<ScreenHeader title="Buat Arisan" onBack={() => navigate("/app")} />
+```
+
+- **The container is the point.** It renders a full-width sticky bar (`bg-surface/95` + `backdrop-blur` + bottom hairline) whose inner content is centered in a **1200px band** (`mx-auto max-w-300 px-5 lg:px-8`) — the same band the Profil hero uses (`calc(50% - 600px)`). This gives the back button + title a consistent *slight* inset that caps on wide desktops; it is intentionally **not** pinned to each page's (narrower) content column. Responsive by construction: `px-5` on mobile → `lg:px-8` + centered band on desktop.
+- Props: `title` (string → the page `<h1>`), `sub` (optional second line, e.g. a count), `onBack` (handler; omit to render no back button), and `children` (optional right-aligned slot — a Save button, loading spinner, share action, etc.). Put right-side actions in `children`, not a new bar.
+- The standard back button (gray-soft, `h-10` rounded, `ChevronLeft`) is built in — never re-import `ChevronLeft` just for a header.
+- `grup/GroupHeader.jsx` is a thin wrapper over `ScreenHeader` (title + `sub`); keep it that way.
+- **Exceptions (don't convert):** the gradient hero headers that are part of a screen's identity — `profil/ProfileHero.jsx` (gradient + avatar) and `home/StoryTopBar.jsx` (title-less story overlay). They already align to the same 1200px band via `calc(50% - 600px)`; leave them bespoke.
+
 ## CSS: where each rule goes (strict priority order)
 
 Three layers. **Always reach for them in this order — only fall to the next when the current one genuinely can't express it.**
@@ -88,6 +108,7 @@ Use only for what Tailwind and tokens can't cleanly do. **Every rule must be sco
 - [ ] All new `app-v2.css` rules scoped under `.v2-*`
 - [ ] No arbitrary Tailwind values where a theme token utility exists
 - [ ] Icons via `icons.jsx`, not inline SVG or a library
+- [ ] Sub-page navbar uses `ScreenHeader` (no hand-rolled sticky header bar)
 - [ ] Component in the right `v2/<screen>/` subfolder; shared pieces at `v2/` top level; static data in `data.jsx`
 - [ ] New route registered in `App.jsx`
 - [ ] If the UI was new/redesigned, a matching `design-prototypes/*.html` exists and the React structure mirrors it

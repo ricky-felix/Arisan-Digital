@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tambah / Edit Metode Pembayaran — Form</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --accent:       var(--lavender-dark);
+  --accent-mid:   var(--lavender);
+  --accent-soft:  var(--lavender-soft);
+  --accent-tint:  var(--lavender-tint);
+  --btn-shadow:   rgba(139,92,246,.30);
+}
+
+/* ── Nav bar ── */
+.nav-bar {
+  background: var(--surface);
+  height: 52px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+  flex-shrink: 0;
+  gap: 10px;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--gray-soft); border: none;
+  display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; color: var(--ink-1); transition: background .15s;
+}
+.back-btn:hover { background: var(--line); }
+.nav-title { flex: 1; font-size: 15px; font-weight: 800; color: var(--ink-1); letter-spacing: -.02em; }
+
+/* ── Screen scroll area ── */
+.form-screen {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  background: var(--app-bg);
+  scrollbar-width: none;
+  padding-bottom: 110px;
+}
+.form-screen::-webkit-scrollbar { display: none; }
+.form-col { padding: 20px 20px 0; }
+
+/* ── Type selector segment ── */
+.type-seg {
+  display: flex; gap: 6px;
+  padding: 4px; background: var(--gray-soft); border-radius: 14px;
+  margin-bottom: 20px;
+}
+.type-seg-btn {
+  flex: 1; padding: 8px 6px;
+  border-radius: 10px; border: none;
+  font-family: inherit; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s;
+  background: transparent; color: var(--ink-2);
+  text-align: center; position: relative;
+}
+.type-seg-btn.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 2px 8px rgba(17,24,39,.08);
+}
+.type-seg-btn.active .seg-icon { color: var(--accent); }
+.seg-icon { display: block; margin: 0 auto 3px; }
+.soon-badge {
+  position: absolute; top: -4px; right: 2px;
+  font-size: 7px; font-weight: 800; color: white;
+  background: var(--ink-3); border-radius: 4px;
+  padding: 1px 4px; letter-spacing: .04em; text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ── Form sections ── */
+.form-section { margin-bottom: 8px; }
+.form-label {
+  font-size: 11px; font-weight: 700; color: var(--ink-2);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 8px;
+}
+.form-label .req { color: var(--danger); margin-left: 2px; }
+
+/* ── Input ── */
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-input);
+  font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ink-1);
+  background: var(--surface); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+}
+.form-input.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.10);
+}
+.form-input::placeholder { color: var(--ink-3); font-weight: 400; }
+
+/* Prefix wrapper */
+.input-prefix-wrap { position: relative; }
+.input-prefix {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 15px; font-weight: 600; color: var(--ink-2);
+  pointer-events: none;
+}
+.form-input.with-prefix { padding-left: 42px; }
+
+/* Field error message */
+.field-error {
+  font-size: 11px; font-weight: 600; color: var(--danger);
+  margin-top: 5px; display: flex; align-items: center; gap: 4px;
+}
+.field-hint {
+  font-size: 11px; font-weight: 500; color: var(--ink-3);
+  margin-top: 5px; line-height: 1.4;
+}
+
+/* ── Select picker (bank / e-wallet) ── */
+.bank-picker-card {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-input);
+  overflow: hidden;
+}
+.bank-picker-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; cursor: pointer; transition: background .1s;
+  border: none; background-color: transparent;
+  font-family: inherit; width: 100%; text-align: left;
+}
+.bank-picker-row:hover { background: var(--gray-soft); }
+.bank-picker-row + .bank-picker-row { border-top: 1px solid var(--line-soft); }
+.bank-picker-row.selected { background: var(--accent-tint); }
+.bpr-radio {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--line); flex-shrink: 0;
+  display: grid; place-items: center;
+  transition: border-color .15s;
+}
+.bank-picker-row.selected .bpr-radio { border-color: var(--accent); }
+.bank-picker-row.selected .bpr-radio::after {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+}
+.bpr-label { font-size: 14px; font-weight: 600; color: var(--ink-1); }
+.bank-picker-row.selected .bpr-label { color: var(--accent); font-weight: 700; }
+
+/* ── QRIS upload zone ── */
+.qris-zone {
+  background: var(--surface);
+  border: 1.5px dashed var(--line);
+  border-radius: var(--r-input);
+  padding: 24px 16px;
+  text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.qris-zone:hover { border-color: var(--accent-mid); background: var(--accent-tint); }
+.qris-upload-icon { color: var(--ink-3); }
+.qris-upload-label {
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.qris-upload-hint {
+  font-size: 11px; font-weight: 500; color: var(--ink-3);
+}
+/* Preview state */
+.qris-preview {
+  background: var(--surface);
+  border: 1.5px solid var(--line-soft);
+  border-radius: var(--r-input);
+  padding: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.qris-preview-img {
+  width: 72px; height: 72px; border-radius: 8px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 100%);
+  display: grid; place-items: center; flex-shrink: 0;
+  color: var(--ink-3); font-size: 11px; font-weight: 700;
+  text-align: center; line-height: 1.3;
+}
+.qris-preview-info { flex: 1; min-width: 0; }
+.qris-preview-name { font-size: 13px; font-weight: 700; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qris-preview-size { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-top: 2px; }
+.qris-change-btn {
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  background: var(--accent-tint); border: none; border-radius: 8px;
+  padding: 6px 10px; cursor: pointer; font-family: inherit; flex-shrink: 0;
+}
+
+/* Phase 4 overlay for QRIS upload */
+.soon-overlay {
+  position: relative;
+}
+.soon-overlay::after {
+  content: 'Segera — Fase 4';
+  position: absolute; inset: 0;
+  background: rgba(248,250,252,.88);
+  border-radius: var(--r-input);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: var(--ink-2);
+  letter-spacing: .03em;
+  backdrop-filter: blur(1px);
+  pointer-events: none;
+}
+
+/* ── Primary toggle ── */
+.primary-toggle-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: var(--r-input);
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.primary-toggle-row.active { border-color: var(--accent); background: var(--accent-tint); }
+.toggle-body { flex: 1; }
+.toggle-label { font-size: 14px; font-weight: 700; color: var(--ink-1); }
+.primary-toggle-row.active .toggle-label { color: var(--accent); }
+.toggle-sub { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-top: 2px; }
+.toggle-checkbox {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 2px solid var(--line); background: white;
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: all .15s;
+}
+.primary-toggle-row.active .toggle-checkbox {
+  background: var(--accent); border-color: var(--accent);
+}
+
+/* ── Type disabled notice (edit mode) ── */
+.type-lock-notice {
+  background: var(--gray-soft); border-radius: 10px;
+  padding: 9px 12px;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+}
+.type-lock-text { font-size: 12px; font-weight: 600; color: var(--ink-3); line-height: 1.4; }
+
+/* ── Floating action bar ── */
+.form-actions {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 12px 16px 28px;
+  background: linear-gradient(to top, var(--app-bg) 70%, transparent);
+}
+.form-btn-primary {
+  width: 100%; padding: 15px;
+  background: var(--accent); color: white; border: none;
+  border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.01em;
+  box-shadow: 0 4px 16px var(--btn-shadow);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .1s, opacity .15s;
+  margin-bottom: 8px;
+}
+.form-btn-primary:active { transform: scale(.98); }
+.form-btn-secondary {
+  width: 100%; padding: 12px;
+  background: transparent; color: var(--ink-2); border: none;
+  border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── Divider between sections ── */
+.form-divider { height: 1px; background: var(--line-soft); margin: 20px 0; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;gap:40px;flex-wrap:wrap;">
+
+<!-- ═══════════════════════════════════════════
+     FRAME 1: Add — Bank type selected
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Tambah — Jenis Bank</div>
+  <div class="phone-frame" id="frame1" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="nav-title">Tambah Metode Pembayaran</span>
+    </div>
+
+    <div class="form-screen">
+      <div class="form-col">
+
+        <!-- Type segment: Bank | E-Wallet | QRIS -->
+        <div class="form-section">
+          <div class="form-label">Jenis Pembayaran</div>
+          <div class="type-seg">
+            <button class="type-seg-btn active">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              Bank
+            </button>
+            <button class="type-seg-btn">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              E-Wallet
+            </button>
+            <button class="type-seg-btn" style="position:relative;">
+              <span class="soon-badge">Segera</span>
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" stroke-width="1.5"/></svg>
+              QRIS
+            </button>
+          </div>
+        </div>
+
+        <!-- Bank picker -->
+        <div class="form-section">
+          <div class="form-label">Nama Bank <span class="req">*</span></div>
+          <div class="bank-picker-card">
+            <button class="bank-picker-row selected">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">BCA</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">Mandiri</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">BNI</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">BRI</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">CIMB Niaga</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">Permata</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Label -->
+        <div class="form-section">
+          <div class="form-label">Label <span class="req">*</span></div>
+          <input class="form-input" type="text" placeholder="cth. BCA Utama" value="BCA Utama">
+          <p class="field-hint">Nama yang ditampilkan kepada anggota grup.</p>
+        </div>
+
+        <!-- Account number -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nomor Rekening <span class="req">*</span></div>
+          <input class="form-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="cth. 1234567890" value="1234567890">
+          <p class="field-hint">Hanya angka, 6–20 digit. Tidak boleh ada spasi.</p>
+        </div>
+
+        <!-- Holder name -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nama Pemilik Rekening <span class="req">*</span></div>
+          <input class="form-input" type="text" placeholder="cth. Ricky Felix" value="Ricky Felix">
+          <p class="field-hint">Sesuai nama di buku tabungan. Maks. 50 karakter.</p>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Primary toggle -->
+        <div class="form-section">
+          <div class="primary-toggle-row active">
+            <div class="toggle-body">
+              <div class="toggle-label">Jadikan Metode Utama</div>
+              <div class="toggle-sub">Ditampilkan pertama saat anggota grup membayarmu.</div>
+            </div>
+            <div class="toggle-checkbox">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /form-screen -->
+
+    <!-- Action bar -->
+    <div class="form-actions">
+      <button class="form-btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Metode
+      </button>
+      <button class="form-btn-secondary">Batal</button>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 2: Add — E-Wallet type selected
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Tambah — E-Wallet</div>
+  <div class="phone-frame" id="frame2" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="nav-title">Tambah Metode Pembayaran</span>
+    </div>
+
+    <div class="form-screen">
+      <div class="form-col">
+
+        <!-- Type segment -->
+        <div class="form-section">
+          <div class="form-label">Jenis Pembayaran</div>
+          <div class="type-seg">
+            <button class="type-seg-btn">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              Bank
+            </button>
+            <button class="type-seg-btn active">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              E-Wallet
+            </button>
+            <button class="type-seg-btn" style="position:relative;">
+              <span class="soon-badge">Segera</span>
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" stroke-width="1.5"/></svg>
+              QRIS
+            </button>
+          </div>
+        </div>
+
+        <!-- E-wallet picker -->
+        <div class="form-section">
+          <div class="form-label">Jenis E-Wallet <span class="req">*</span></div>
+          <div class="bank-picker-card">
+            <button class="bank-picker-row selected">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">GoPay</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">OVO</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">DANA</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">ShopeePay</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">LinkAja</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Label -->
+        <div class="form-section">
+          <div class="form-label">Label <span class="req">*</span></div>
+          <input class="form-input" type="text" placeholder="cth. GoPay Pribadi" value="GoPay">
+        </div>
+
+        <!-- Phone number -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nomor HP / E-Wallet <span class="req">*</span></div>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">+62</span>
+            <input class="form-input with-prefix" type="tel" inputmode="numeric" placeholder="812 3456 7890" value="812 3456 789">
+          </div>
+          <p class="field-hint">Nomor yang terdaftar di GoPay. Bisa diawali 0 atau +62.</p>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Primary toggle — not checked -->
+        <div class="form-section">
+          <div class="primary-toggle-row">
+            <div class="toggle-body">
+              <div class="toggle-label">Jadikan Metode Utama</div>
+              <div class="toggle-sub">Ditampilkan pertama saat anggota grup membayarmu.</div>
+            </div>
+            <div class="toggle-checkbox"></div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /form-screen -->
+
+    <div class="form-actions">
+      <button class="form-btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Metode
+      </button>
+      <button class="form-btn-secondary">Batal</button>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 3: QRIS tab (Phase 4 placeholder)
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">QRIS — placeholder Fase 4</div>
+  <div class="phone-frame" id="frame3" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="nav-title">Tambah Metode Pembayaran</span>
+    </div>
+
+    <div class="form-screen">
+      <div class="form-col">
+
+        <!-- Type segment — QRIS selected -->
+        <div class="form-section">
+          <div class="form-label">Jenis Pembayaran</div>
+          <div class="type-seg">
+            <button class="type-seg-btn">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              Bank
+            </button>
+            <button class="type-seg-btn">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              E-Wallet
+            </button>
+            <button class="type-seg-btn active" style="position:relative;">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" stroke-width="1.5"/></svg>
+              QRIS
+            </button>
+          </div>
+        </div>
+
+        <!-- QRIS coming-soon notice -->
+        <div class="type-lock-notice" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p class="type-lock-text" style="color:#15803d;">Upload QRIS tersedia di Fase 4. Kamu tetap bisa menambahkan label dan detail, gambar QRIS bisa ditambahkan nanti.</p>
+        </div>
+
+        <!-- Label -->
+        <div class="form-section">
+          <div class="form-label">Label <span class="req">*</span></div>
+          <input class="form-input" type="text" placeholder="cth. QRIS Pribadi" value="QRIS Pribadi">
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- QRIS upload zone — grayed out with "soon" overlay -->
+        <div class="form-section">
+          <div class="form-label">Upload Gambar QRIS <span style="color:var(--ink-3);font-weight:500;text-transform:none;letter-spacing:0;">(opsional)</span></div>
+          <div class="soon-overlay">
+            <div class="qris-zone" style="pointer-events:none;">
+              <svg class="qris-upload-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" stroke-width="1.8"/></svg>
+              <span class="qris-upload-label">Tambah Gambar QRIS</span>
+              <span class="qris-upload-hint">Maks. 5 MB · JPG atau PNG · gambar statis</span>
+            </div>
+          </div>
+          <p class="field-hint" style="margin-top:8px;">Hanya gambar yang kamu upload sendiri yang ditampilkan. Arisan Digital tidak membuat atau memproses QRIS.</p>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Primary toggle -->
+        <div class="form-section">
+          <div class="primary-toggle-row">
+            <div class="toggle-body">
+              <div class="toggle-label">Jadikan Metode Utama</div>
+              <div class="toggle-sub">Ditampilkan pertama saat anggota grup membayarmu.</div>
+            </div>
+            <div class="toggle-checkbox"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="form-btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Metode
+      </button>
+      <button class="form-btn-secondary">Batal</button>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 4: Validation error state
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Error — validasi gagal</div>
+  <div class="phone-frame" id="frame4" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="nav-title">Tambah Metode Pembayaran</span>
+    </div>
+
+    <div class="form-screen">
+      <div class="form-col">
+
+        <div class="form-section">
+          <div class="form-label">Jenis Pembayaran</div>
+          <div class="type-seg">
+            <button class="type-seg-btn active">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              Bank
+            </button>
+            <button class="type-seg-btn">
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              E-Wallet
+            </button>
+            <button class="type-seg-btn" style="position:relative;">
+              <span class="soon-badge">Segera</span>
+              <svg class="seg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z" stroke-width="1.5"/></svg>
+              QRIS
+            </button>
+          </div>
+        </div>
+
+        <!-- Bank — BCA selected -->
+        <div class="form-section">
+          <div class="form-label">Nama Bank <span class="req">*</span></div>
+          <div class="bank-picker-card">
+            <button class="bank-picker-row selected">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">BCA</span>
+            </button>
+            <button class="bank-picker-row">
+              <div class="bpr-radio"></div>
+              <span class="bpr-label">Mandiri</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Label: error -->
+        <div class="form-section">
+          <div class="form-label">Label <span class="req">*</span></div>
+          <input class="form-input error" type="text" placeholder="cth. BCA Utama" value="">
+          <p class="field-error">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Label wajib diisi.
+          </p>
+        </div>
+
+        <!-- Account number: error -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nomor Rekening <span class="req">*</span></div>
+          <input class="form-input error" type="tel" inputmode="numeric" value="12abc">
+          <p class="field-error">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Nomor rekening harus berupa angka (6–20 digit).
+          </p>
+        </div>
+
+        <!-- Holder: ok -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nama Pemilik Rekening <span class="req">*</span></div>
+          <input class="form-input" type="text" value="Ricky Felix">
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="form-section">
+          <div class="primary-toggle-row">
+            <div class="toggle-body">
+              <div class="toggle-label">Jadikan Metode Utama</div>
+              <div class="toggle-sub">Ditampilkan pertama saat anggota grup membayarmu.</div>
+            </div>
+            <div class="toggle-checkbox"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="form-btn-primary" style="opacity:.5;pointer-events:none;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Metode
+      </button>
+      <button class="form-btn-secondary">Batal</button>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FRAME 5: Edit mode (type locked)
+═══════════════════════════════════════════ -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <div class="frame-label" style="font-size:12px;font-weight:700;color:#374151;">Edit mode — jenis terkunci</div>
+  <div class="phone-frame" id="frame5" style="position:relative;">
+
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="#111827"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".4"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="#111827"><path d="M7.5 2.5a6.5 6.5 0 0 1 4.6 1.9l1.4-1.4A8.5 8.5 0 0 0 7.5.5a8.5 8.5 0 0 0-6 2.5l1.4 1.4A6.5 6.5 0 0 1 7.5 2.5z" opacity=".4"/><path d="M7.5 5.5a3.5 3.5 0 0 1 2.5 1l1.4-1.4A5.5 5.5 0 0 0 7.5 3.5a5.5 5.5 0 0 0-3.9 1.6l1.4 1.4A3.5 3.5 0 0 1 7.5 5.5z"/><circle cx="7.5" cy="10" r="1.5"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="#111827"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#111827" stroke-width="1.5" fill="none" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/><path d="M22 4.5v3a1.5 1.5 0 0 0 0-3z"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="nav-title">Edit BCA Utama</span>
+    </div>
+
+    <div class="form-screen">
+      <div class="form-col">
+
+        <!-- Type locked notice -->
+        <div class="type-lock-notice">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p class="type-lock-text">Jenis pembayaran tidak bisa diubah. Hapus dan buat baru jika perlu mengganti jenis.</p>
+        </div>
+
+        <!-- Type read-only display -->
+        <div class="form-section">
+          <div class="form-label">Jenis Pembayaran</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--surface);border:1.5px solid var(--line-soft);border-radius:var(--r-input);opacity:.65;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+            <span style="font-size:14px;font-weight:600;color:var(--ink-2);">Bank — BCA</span>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Label — pre-filled -->
+        <div class="form-section">
+          <div class="form-label">Label <span class="req">*</span></div>
+          <input class="form-input" type="text" value="BCA Utama">
+        </div>
+
+        <!-- Account number — pre-filled -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nomor Rekening <span class="req">*</span></div>
+          <input class="form-input" type="tel" inputmode="numeric" value="1234567890">
+        </div>
+
+        <!-- Holder name — pre-filled -->
+        <div class="form-section" style="margin-top:14px;">
+          <div class="form-label">Nama Pemilik Rekening <span class="req">*</span></div>
+          <input class="form-input" type="text" value="Ricky Felix">
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- Primary toggle — checked -->
+        <div class="form-section">
+          <div class="primary-toggle-row active">
+            <div class="toggle-body">
+              <div class="toggle-label">Jadikan Metode Utama</div>
+              <div class="toggle-sub">Ditampilkan pertama saat anggota grup membayarmu.</div>
+            </div>
+            <div class="toggle-checkbox">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="form-btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Perubahan
+      </button>
+      <button class="form-btn-secondary">Batal</button>
+    </div>
+
+  </div><!-- /phone-frame -->
+</div>
+
+</div><!-- /flex row -->
+</body>
+</html>

@@ -1,36 +1,39 @@
 import { api } from '../lib/api';
 
 /**
- * Storage service for managing file uploads and downloads
- * Handles payment proofs, receipts, and other file attachments
+ * Storage service for managing file uploads and downloads.
+ * Handles avatars, payment proofs, receipts, and other file attachments.
+ *
+ * Field names + response shapes below MATCH the backend storage controller
+ * (backend/src/storage/*). Buckets are PRIVATE; reads go through signed URLs.
  */
 export const storageService = {
   /**
-   * Get a presigned URL for uploading a file
-   * @param {Object} data - Upload URL request data
-   * @param {string} data.file_name - Name of the file to upload
-   * @param {string} data.file_type - MIME type of the file
-   * @param {string} data.bucket - Storage bucket name (e.g., 'payment-proofs', 'receipts')
-   * @returns {Promise<Object>} Object containing upload URL and file key
+   * Request a token-based signed upload URL.
+   * @param {Object} data
+   * @param {string} data.bucket - One of: 'avatars' | 'receipts' | 'payment-proofs'
+   * @param {string} data.filename - Original file name (basename is used server-side)
+   * @param {string} [data.content_type] - MIME type hint
+   * @returns {Promise<{ bucket: string, path: string, signed_url: string, token: string }>}
    */
   getUploadUrl: (data) => api.post('/storage/upload-url', data),
 
   /**
-   * Get a presigned URL for reading/downloading a file
-   * @param {Object} data - Read URL request data
-   * @param {string} data.file_key - Key/path of the file in storage
+   * Request a signed read URL for a private object.
+   * @param {Object} data
    * @param {string} data.bucket - Storage bucket name
-   * @param {number} data.expires_in - URL expiration time in seconds (optional)
-   * @returns {Promise<Object>} Object containing read URL
+   * @param {string} data.path - Object path, e.g. "<userId>/<uuid>-file.jpg"
+   * @param {number} [data.expires_in_seconds] - Validity in seconds (60–86400, default 3600)
+   * @returns {Promise<{ signed_url: string, expires_at: string }>}
    */
   getReadUrl: (data) => api.post('/storage/read-url', data),
 
   /**
-   * Delete a file from storage
-   * @param {Object} data - Delete request data
-   * @param {string} data.file_key - Key/path of the file to delete
+   * Delete a stored object. Backend mounts DELETE /storage/object with a body.
+   * @param {Object} data
    * @param {string} data.bucket - Storage bucket name
+   * @param {string} data.path - Object path to delete
    * @returns {Promise<Object>} Deletion confirmation
    */
-  deleteObject: (data) => api.post('/storage/delete', data),
+  deleteObject: (data) => api.delete('/storage/object', data),
 };

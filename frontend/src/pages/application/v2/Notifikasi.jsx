@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/app-v2.css";
 import PaySheet from "../../../components/application/v2/PaySheet";
+import PaymentMethodSelector from "../../../components/application/v2/metodePembayaran/PaymentMethodSelector";
 import { useToast } from "../../../context/ToastContext";
-import { ChevronLeft, Users, Split, Check, Clock } from "../../../components/application/v2/icons";
+import { useNotifications } from "../../../hooks/useNotifications";
+import { Users, Split, Check, Clock } from "../../../components/application/v2/icons";
+import ScreenHeader   from "../../../components/application/v2/ScreenHeader";
 import NotifBubble    from "../../../components/application/v2/notifikasi/NotifBubble";
 import GroupLabel     from "../../../components/application/v2/notifikasi/GroupLabel";
 import ReminderButton from "../../../components/application/v2/notifikasi/ReminderButton";
@@ -19,8 +22,21 @@ export default function Notifikasi() {
   const navigate = useNavigate();
   const toast = useToast();
   const [paySheet, setPaySheet] = useState({ open: false });
+  // PaymentMethodSelector — for patungan "bayar" notification actions where
+  // the payee's userId is available from the notification payload.
+  // TODO(wire-payee-id): replace the static { payeeUserId: null } placeholder
+  // with the real payeeUserId from the notification when the live notification
+  // schema includes it (wave2-notif workstream).
+  const [methodSelector, setMethodSelector] = useState({ open: false, payeeUserId: null, payeeName: '', contextLabel: '', amount: '' });
   const [sentReminders, setSentReminders] = useState({});
   const [paidBtns, setPaidBtns] = useState({});
+
+  // Live notifications — used to drive unread dot / mark-read actions.
+  // The static bubble JSX below remains as the visual shell (Workstream D
+  // does not redesign the screen). markAllRead is wired to the SuggestBar.
+  // TODO(wave2-notif): replace static bubbles with dynamically rendered
+  // notification list once the notification type/metadata schema is finalised.
+  const { markAllRead } = useNotifications();
 
   function openPaySheet() {
     setPaySheet({ open: true });
@@ -29,6 +45,45 @@ export default function Notifikasi() {
     setPaySheet({ open: false });
   }
   function handlePaid() {
+    setPaidBtns(p => ({ ...p, bayarNotif: true }));
+  }
+
+  /**
+   * Opens the PaymentMethodSelector for a patungan "bayar" notification.
+   * Pass the payee context from the notification payload when available.
+   *
+   * @param {Object} opts
+   * @param {string|null} opts.payeeUserId   – payee's userId (null = TODO not yet wired)
+   * @param {string}      opts.payeeName     – display name of the payee
+   * @param {string}      opts.contextLabel  – e.g. "Makan Bali 2026 · Penerima"
+   * @param {string}      opts.amount        – formatted or raw Rupiah amount
+   */
+  function openMethodSelector({ payeeUserId = null, payeeName = '', contextLabel = '', amount = '' } = {}) {
+    setMethodSelector({ open: true, payeeUserId, payeeName, contextLabel, amount });
+  }
+  function closeMethodSelector() {
+    setMethodSelector(s => ({ ...s, open: false }));
+  }
+
+  /**
+   * Called when the payer picks a method in the selector and taps "Lanjutkan".
+   * Navigates to BuktiTransfer carrying the selected method for the receipt row.
+   */
+  function handleNotifMethodSelected(selectedMethod) {
+    closeMethodSelector();
+    const { payeeUserId, amount } = methodSelector;
+    const params = new URLSearchParams({
+      type: 'patungan',
+      // TODO(wire-payee-id): include billId / fromUserId / toUserId once the
+      // notification schema provides them.
+      ...(payeeUserId && { toUserId: payeeUserId }),
+      ...(amount      && { amount: String(amount).replace(/\D/g, '') }),
+      methodId:     selectedMethod.id,
+      methodLabel:  selectedMethod.label,
+      methodMasked: selectedMethod.account_number ?? selectedMethod.phone ?? '',
+      ...(selectedMethod.holder_name && { methodHolder: selectedMethod.holder_name }),
+    });
+    navigate(`/app/bukti?${params.toString()}`);
     setPaidBtns(p => ({ ...p, bayarNotif: true }));
   }
 
@@ -42,12 +97,7 @@ export default function Notifikasi() {
       <div className="v2-inner bg-app-bg overflow-y-auto">
 
         {/* Header */}
-        <div className="notif-header">
-          <button className="back-btn" aria-label="Kembali" type="button" onClick={() => navigate("/app")}>
-            <ChevronLeft size={16} />
-          </button>
-          <span className="notif-title">Notifikasi</span>
-        </div>
+        <ScreenHeader title="Notifikasi" onBack={() => navigate("/app")} />
 
         {/* Helper legend */}
         <div className="notif-legend">
@@ -228,14 +278,17 @@ export default function Notifikasi() {
 
         {/* Quick-reply chips */}
         <SuggestBar
-          onMarkRead={() => toast("Semua notifikasi ditandai dibaca ✓")}
+          onMarkRead={async () => {
+            await markAllRead();
+            toast("Semua notifikasi ditandai dibaca ✓");
+          }}
           onRemind={() => toast("Pengingat dikirim ke yang belum bayar ✓")}
           onOpenWallet={() => navigate("/app/dompet")}
         />
 
       </div>
 
-      {/* Pay sheet */}
+      {/* Pay sheet — arisan group-wallet payments */}
       <PaySheet
         open={paySheet.open}
         onClose={closePaySheet}
@@ -245,6 +298,23 @@ export default function Notifikasi() {
         destType="arisan"
         onPaid={handlePaid}
       />
+
+      {/* Payment Method Selector — patungan peer-to-peer payments from notifications.
+          Triggered by "Bayar" actions on patungan notification bubbles.
+          TODO(wire-payee-id): notification bubbles currently call openPaySheet()
+          (arisan-style). Once wave2-notif wires in live notification data, patungan
+          "bayar" actions should call openMethodSelector({ payeeUserId, payeeName,
+          contextLabel, amount }) instead. */}
+      {methodSelector.open && (
+        <PaymentMethodSelector
+          payeeUserId={methodSelector.payeeUserId}
+          payeeName={methodSelector.payeeName}
+          contextLabel={methodSelector.contextLabel}
+          amount={methodSelector.amount}
+          onContinue={handleNotifMethodSelected}
+          onCancel={closeMethodSelector}
+        />
+      )}
     </div>
   );
 }

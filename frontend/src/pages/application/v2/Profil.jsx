@@ -11,6 +11,7 @@ import {
   HelpCircle,
   Replay,
   LogOut,
+  WalletRounded,
 } from "../../../components/application/v2/icons";
 import ProfileHero from "../../../components/application/v2/profil/ProfileHero";
 import StatsCard from "../../../components/application/v2/profil/StatsCard";
@@ -20,22 +21,22 @@ import MenuSection from "../../../components/application/v2/profil/MenuSection";
 export default function Profil() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { signOut, profile, isAnonymous } = useAuth();
+  const { logout, profile, user } = useAuth();
 
-  // Registered users show their own name/phone; guests (anonymous or the
-  // default "Tamu" placeholder) fall back to a generic "Guest" identity.
-  const name = profile?.name?.trim();
-  const isGuest = isAnonymous || !name || name === "Tamu";
-  const displayName = isGuest ? "Guest" : name;
-  const displayPhone = isGuest ? "" : profile?.phone || "";
+  // All users are now authenticated — no anonymous branches.
+  // Display name falls back to "Pengguna" if the DB profile hasn't loaded yet.
+  const name = profile?.name?.trim() || "";
+  const displayName = name || "Pengguna";
+  // Show phone from profile if available, otherwise show email from auth user.
+  const displayPhone = profile?.phone || user?.email || "";
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      await logout();
     } catch {
-      /* ignore — return to landing regardless */
+      /* ignore — redirect regardless */
     }
-    navigate("/");
+    navigate("/masuk");
   };
 
   // Clear the coach-mark flag (same key HomeDeck reads) then jump to the deck
@@ -58,7 +59,7 @@ export default function Profil() {
           phone={displayPhone}
           joined="Bergabung sejak Januari 2024"
           onBack={() => navigate("/app")}
-          onEdit={() => toast("Edit profil — segera hadir")}
+          onEdit={() => navigate("/app/profil/edit")}
         />
 
         {/* Past phone width the content collapses to a single centered column.
@@ -79,21 +80,28 @@ export default function Profil() {
                 tileClass="em"
                 label="Edit Profil"
                 sub="Nama, foto, nomor HP"
-                onClick={() => toast("Edit profil — segera hadir")}
+                onClick={() => navigate("/app/profil/edit")}
               />
               <MenuRow
                 icon={<Card size={17} strokeWidth={2} />}
                 tileClass="lv"
                 label="Metode Pembayaran"
                 sub="Dompet grup & transfer langsung"
-                onClick={() => toast("Metode pembayaran — segera hadir")}
+                onClick={() => navigate("/app/profil/pembayaran")}
               />
               <MenuRow
                 icon={<Lock size={17} strokeWidth={2} />}
                 tileClass="em"
                 label="Keamanan & PIN"
                 sub="Ubah PIN, sidik jari"
-                onClick={() => toast("Keamanan — segera hadir")}
+                onClick={() => navigate("/app/profil/keamanan")}
+              />
+              <MenuRow
+                icon={<WalletRounded size={17} strokeWidth={2} />}
+                tileClass="lv"
+                label="Riwayat Transaksi"
+                sub="Semua iuran & patunganmu"
+                onClick={() => navigate("/app/riwayat")}
               />
             </MenuSection>
 
@@ -111,14 +119,14 @@ export default function Profil() {
                 tileClass="gray"
                 label="Bahasa"
                 sub="Bahasa Indonesia"
-                onClick={() => toast("Bahasa: Bahasa Indonesia")}
+                onClick={() => navigate("/app/profil/bahasa")}
               />
               <MenuRow
                 icon={<HelpCircle size={17} strokeWidth={2} />}
                 tileClass="gray"
                 label="Bantuan"
                 sub="FAQ & hubungi kami"
-                onClick={() => toast("Bantuan — segera hadir")}
+                onClick={() => navigate("/app/profil/bantuan")}
               />
               <MenuRow
                 icon={<Replay size={17} strokeWidth={2} />}

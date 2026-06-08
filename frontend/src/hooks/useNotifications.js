@@ -1,0 +1,76 @@
+import { useState, useEffect, useCallback } from 'react';
+import { notificationsService } from '../services';
+
+/**
+ * useNotifications — loads notifications + unread count from the API.
+ * Exposes markRead / markAllRead actions that optimistically update local state.
+ *
+ * The API returns an array of notification objects. Shape (per backend):
+ *   { id, type, title, body, metadata, is_read, created_at }
+ *
+ * Returns the raw API list so the Notifikasi screen can render its own
+ * bubble layout, plus helpers it needs.
+ */
+export function useNotifications() {
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        // TODO(wave2-auth): relies on anonymous Supabase session token being present.
+        const [list, countRes] = await Promise.all([
+          notificationsService.list(),
+          notificationsService.getUnreadCount(),
+        ]);
+
+        if (cancelled) return;
+        setNotifications(Array.isArray(list) ? list : []);
+        setUnreadCount(typeof countRes?.count === 'number' ? countRes.count : 0);
+      } catch (err) {
+        if (cancelled) return;
+        console.error('[useNotifications] failed to load:', err.message);
+        setError(err.message);
+        // Keep empty arrays — the screen shows its static JSX as fallback
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  const markRead = useCallback(async (id) => {
+    // Optimistic update
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+    );
+    setUnreadCount(prev => Math.max(0, prev - 1));
+    try {
+      await notificationsService.markRead(id);
+    } catch (err) {
+      console.error('[useNotifications] markRead failed:', err.message);
+      // Rollback would require re-fetching; tolerate the stale state for MVP.
+    }
+  }, []);
+
+  const markAllRead = useCallback(async () => {
+    // Optimistic update
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+    try {
+      await notificationsService.markAllRead();
+    } catch (err) {
+      console.error('[useNotifications] markAllRead failed:', err.message);
+    }
+  }, []);
+
+  return { notifications, unreadCount, loading, error, markRead, markAllRead };
+}
