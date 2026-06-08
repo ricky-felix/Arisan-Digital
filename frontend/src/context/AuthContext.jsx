@@ -45,6 +45,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { usersService } from "../services/users.service";
+import { authService } from "../services/auth.service";
 import { parseIdentifier } from "../utils/identifier";
 
 const AuthContext = createContext(null);
@@ -103,10 +104,14 @@ export function AuthProvider({ children }) {
    * Register a new account. Both email and phone number are required; email +
    * password is the auth credential, the phone number is stored on the profile.
    *
-   * Phone-as-primary signup is intentionally disabled — every account
-   * authenticates by email. The phone is passed in user metadata so the
-   * handle_new_user DB trigger can populate users.phone (it is NOT a top-level
-   * auth field on signUp, which would make it a login credential).
+   * Email is always the signUp credential (signUp accepts either an email OR a
+   * phone, never both). The phone is passed in user metadata so the
+   * handle_new_user DB trigger can populate users.phone. Immediately afterwards
+   * we call the backend (authService.syncPhone) to also promote that phone onto
+   * the top-level auth.users.phone field — confirmed via the admin API — so that
+   * phone + password login works. Without this step, phone login can never
+   * succeed because Supabase looks users up by auth.users.phone, which signUp
+   * leaves null.
    *
    * @param {{ email: string, phone: string, password: string, name: string }} opts
    * @throws Error with a user-friendly Indonesian message.
@@ -127,6 +132,20 @@ export function AuthProvider({ children }) {
       options: { data: { full_name: name, phone: parsedPhone.phone } },
     });
     if (error) throw error;
+
+    // ── Promote the phone onto the auth record (enables phone login) ──────
+    // signUp only stored the phone in user metadata; copy it to
+    // auth.users.phone (confirmed) via the backend admin API. Best-effort:
+    // a failure here must not block an otherwise-successful registration, and
+    // it must run before the confirmation-pending throw below so the phone is
+    // attached even when there is no session yet.
+    if (data.user) {
+      try {
+        await authService.syncPhone(data.user.id);
+      } catch {
+        // Non-fatal — the account exists and the profile still has the phone.
+      }
+    }
 
     // ── Confirmation-pending case ─────────────────────────────────────────
     // When "Confirm email" is ENABLED in Supabase, signUp returns a user
