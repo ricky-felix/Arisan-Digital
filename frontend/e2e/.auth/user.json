@@ -1,0 +1,18 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "arisan_app_access",
+          "value": "1"
+        },
+        {
+          "name": "arisan.v2.coachSeen",
+          "value": "1"
+        }
+      ]
+    }
+  ]
+}
