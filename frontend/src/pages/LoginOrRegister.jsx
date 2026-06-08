@@ -405,7 +405,19 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-start bg-gray-50 px-4 py-8 sm:justify-center">
-      <div className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="w-full max-w-md">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="mb-3 inline-flex items-center gap-1.5 rounded-lg py-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
+        >
+          <svg className="size-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Kembali ke beranda
+        </button>
+
+        <div className="flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
 
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between bg-[#10b981] px-6 py-4">
@@ -414,6 +426,16 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
             alt="Arisan Digital"
             style={{ height: "56px", width: "auto" }}
           />
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            aria-label="Tutup dan kembali ke beranda"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full text-white/90 transition hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+          >
+            <svg className="size-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* Tabs */}
@@ -480,6 +502,7 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
               </>
             )}
           </p>
+        </div>
         </div>
       </div>
     </div>
