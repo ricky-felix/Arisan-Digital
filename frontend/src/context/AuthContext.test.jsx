@@ -53,7 +53,7 @@ function AuthConsumer() {
       </button>
       <button
         onClick={() =>
-          register({ identifier: '081234567890', password: 'password123', name: 'Budi' })
+          register({ email: 'budi@example.com', phone: '081234567890', password: 'password123', name: 'Budi' })
         }
       >
         Register
@@ -246,7 +246,7 @@ describe('login()', () => {
 });
 
 describe('register()', () => {
-  it('calls signUp with phone credentials (local format)', async () => {
+  it('signs up with email as the credential and carries the normalised phone in metadata', async () => {
     supabase.auth.signUp.mockResolvedValue({
       data: { user: { id: 'new-user' }, session: { access_token: 'tok' } },
       error: null,
@@ -260,15 +260,20 @@ describe('register()', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Register' }));
 
+    // Phone-as-primary signup is disabled: email is the auth credential, and the
+    // phone is normalised to E.164 and passed in metadata for the DB trigger.
     expect(supabase.auth.signUp).toHaveBeenCalledWith(
       expect.objectContaining({
-        phone: '+6281234567890',
+        email: 'budi@example.com',
         password: 'password123',
         options: expect.objectContaining({
-          data: expect.objectContaining({ full_name: 'Budi' }),
+          data: expect.objectContaining({ full_name: 'Budi', phone: '+6281234567890' }),
         }),
       })
     );
+    // The phone number must NOT be a top-level auth field (that would make it a
+    // login credential).
+    expect(supabase.auth.signUp.mock.calls[0][0]).not.toHaveProperty('phone');
   });
 
   it('throws when confirmation is pending (user without session)', async () => {
@@ -284,7 +289,7 @@ describe('register()', () => {
         <button
           onClick={async () => {
             try {
-              await register({ identifier: 'confirm@test.com', password: 'pw123456', name: 'Test' });
+              await register({ email: 'confirm@test.com', phone: '081234567890', password: 'pw123456', name: 'Test' });
             } catch (e) {
               thrownError = e;
             }

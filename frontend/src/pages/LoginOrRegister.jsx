@@ -105,6 +105,26 @@ function IdentifierHint({ value }) {
   return <p className="mt-1 text-xs text-emerald-600">Nomor HP: {parsed.phone}</p>;
 }
 
+// ── Typed field hint (register form) ──────────────────────────────────────────
+// The register form has dedicated Email and Nomor HP fields (both required), so
+// each one validates against a single expected type rather than accepting either.
+function TypedHint({ value, expect }) {
+  if (!value) return null;
+  const parsed = parseIdentifier(value);
+  if (parsed?.type === expect) {
+    return (
+      <p className="mt-1 text-xs text-emerald-600">
+        {expect === "email" ? "Email terdeteksi." : `Nomor HP: ${parsed.phone}`}
+      </p>
+    );
+  }
+  return (
+    <p className="mt-1 text-xs text-red-500">
+      {expect === "email" ? "Format email tidak dikenali." : "Format nomor HP tidak dikenali."}
+    </p>
+  );
+}
+
 // ── Login form ────────────────────────────────────────────────────────────────
 function LoginForm({ onSuccess }) {
   const { login } = useAuth();
@@ -182,7 +202,7 @@ function LoginForm({ onSuccess }) {
 function RegisterForm({ onSuccess }) {
   const { register } = useAuth();
 
-  const [form, setForm] = useState({ identifier: "", name: "", password: "", confirm: "" });
+  const [form, setForm] = useState({ email: "", phone: "", name: "", password: "", confirm: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
@@ -196,12 +216,21 @@ function RegisterForm({ onSuccess }) {
   function validate() {
     const errs = {};
     if (!form.name.trim()) errs.name = "Nama wajib diisi";
-    const parsed = parseIdentifier(form.identifier);
-    if (!form.identifier.trim()) {
-      errs.identifier = "Email atau nomor HP wajib diisi";
-    } else if (!parsed) {
-      errs.identifier = "Format tidak dikenali. Masukkan email atau nomor HP.";
+
+    const parsedEmail = parseIdentifier(form.email);
+    if (!form.email.trim()) {
+      errs.email = "Email wajib diisi";
+    } else if (parsedEmail?.type !== "email") {
+      errs.email = "Masukkan alamat email yang valid.";
     }
+
+    const parsedPhone = parseIdentifier(form.phone);
+    if (!form.phone.trim()) {
+      errs.phone = "Nomor HP wajib diisi";
+    } else if (parsedPhone?.type !== "phone") {
+      errs.phone = "Masukkan nomor HP yang valid.";
+    }
+
     if (form.password.length < 8) errs.password = "Minimal 8 karakter";
     if (form.password !== form.confirm) errs.confirm = "Kata sandi tidak cocok";
     return errs;
@@ -219,7 +248,7 @@ function RegisterForm({ onSuccess }) {
     setErrors({});
     setPending(true);
     try {
-      await register({ identifier: form.identifier, password: form.password, name: form.name.trim() });
+      await register({ email: form.email, phone: form.phone, password: form.password, name: form.name.trim() });
       onSuccess();
     } catch (err) {
       const msg = err.message ?? "Gagal mendaftar. Coba lagi.";
@@ -234,8 +263,13 @@ function RegisterForm({ onSuccess }) {
     }
   }
 
-  const identifierParsed = parseIdentifier(form.identifier);
-  const canSubmit = !!identifierParsed && form.name.trim() && form.password.length >= 8 && form.password === form.confirm && !pending;
+  const canSubmit =
+    parseIdentifier(form.email)?.type === "email" &&
+    parseIdentifier(form.phone)?.type === "phone" &&
+    form.name.trim() &&
+    form.password.length >= 8 &&
+    form.password === form.confirm &&
+    !pending;
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
@@ -252,18 +286,34 @@ function RegisterForm({ onSuccess }) {
 
       <div>
         <InputField
-          label="Email atau Nomor HP"
-          type="text"
-          placeholder="nama@email.com atau 0812..."
-          id="reg-identifier"
+          label="Email"
+          type="email"
+          placeholder="nama@email.com"
+          id="reg-email"
           required
-          value={form.identifier}
-          onChange={set("identifier")}
-          error={errors.identifier}
-          autoComplete="username"
+          value={form.email}
+          onChange={set("email")}
+          error={errors.email}
+          autoComplete="email"
           inputMode="email"
         />
-        {!errors.identifier && <IdentifierHint value={form.identifier} />}
+        {!errors.email && <TypedHint value={form.email} expect="email" />}
+      </div>
+
+      <div>
+        <InputField
+          label="Nomor HP"
+          type="tel"
+          placeholder="0812..."
+          id="reg-phone"
+          required
+          value={form.phone}
+          onChange={set("phone")}
+          error={errors.phone}
+          autoComplete="tel"
+          inputMode="tel"
+        />
+        {!errors.phone && <TypedHint value={form.phone} expect="phone" />}
       </div>
 
       <div className="flex flex-col gap-0">
@@ -397,7 +447,7 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
             <p className="mt-0.5 text-sm text-gray-500">
               {tab === "login"
                 ? "Masuk dengan email atau nomor HP dan kata sandimu."
-                : "Daftar dengan email atau nomor HP dan buat kata sandi."}
+                : "Daftar dengan email dan nomor HP, lalu buat kata sandi."}
             </p>
           </div>
 

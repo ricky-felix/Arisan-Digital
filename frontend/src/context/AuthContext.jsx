@@ -33,7 +33,7 @@
  *   profile        – row from `users` table | null  (kept for downstream consumers)
  *   loading        – boolean — true while initial session is resolving
  *   isAuthenticated– boolean (true when session exists)
- *   register({ identifier, password, name })  → Promise<void>
+ *   register({ email, phone, password, name }) → Promise<void>
  *   login({ identifier, password })           → Promise<void>
  *   logout()                                  → Promise<void>
  *   updateProfile(updates)                    → Promise<void>
@@ -100,51 +100,45 @@ export function AuthProvider({ children }) {
 
   // ── register ─────────────────────────────────────────────────────────────
   /**
-   * Register a new account using email or phone + password.
+   * Register a new account. Both email and phone number are required; email +
+   * password is the auth credential, the phone number is stored on the profile.
    *
-   * @param {{ identifier: string, password: string, name: string }} opts
+   * Phone-as-primary signup is intentionally disabled — every account
+   * authenticates by email. The phone is passed in user metadata so the
+   * handle_new_user DB trigger can populate users.phone (it is NOT a top-level
+   * auth field on signUp, which would make it a login credential).
+   *
+   * @param {{ email: string, phone: string, password: string, name: string }} opts
    * @throws Error with a user-friendly Indonesian message.
    */
-  async function register({ identifier, password, name }) {
-    const parsed = parseIdentifier(identifier);
-    if (!parsed) {
-      throw new Error("Masukkan email atau nomor HP yang valid.");
+  async function register({ email, phone, password, name }) {
+    const parsedEmail = parseIdentifier(email);
+    if (!parsedEmail || parsedEmail.type !== "email") {
+      throw new Error("Masukkan alamat email yang valid.");
+    }
+    const parsedPhone = parseIdentifier(phone);
+    if (!parsedPhone || parsedPhone.type !== "phone") {
+      throw new Error("Masukkan nomor HP yang valid.");
     }
 
-    let signUpArgs;
-    if (parsed.type === "email") {
-      signUpArgs = {
-        email: parsed.email,
-        password,
-        options: { data: { full_name: name } },
-      };
-    } else {
-      // Phone + password.
-      // NOTE: Supabase phone+password auth works WITHOUT an SMS provider ONLY
-      // when "Confirm phone" is DISABLED in Authentication → Providers → Phone.
-      // Pass phone in metadata as well so the handle_new_user DB trigger can
-      // populate users.phone without needing it as a top-level auth field.
-      signUpArgs = {
-        phone: parsed.phone,
-        password,
-        options: { data: { full_name: name, phone: parsed.phone } },
-      };
-    }
-
-    const { data, error } = await supabase.auth.signUp(signUpArgs);
+    const { data, error } = await supabase.auth.signUp({
+      email: parsedEmail.email,
+      password,
+      options: { data: { full_name: name, phone: parsedPhone.phone } },
+    });
     if (error) throw error;
 
     // ── Confirmation-pending case ─────────────────────────────────────────
-    // When "Confirm email/phone" is ENABLED in Supabase, signUp returns a
-    // user object but session is null — the user must click the confirmation
-    // link first. Surface a clear message instead of silently hanging.
+    // When "Confirm email" is ENABLED in Supabase, signUp returns a user
+    // object but session is null — the user must click the confirmation link
+    // first. Surface a clear message instead of silently hanging.
     if (data.user && !data.session) {
       // Don't throw here — let the caller show the "please confirm" message.
       // We communicate this via the returned object being a no-session state.
       // The caller (LoginOrRegister) checks for this condition.
       throw new Error(
         "Silakan konfirmasi akun kamu. Kami mengirim tautan verifikasi ke " +
-        (parsed.type === "email" ? parsed.email : parsed.phone) + "."
+        parsedEmail.email + "."
       );
     }
   }

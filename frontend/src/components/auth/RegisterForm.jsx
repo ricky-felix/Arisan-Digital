@@ -35,7 +35,7 @@ export function RegisterForm({ onSuccess }) {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ identifier: "", name: "", password: "", confirm: "" });
+  const [form, setForm] = useState({ email: "", phone: "", name: "", password: "", confirm: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,9 +45,10 @@ export function RegisterForm({ onSuccess }) {
   function validate() {
     const errs = {};
     if (!form.name.trim()) errs.name = "Nama wajib diisi";
-    const parsed = parseIdentifier(form.identifier);
-    if (!form.identifier.trim()) errs.identifier = "Email atau nomor HP wajib diisi";
-    else if (!parsed) errs.identifier = "Format tidak dikenali";
+    if (!form.email.trim()) errs.email = "Email wajib diisi";
+    else if (parseIdentifier(form.email)?.type !== "email") errs.email = "Masukkan alamat email yang valid";
+    if (!form.phone.trim()) errs.phone = "Nomor HP wajib diisi";
+    else if (parseIdentifier(form.phone)?.type !== "phone") errs.phone = "Masukkan nomor HP yang valid";
     if (form.password.length < 8) errs.password = "Minimal 8 karakter";
     if (form.password !== form.confirm) errs.confirm = "Kata sandi tidak cocok";
     return errs;
@@ -61,7 +62,7 @@ export function RegisterForm({ onSuccess }) {
     setErrors({});
     setLoading(true);
     try {
-      await register({ identifier: form.identifier, password: form.password, name: form.name.trim() });
+      await register({ email: form.email, phone: form.phone, password: form.password, name: form.name.trim() });
       if (onSuccess) onSuccess();
       else navigate("/app");
     } catch (err) {
@@ -71,12 +72,16 @@ export function RegisterForm({ onSuccess }) {
     }
   }
 
-  const canSubmit = !!parseIdentifier(form.identifier) && form.name.trim() && form.password.length >= 8 && form.password === form.confirm && !loading;
+  const canSubmit =
+    parseIdentifier(form.email)?.type === "email" &&
+    parseIdentifier(form.phone)?.type === "phone" &&
+    form.name.trim() && form.password.length >= 8 && form.password === form.confirm && !loading;
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
       <InputField label="Nama Lengkap" placeholder="Budi Santoso" id="reg-name" required value={form.name} onChange={set("name")} error={errors.name} autoComplete="name" />
-      <InputField label="Email atau Nomor HP" type="text" placeholder="nama@email.com atau 0812..." id="reg-identifier" required value={form.identifier} onChange={set("identifier")} error={errors.identifier} autoComplete="username" />
+      <InputField label="Email" type="email" placeholder="nama@email.com" id="reg-email" required value={form.email} onChange={set("email")} error={errors.email} autoComplete="email" inputMode="email" />
+      <InputField label="Nomor HP" type="tel" placeholder="0812..." id="reg-phone" required value={form.phone} onChange={set("phone")} error={errors.phone} autoComplete="tel" inputMode="tel" />
       <InputField label="Kata Sandi" type="password" placeholder="Min. 8 karakter" id="reg-password" required value={form.password} onChange={set("password")} error={errors.password} autoComplete="new-password" />
       <InputField label="Konfirmasi Kata Sandi" type="password" placeholder="Ulangi kata sandi" id="reg-confirm" required value={form.confirm} onChange={set("confirm")} error={errors.confirm} autoComplete="new-password" />
 
