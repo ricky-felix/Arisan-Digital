@@ -20,13 +20,11 @@
 		"frontend": {
 			"root": "frontend",
 			"routePrefix": "/",
-			"framework": "vite",
-			"outputDirectory": "dist"
+			"framework": "vite"
 		},
 		"backend": {
 			"root": "backend",
-			"routePrefix": "/",
-			"outputDirectory": "dist"
+			"routePrefix": "/"
 		}
 	}
 }
