@@ -17,16 +17,16 @@
 		}
 	],
 	"experimentalServices": {
-        "frontend": {
-            "root": "frontend",
-            "routePrefix": "/",
-            "framework": "vite",
-			"outputDirectory": "./frontend/dist"
-        },
-        "backend": {
-            "root": "backend",
-            "routePrefix": "/",
-			"outputDirectory": "./backend/dist"
-        }
-}
+		"frontend": {
+			"root": "frontend",
+			"routePrefix": "/",
+			"framework": "vite",
+			"outputDirectory": "dist"
+		},
+		"backend": {
+			"root": "backend",
+			"routePrefix": "/",
+			"outputDirectory": "dist"
+		}
+	}
 }
