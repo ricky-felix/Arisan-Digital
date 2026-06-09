@@ -24,7 +24,8 @@
 		},
 		"backend": {
 			"root": "backend",
-			"routePrefix": "/"
+			"routePrefix": "/",
+			"framework": "nestjs"
 		}
 	}
 }
