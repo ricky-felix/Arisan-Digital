@@ -5,7 +5,6 @@
 			"NODE_ENV": "production"
 		}
 	},
-	"buildCommand": "npm install --include=dev --legacy-peer-deps && npm run build",
 	"headers": [
 		{
 			"source": "/(.*)",
@@ -21,11 +20,13 @@
         "frontend": {
             "root": "frontend",
             "routePrefix": "/",
-            "framework": "vite"
+            "framework": "vite",
+			"outputDirectory": "./frontend/dist"
         },
         "backend": {
             "root": "backend",
-            "routePrefix": "/"
+            "routePrefix": "/",
+			"outputDirectory": "./backend/dist"
         }
 }
 }
