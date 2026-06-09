@@ -19,12 +19,12 @@
 	"experimentalServices": {
 		"frontend": {
 			"root": "frontend",
-			"routePrefix": "./frontend",
+			"routePrefix": "frontend",
 			"framework": "vite"
 		},
 		"backend": {
 			"root": "backend",
-			"routePrefix": "./backend",
+			"routePrefix": "backend",
 			"framework": "nestjs"
 		}
 	}
