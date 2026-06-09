@@ -1,19 +1,19 @@
 {
-  "name": "arisan-digital",
-  "private": true,
-  "scripts": {
-    "dev": "concurrently -n frontend,backend -c cyan,green \"npm run dev --prefix frontend\" \"npm run start:dev --prefix backend\"",
-    "frontend": "npm run dev --prefix frontend",
-    "backend": "npm run start:dev --prefix backend",
-    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
-    "test": "npm run test:run --prefix frontend && npm run test --prefix backend && npm run test:e2e --prefix frontend",
-    "test:frontend": "npm run test:run --prefix frontend",
-    "test:backend": "npm run test --prefix backend",
-    "test:e2e": "npm run test:e2e --prefix frontend",
-    "build": "npm run build --prefix frontend",
-    "install:all": "npm install && npm install --prefix frontend && npm install --prefix backend"
-  },
-  "devDependencies": {
-    "concurrently": "^9.0.0"
-  }
+	"name": "arisan-digital",
+	"private": true,
+	"scripts": {
+		"dev": "concurrently -n frontend,backend -c cyan,green \"npm run dev --prefix frontend\" \"npm run start:dev --prefix backend\"",
+		"frontend": "npm run dev --prefix frontend",
+		"backend": "npm run start:dev --prefix backend",
+		"lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+		"test": "npm run test:run --prefix frontend && npm run test --prefix backend && npm run test:e2e --prefix frontend",
+		"test:frontend": "npm run test:run --prefix frontend",
+		"test:backend": "npm run test --prefix backend",
+		"test:e2e": "npm run test:e2e --prefix frontend",
+		"build:all": "npm run build --prefix frontend && npm run build --prefix backend",
+		"install:all": "npm install && npm install --prefix frontend && npm install --prefix backend"
+	},
+	"devDependencies": {
+		"concurrently": "^9.0.0"
+	}
 }
