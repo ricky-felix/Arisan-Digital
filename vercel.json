@@ -1,5 +1,4 @@
 {
-	"rewrites": [{ "source": "/(.*)", "destination": "/" }],
 	"build": {
 		"env": {
 			"NODE_ENV": "production"
@@ -19,12 +18,12 @@
 	"experimentalServices": {
 		"frontend": {
 			"root": "frontend",
-			"routePrefix": "frontend",
+			"routePrefix": "/",
 			"framework": "vite"
 		},
 		"backend": {
 			"root": "backend",
-			"routePrefix": "backend",
+			"routePrefix": "/api",
 			"framework": "nestjs"
 		}
 	}
