@@ -30,7 +30,7 @@ export function Hero() {
         <div>
           <span className="eyebrow">
             <span className="dot" />
-            Arisan &amp; patungan dalam satu app
+            Arisan &amp; patungan dalam satu webapp
           </span>
           <h1 className="hero-title">
              <span className="em">Arisan</span> transparan. {" "}

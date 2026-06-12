@@ -31,8 +31,8 @@ export function Footer() {
               alt="Arisan Digital"
             />
             <p>
-              Arisan &amp; patungan dalam satu app — transparan, adil, dan
-              otomatis. Tanpa buku catatan, tanpa drama.
+              Arisan &amp; patungan dalam satu app — modern, transparan, dan
+              aman. Tanpa buku catatan, tanpa drama.
             </p>
             <div className="socials">
               <a href="https://www.instagram.com/arisan_digital/" aria-label="Instagram">◎</a>

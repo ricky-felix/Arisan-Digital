@@ -37,7 +37,7 @@ export function Demographics() {
           <span className="kicker">Untuk Siapa</span>
           <h2 id="demo-heading">Arisan modern untuk semua lingkaranmu</h2>
           <p>
-            Satu app yang menyesuaikan — dari nongkrong teman sampai kas
+            Satu webapp yang menyesuaikan — dari nongkrong teman sampai kas
             komunitas dan bisnis.
           </p>
         </div>

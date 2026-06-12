@@ -30,7 +30,7 @@ const FEATURES = [
   {
     idx: "04",
     label: "Chat Group",
-    title: "Komunikasi dalam satu app",
+    title: "Komunikasi dalam satu webapp",
     tags: [{ cls: "lv", text: "fokus" }],
     desc: "Obrolan khusus arisan, jadi chat WhatsApp grup nggak berantakan sama urusan arisan.",
   },

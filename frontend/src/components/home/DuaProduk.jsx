@@ -33,7 +33,7 @@ export function DuaProduk() {
       <div className="wrap">
         <div className="sec-head">
           <span className="kicker">Dua Produk</span>
-          <h2 id="produk-heading">Satu app untuk arisan &amp; patungan</h2>
+          <h2 id="produk-heading">Satu webapp untuk arisan &amp; patungan</h2>
         </div>
         <div className="dual">
           {PRODUCTS.map((p) => (
