@@ -1,201 +1,76 @@
 "use client";
 
-import { Button } from "./Button";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  BiLogoFacebookCircle,
-  BiLogoInstagram,
-  BiLogoLinkedinSquare,
-  BiLogoYoutube,
-} from "react-icons/bi";
-import { FaXTwitter } from "react-icons/fa6";
 import { handleAnchorClick } from "../../utils/smoothScroll";
 import { routes } from "../../config";
 
-const useRelume = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-  const animateMenu = isMenuOpen
-    ? { menu: "open", menu2: "openSecond" }
-    : { menu: "close", menu2: "closeSecond" };
-  return {
-    toggleMenu,
-    animateMenu,
-    isMenuOpen,
-  };
-};
+const NAV_LINKS = [
+  { id: "siapa", label: "Untuk Siapa" },
+  { id: "cara", label: "Cara Kerja" },
+  { id: "produk", label: "Produk" },
+  { id: "fitur", label: "Fitur" },
+  { id: "faq", label: "FAQ" },
+];
 
 export function Navbar() {
-  const useActive = useRelume();
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
 
   return (
-    <nav
-      id="navbar"
-      role="navigation"
-      aria-label="Main navigation"
-      className="fixed top-0 left-0 right-0 z-[999] flex min-h-16 w-full items-center border-b border-b-border-primary bg-[#10b981] px-[5%] md:min-h-18"
-    >
-      <div className="mx-auto flex size-full items-center justify-between">
+    <nav id="navbar" role="navigation" aria-label="Main navigation">
+      <div className="wrap nav-in">
         <a
           href="#beranda"
-          onClick={(e) => handleAnchorClick(e, 'beranda')}
-          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#10b981] rounded"
+          className="brand"
+          onClick={(e) => handleAnchorClick(e, "beranda")}
+          aria-label="Arisan Digital - Beranda"
         >
-          <img
-            src="/Arisan-Digital-Logo-nobg.png"
-            alt="Arisan Digital - Logo"
-            style={{ height: "48px", width: "auto" }}
-          />
+          <img src="/Arisan-Digital-Logo-nobg.png" alt="Arisan Digital" />
+          <span>Arisan Digital</span>
         </a>
-        <div className="flex items-center justify-center gap-2 lg:gap-4">
-          {/* <Button
-            title="Masuk"
-            size="sm"
-            variant="secondary-alt"
-            className="hidden sm:inline-block"
-            onClick={() => navigate(routes.login)}
-          >
-            Masuk
-          </Button> */}
-          <Button
-            title="Coba Sekarang"
-            size="sm"
-            variant="secondary"
-            className="shadow-md hover:shadow-lg"
-            href={routes.app}
-          >
-            Coba Sekarang
-          </Button>
+
+        <div className="nav-links">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.id}
+              href={`#${link.id}`}
+              onClick={(e) => handleAnchorClick(e, link.id)}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+
+        <div className="nav-cta">
+          <a className="btn btn-emerald" href={routes.app}>
+            Mulai Gratis
+          </a>
           <button
-            className="-mr-2 flex size-12 flex-col items-center justify-center justify-self-end rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#10b981] lg:mr-0"
-            onClick={useActive.toggleMenu}
-            aria-label={useActive.isMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            aria-expanded={useActive.isMenuOpen}
+            type="button"
+            className={`nav-toggle${open ? " open" : ""}`}
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Tutup menu" : "Buka menu"}
+            aria-expanded={open}
             aria-controls="mobile-menu"
           >
-            <span className={`hamburger relative flex size-6 flex-col items-center justify-center${useActive.isMenuOpen ? " open" : ""}`}>
-              <span className="bar bar-edge absolute top-[3px] h-0.5 w-full bg-white" />
-              <span className="bar bar-mid absolute h-0.5 w-full bg-white" />
-              <span className="bar bar-mid2 absolute h-0.5 w-full bg-white" />
-              <span className="bar bar-edge absolute bottom-[3px] h-0.5 w-full bg-white" />
-            </span>
+            <span /><span /><span />
           </button>
         </div>
       </div>
-      {useActive.isMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="absolute inset-x-0 top-full h-[calc(100vh-4rem)] w-full overflow-hidden md:h-[calc(100vh-4.5rem)]"
-          >
-            <div className="nav-menu-panel flex h-full flex-col overflow-auto bg-[#10b981] px-[5%] pt-0.5">
-              <div className="my-auto grid max-w-[50rem] grid-cols-1 gap-x-10 gap-y-4 py-4 sm:grid-cols-2 md:py-0">
-                <a
-                  href="#beranda"
-                  onClick={(e) => handleAnchorClick(e, 'beranda', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Beranda
-                </a>
-                <a
-                  href="#fitur"
-                  onClick={(e) => handleAnchorClick(e, 'fitur', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Fitur
-                </a>
-                <a
-                  href="#bagi-tagihan"
-                  onClick={(e) => handleAnchorClick(e, 'bagi-tagihan', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-              >
-                Patungan
-                </a>
-                <a
-                  href="#pelajari"
-                  onClick={(e) => handleAnchorClick(e, 'pelajari', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Pelajari
-                </a>
-                <a
-                  href="#cara-kerja"
-                  onClick={(e) => handleAnchorClick(e, 'cara-kerja', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Cara kerja
-                </a>
-                <a
-                  href="#gallery"
-                  onClick={(e) => handleAnchorClick(e, 'gallery', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Gallery
-                </a>
-                <a
-                  href="#faq"
-                  onClick={(e) => handleAnchorClick(e, 'faq', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  FAQ
-                </a>
-                <a
-                  href="#tentang-kami"
-                  onClick={(e) => handleAnchorClick(e, 'tentang-kami', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Tentang
-                </a>
-                <a
-                  href="#hubungi"
-                  onClick={(e) => handleAnchorClick(e, 'hubungi', useActive.toggleMenu)}
-                  className="py-2 text-2xl font-bold leading-[1.2] text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-6xl lg:text-7xl"
-                >
-                  Hubungi
-                </a>
-              </div>
-              <div className="flex min-h-18 items-center justify-between gap-x-4">
-                <div className="flex items-center gap-x-4">
-                  {/* <button
-                    type="button"
-                    className="inline-flex items-center justify-center gap-2 border-0 bg-transparent p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 md:text-xl"
-                    onClick={() => {
-                      useActive.toggleMenu();
-                      navigate(routes.login);
-                    }}
-                  >
-                    Masuk
-                  </button> */}
-                  <a
-                    className="inline-flex items-center justify-center gap-2 border-0 p-0 text-base text-white underline transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:text-xl"
-                    href={routes.app}
-                  >
-                    Coba Sekarang
-                  </a>
-                </div>
-              <div className="flex items-center gap-3">
-                <p className="text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2">Social Media Coming Soon</p>
-                  {/* <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Facebook">
-                    <BiLogoFacebookCircle className="size-6" />
-                  </a>
-                  <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Instagram">
-                    <BiLogoInstagram className="size-6" />
-                  </a>
-                  <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="Twitter">
-                    <FaXTwitter className="size-6" />
-                  </a>
-                  <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="LinkedIn">
-                    <BiLogoLinkedinSquare className="size-6" />
-                  </a>
-                  <a href="#" className="text-white transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-primary focus-visible:ring-offset-2" aria-label="YouTube">
-                    <BiLogoYoutube className="size-6" />
-                  </a> */}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+
+      {open && (
+        <div id="mobile-menu" className="mobile-menu">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.id}
+              href={`#${link.id}`}
+              onClick={(e) => handleAnchorClick(e, link.id, close)}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      )}
     </nav>
   );
 }

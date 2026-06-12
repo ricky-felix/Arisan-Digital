@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Landing Redesign — Compare</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#0e1320;color:#fff;padding:40px 24px;line-height:1.5}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.sub{color:#8b93a4;margin:8px 0 32px;font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{display:block;border:1px solid #1b2233;border-radius:18px;padding:24px;background:#070a12;transition:.18s}
+.card:hover{transform:translateY(-4px);border-color:#39435a}
+.tag{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.a .tag{color:#10b981}.b .tag{color:#f59e0b}.c .tag{color:#a78bfa}
+.card h2{font-size:22px;font-weight:800;margin:10px 0 8px}
+.card p{color:#8b93a4;font-size:14px}
+.swatch{display:flex;gap:6px;margin-top:16px}
+.swatch i{width:26px;height:26px;border-radius:7px;display:block}
+a{text-decoration:none;color:inherit}
+.row{display:flex;gap:18px;flex-wrap:wrap;margin-top:30px;color:#8b93a4;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Landing Page — 3 Redesign Directions</h1>
+  <p class="sub">Open each, compare, and tell me which to refine + port to React. All use real brand tokens (emerald=arisan, lavender=patungan, gold accent) and real app screenshots.</p>
+  <p class="sub" style="margin-top:-18px;font-size:14px">Each covers all 8 sections: <b style="color:#fff">Hero → Untuk Siapa (demografi) → Tiga Langkah → Dua Produk → 6 Fitur → Galeri → FAQ → CTA</b>.</p>
+  <div class="grid">
+    <a class="card a" href="landing-A-clean-product.html">
+      <span class="tag">Direction A</span>
+      <h2>Clean Product</h2>
+      <p>Modern fintech/SaaS. White, airy, refined type scale, app in device frames with floating data cards, gradient-mesh hero, dark screenshot showcase. Trustworthy &amp; premium.</p>
+      <div class="swatch"><i style="background:#fbfcfe;border:1px solid #ccc"></i><i style="background:#10b981"></i><i style="background:#a78bfa"></i><i style="background:#0b1220"></i></div>
+    </a>
+    <a class="card b" href="landing-B-warm-community.html">
+      <span class="tag">Direction B</span>
+      <h2>Warm Community</h2>
+      <p>Friendly gotong-royong. Cream background, chunky outlined cards with hard shadows, sticker callouts, emoji steps, marquee of values. Human, approachable, playful.</p>
+      <div class="swatch"><i style="background:#fbf6ee;border:1px solid #ccc"></i><i style="background:#10b981"></i><i style="background:#f59e0b"></i><i style="background:#23201b"></i></div>
+    </a>
+    <a class="card c" href="landing-C-bold-editorial.html">
+      <span class="tag">Direction C</span>
+      <h2>Bold Editorial</h2>
+      <p>Dark, high-contrast, confident. Huge display headline, glowing hero phone flanked by feature cards, editorial numbered feature rows, gradient ticker. Punchy &amp; modern.</p>
+      <div class="swatch"><i style="background:#070a12;border:1px solid #333"></i><i style="background:#10b981"></i><i style="background:#a78bfa"></i><i style="background:#fbbf24"></i></div>
+    </a>
+  </div>
+  <div class="row"><span>Files in <b style="color:#fff">frontend/design-prototypes/</b></span><span>Open via Live Server / a static server so <code style="color:#10b981">../public/pictures/…</code> screenshots load.</span></div>
+</div>
+</body>
+</html>

@@ -1,88 +1,46 @@
 "use client";
 
 import React from "react";
-import { Reveal } from "./Reveal";
+
+const STEPS = [
+  {
+    color: "var(--emerald)",
+    title: "Buat grup arisan",
+    desc: "Atur nama, iuran per ronde, frekuensi, dan metode giliran. Undang anggota lewat satu link.",
+  },
+  {
+    color: "var(--lavender-dark)",
+    title: "Catat setiap kontribusi",
+    desc: "Setiap pembayaran tercatat otomatis dan real-time. Semua anggota lihat siapa sudah bayar.",
+  },
+  {
+    color: "var(--gold)",
+    title: "Kelola giliran transparan",
+    desc: "Undian fair menentukan giliran. Sistem ingatkan setiap anggota otomatis.",
+  },
+];
 
 export function HowToUse() {
   return (
-    <section id="cara-kerja" className="bg-background-primary px-[5%] py-16 md:py-24 lg:py-28" aria-labelledby="how-to-use-heading">
-      <Reveal className="container mx-auto">
-        <div className="reveal-up mx-auto mb-12 w-full max-w-lg text-center md:mb-16 lg:mb-20">
-          <p className="mb-3 font-semibold text-text-primary md:mb-4">Langkah</p>
-          <h2 id="how-to-use-heading" className="mb-5 text-5xl font-bold leading-tight text-text-primary md:mb-6 md:text-7xl lg:text-8xl">
-            Tiga langkah sederhana
-          </h2>
-          <p className="text-base text-text-primary md:text-lg">
-            Mulai dari nol hingga arisan yang berjalan lancar dalam hitungan
-            menit.
-          </p>
+    <section className="block band-em" id="cara" aria-labelledby="how-to-use-heading">
+      <div className="wrap">
+        <div className="sec-head">
+          <span className="kicker">Tiga Langkah Arisan</span>
+          <h2 id="how-to-use-heading">Arisan langsung jalan dalam menit</h2>
+          <p>Dari nol sampai grup berjalan lancar dalam hitungan menit.</p>
         </div>
-        <div className="grid auto-cols-fr grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
-          <div
-            className="reveal-up hover-card flex flex-col border border-border-primary bg-background-primary"
-            style={{ "--reveal-delay": "0.1s" }}
-          >
-            <div className="flex flex-1 flex-col justify-center p-6 md:p-8">
-              <div>
-                <p className="mb-2 font-semibold text-text-secondary">Pertama</p>
-                <h3 className="mb-3 text-2xl font-bold text-text-primary md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                  Buat grup arisan
-                </h3>
-                <p className="text-text-primary">Undang teman dan atur jumlah kontribusi bulanan</p>
+        <div className="steps">
+          {STEPS.map((step, i) => (
+            <div className="step" key={step.title}>
+              <div className="num" style={{ background: step.color }}>
+                {i + 1}
               </div>
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
             </div>
-            <div className="flex w-full flex-col items-center justify-center self-start">
-              <img
-                src="/pictures/make-group.webp"
-                alt="Ilustrasi membuat grup arisan"
-              />
-            </div>
-          </div>
-          <div
-            className="reveal-up hover-card flex flex-col border border-border-primary bg-background-primary"
-            style={{ "--reveal-delay": "0.2s" }}
-          >
-            <div className="flex flex-1 flex-col justify-center p-6 md:p-8">
-              <div>
-                <p className="mb-2 font-semibold text-text-secondary">Kedua</p>
-                <h3 className="mb-3 text-2xl font-bold text-text-primary md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                  Catat setiap kontribusi
-                </h3>
-                <p className="text-text-primary">WebApp mencatat otomatis setiap pembayaran anggota</p>
-              </div>
-            </div>
-            <div className="flex w-full flex-col items-center justify-center self-start">
-              <img
-                src="/pictures/holding-phone.webp"
-                alt="Ilustrasi pencatatan kontribusi"
-              />
-            </div>
-          </div>
-          <div
-            className="reveal-up hover-card flex flex-col border border-border-primary bg-background-primary"
-            style={{ "--reveal-delay": "0.3s" }}
-          >
-            <div className="flex flex-1 flex-col justify-center p-6 md:p-8">
-              <div>
-                <p className="mb-2 font-semibold text-text-secondary">Ketiga</p>
-                <h3 className="mb-3 text-2xl font-bold text-text-primary md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                  Kelola giliran dengan transparan
-                </h3>
-                <p className="text-text-primary">
-                  Sistem otomatis menentukan giliran dan mengingatkan setiap
-                  anggota
-                </p>
-              </div>
-            </div>
-            <div className="flex w-full flex-col items-center justify-center self-start">
-              <img
-                src="/pictures/giving-cash.webp"
-                alt="Ilustrasi kelola giliran arisan"
-              />
-            </div>
-          </div>
+          ))}
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }
