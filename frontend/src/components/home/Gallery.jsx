@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { Reveal } from "./Reveal";
 
 const SLIDES = [
   { src: "/pictures/app/beranda.png", title: "Beranda", caption: "Iuran & giliran dalam satu kartu" },
@@ -36,8 +37,8 @@ export function Gallery() {
 
   return (
     <section className="block band-lv" id="galeri" aria-labelledby="gallery-heading">
-      <div className="wrap">
-        <div className="gal-top">
+      <Reveal className="wrap">
+        <div className="gal-top reveal-up">
           <div className="sec-head left gal-head">
             <span className="kicker lv">Galeri</span>
             <h2 id="gallery-heading">Lihat WebApp</h2>
@@ -62,7 +63,11 @@ export function Gallery() {
             </button>
           </div>
         </div>
-        <div className="rail" ref={railRef}>
+        <div
+          className="rail reveal-up"
+          ref={railRef}
+          style={{ "--reveal-delay": "0.1s" }}
+        >
           {SLIDES.map((slide) => (
             <div className="shot" key={slide.src}>
               <button
@@ -80,7 +85,7 @@ export function Gallery() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
 
       {active && (
         <div

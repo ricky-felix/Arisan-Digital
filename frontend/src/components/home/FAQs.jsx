@@ -2,6 +2,7 @@
 
 import React from "react";
 import { routes } from "../../config";
+import { Reveal } from "./Reveal";
 
 const FAQS = [
   {
@@ -119,8 +120,8 @@ const FAQS = [
 export function FAQs() {
   return (
     <section className="block" id="faq" aria-labelledby="faq-heading">
-      <div className="wrap">
-        <div className="sec-head">
+      <Reveal className="wrap">
+        <div className="sec-head reveal-up">
           <span className="kicker">Tanya Jawab</span>
           <h2 id="faq-heading">Pertanyaan umum</h2>
           <p>
@@ -128,7 +129,7 @@ export function FAQs() {
             kerjanya.
           </p>
         </div>
-        <div className="faq">
+        <div className="faq reveal-up" style={{ "--reveal-delay": "0.1s" }}>
           {FAQS.map((faq, i) => (
             <details key={faq.q} {...(i === 0 ? { open: true } : {})}>
               <summary>
@@ -141,7 +142,7 @@ export function FAQs() {
             </details>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Reveal } from "./Reveal";
 
 const PRODUCTS = [
   {
@@ -30,14 +31,18 @@ const PRODUCTS = [
 export function DuaProduk() {
   return (
     <section className="block" id="produk" aria-labelledby="produk-heading">
-      <div className="wrap">
-        <div className="sec-head">
+      <Reveal className="wrap">
+        <div className="sec-head reveal-up">
           <span className="kicker">Dua Produk</span>
           <h2 id="produk-heading">Satu webapp untuk arisan &amp; patungan</h2>
         </div>
         <div className="dual">
-          {PRODUCTS.map((p) => (
-            <div className={`pcard ${p.variant}`} key={p.tag}>
+          {PRODUCTS.map((p, i) => (
+            <div
+              className={`pcard ${p.variant} ${i === 0 ? "reveal-left" : "reveal-right"}`}
+              key={p.tag}
+              style={{ "--reveal-delay": "0.1s" }}
+            >
               <div className="glow" />
               <span className="tag">{p.tag}</span>
               <h3>{p.title}</h3>
@@ -50,7 +55,7 @@ export function DuaProduk() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

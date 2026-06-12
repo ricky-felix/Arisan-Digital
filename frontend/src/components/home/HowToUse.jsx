@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Reveal } from "./Reveal";
 
 const STEPS = [
   {
@@ -23,15 +24,19 @@ const STEPS = [
 export function HowToUse() {
   return (
     <section className="block band-em" id="cara" aria-labelledby="how-to-use-heading">
-      <div className="wrap">
-        <div className="sec-head">
+      <Reveal className="wrap">
+        <div className="sec-head reveal-up">
           <span className="kicker">Tiga Langkah Arisan</span>
           <h2 id="how-to-use-heading">Arisan langsung jalan dalam menit</h2>
           <p>Dari nol sampai grup berjalan lancar dalam hitungan menit.</p>
         </div>
         <div className="steps">
           {STEPS.map((step, i) => (
-            <div className="step" key={step.title}>
+            <div
+              className="step reveal-up"
+              key={step.title}
+              style={{ "--reveal-delay": `${0.1 + i * 0.1}s` }}
+            >
               <div className="num" style={{ background: step.color }}>
                 {i + 1}
               </div>
@@ -40,7 +45,7 @@ export function HowToUse() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

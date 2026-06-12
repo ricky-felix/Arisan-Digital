@@ -2,6 +2,7 @@
 
 import React from "react";
 import { routes } from "../../config";
+import { Reveal } from "./Reveal";
 
 const PAINS = [
   "Pencatatan manual sering kali tidak akurat",
@@ -12,9 +13,9 @@ const PAINS = [
 export function ProblemStatement() {
   return (
     <section className="block" id="masalah" aria-labelledby="problem-heading">
-      <div className="wrap">
+      <Reveal className="wrap">
         <div className="prob-grid">
-          <div>
+          <div className="reveal-left">
             <span className="kicker dg">Masalah</span>
             <h2 id="problem-heading" className="prob-title">
               Arisan tradisional butuh solusi modern
@@ -38,14 +39,14 @@ export function ProblemStatement() {
               Coba Sekarang →
             </a>
           </div>
-          <div className="prob-img">
+          <div className="prob-img reveal-right" style={{ "--reveal-delay": "0.1s" }}>
             <img
               src="/pictures/problem.webp"
               alt="Ilustrasi permasalahan arisan tradisional"
             />
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Reveal } from "./Reveal";
 
 const AUDIENCES = [
   {
@@ -32,8 +33,8 @@ const AUDIENCES = [
 export function Demographics() {
   return (
     <section className="block" id="siapa" aria-labelledby="demo-heading">
-      <div className="wrap">
-        <div className="sec-head">
+      <Reveal className="wrap">
+        <div className="sec-head reveal-up">
           <span className="kicker">Untuk Siapa</span>
           <h2 id="demo-heading">Arisan modern untuk semua lingkaranmu</h2>
           <p>
@@ -42,8 +43,12 @@ export function Demographics() {
           </p>
         </div>
         <div className="demo">
-          {AUDIENCES.map((a) => (
-            <article key={a.who} className={`dcard ${a.variant}`}>
+          {AUDIENCES.map((a, i) => (
+            <article
+              key={a.who}
+              className={`dcard ${a.variant} reveal-up`}
+              style={{ "--reveal-delay": `${0.1 + i * 0.08}s` }}
+            >
               <img src={a.img} alt={a.who} loading="lazy" />
               <div className="body">
                 <span className="who">{a.who}</span>
@@ -52,7 +57,7 @@ export function Demographics() {
             </article>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

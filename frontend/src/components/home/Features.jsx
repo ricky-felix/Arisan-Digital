@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Reveal } from "./Reveal";
 
 const FEATURES = [
   {
@@ -47,15 +48,19 @@ const FEATURES = [
 export function Features() {
   return (
     <section className="block band-dark" id="fitur" aria-labelledby="features-heading">
-      <div className="wrap">
-        <div className="sec-head left">
+      <Reveal className="wrap">
+        <div className="sec-head left reveal-left">
           <span className="kicker">Fitur</span>
           <h2 id="features-heading">Semua yang bikin arisan jalan mulus</h2>
           <p>Enam hal inti yang dirancang supaya tiap ronde berjalan tanpa drama.</p>
         </div>
         <div className="rows">
-          {FEATURES.map((f) => (
-            <div className="row" key={f.idx}>
+          {FEATURES.map((f, i) => (
+            <div
+              className="row reveal-up"
+              key={f.idx}
+              style={{ "--reveal-delay": `${0.05 + i * 0.07}s` }}
+            >
               <div className="idx">{f.idx}</div>
               <div>
                 <div className="lbl">{f.label}</div>
@@ -72,7 +77,7 @@ export function Features() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { routes } from "../../config";
 import { handleAnchorClick } from "../../utils/smoothScroll";
+import { Reveal } from "./Reveal";
 
 const HERO_SHOT = {
   src: "/pictures/app/beranda.png",
@@ -26,8 +27,8 @@ export function Hero() {
 
   return (
     <header className="hero" id="beranda" aria-label="Hero section">
-      <div className="wrap hero-grid">
-        <div>
+      <Reveal className="wrap hero-grid">
+        <div className="reveal-up">
           <span className="eyebrow">
             <span className="dot" />
             Arisan &amp; patungan dalam satu webapp
@@ -67,7 +68,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="hero-visual">
+        <div className="hero-visual reveal-right" style={{ "--reveal-delay": "0.1s" }}>
           <button
             type="button"
             className="hero-shot"
@@ -88,7 +89,7 @@ export function Hero() {
             <div className="fv">Dewi 🎉</div>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {zoomed && (
         <div

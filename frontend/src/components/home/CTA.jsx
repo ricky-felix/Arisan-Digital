@@ -2,12 +2,13 @@
 
 import React from "react";
 import { routes } from "../../config";
+import { Reveal } from "./Reveal";
 
 export function CTA() {
   return (
     <section className="block" aria-labelledby="cta-heading">
-      <div className="wrap">
-        <div className="cta">
+      <Reveal className="wrap">
+        <div className="cta reveal-scale">
           <h2 id="cta-heading">Mulai gunakan Arisan Digital</h2>
           <p>Coba sekarang dan buat grup pertamamu dalam beberapa menit saja.</p>
           <div className="acts">
@@ -19,7 +20,7 @@ export function CTA() {
             </a>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
