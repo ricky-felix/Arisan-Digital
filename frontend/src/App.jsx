@@ -52,62 +52,6 @@ function LandingShell() {
   return <LandingPage />;
 }
 
-// ── Pre-launch access gate ────────────────────────────────────
-// The landing page ("/") stays public for marketing. The app screens
-// (/app/*) are hidden behind a shared access code until launch, so only
-// people we hand the code to can see v1/v2. This is client-side
-// obfuscation (the code ships in the bundle) — enough to keep the app
-// out of sight of casual LinkedIn visitors, NOT real security. For true
-// protection, gate server-side / behind real auth.
-const APP_ACCESS_CODE = import.meta.env.VITE_APP_ACCESS_CODE || "arisan_patungan_2026";
-const APP_ACCESS_KEY = "arisan_app_access";
-
-function AppGate({ children }) {
-  const [unlocked, setUnlocked] = useState(
-    () => !APP_ACCESS_CODE || localStorage.getItem(APP_ACCESS_KEY) === "1"
-  );
-  const [code, setCode] = useState("");
-  const [error, setError] = useState(false);
-
-  if (unlocked) return children;
-
-  const submit = (e) => {
-    e.preventDefault();
-    if (code.trim() === APP_ACCESS_CODE) {
-      localStorage.setItem(APP_ACCESS_KEY, "1");
-      setUnlocked(true);
-    } else {
-      setError(true);
-    }
-  };
-
-  return (
-    <div className="flex min-h-svh items-center justify-center bg-gray-50 p-6">
-      <form onSubmit={submit} className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="text-lg font-bold text-gray-900">Akses terbatas</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          WebApp Arisan Digital masih dalam tahap pratayang. Masukkan kode akses untuk melanjutkan.
-        </p>
-        <input
-          type="password"
-          value={code}
-          autoFocus
-          onChange={(e) => { setCode(e.target.value); setError(false); }}
-          placeholder="Kode akses"
-          className="mt-4 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#10b981] focus:outline-none focus:ring-2 focus:ring-[#10b981]/30"
-        />
-        {error && <p className="mt-2 text-xs text-red-500">Kode salah, coba lagi.</p>}
-        <button
-          type="submit"
-          className="mt-4 w-full rounded-lg bg-[#10b981] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0d9e6e] focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:ring-offset-2"
-        >
-          Masuk
-        </button>
-      </form>
-    </div>
-  );
-}
-
 // ── ProtectedRoute ────────────────────────────────────────────
 // Requires a real authenticated session. Unauthenticated users are
 // redirected to /masuk with the originally-requested path preserved as
@@ -131,7 +75,7 @@ function ProtectedRoute({ children }) {
     );
   }
 
-  return <AppGate>{children}</AppGate>;
+  return children;
 }
 
 // ── Full-screen loading while auth resolves ───────────────────
