@@ -11,6 +11,8 @@ import { AccountPromptProvider } from "./context/AccountPromptContext";
 import LandingPage from "./pages/LandingPage";
 import { LoginOrRegister } from "./pages/LoginOrRegister";
 import NotFound from "./pages/NotFound";
+import SyaratKetentuan from "./pages/legal/SyaratKetentuan";
+import KebijakanPrivasi from "./pages/legal/KebijakanPrivasi";
 
 // v1 screens
 import { AppHomepage } from "./pages/application/v1/AppHomepage";
@@ -151,6 +153,10 @@ function AppRoutes() {
         <Route path="/masuk" element={<LoginOrRegister />} />
         {/* Legacy /login redirect → /masuk for any old inbound links */}
         <Route path="/login" element={<Navigate to="/masuk" replace />} />
+
+        {/* Public legal pages (linked from the landing footer) */}
+        <Route path="/syarat-ketentuan" element={<SyaratKetentuan />} />
+        <Route path="/kebijakan-privasi" element={<KebijakanPrivasi />} />
 
         {/* App routes — all gated behind ProtectedRoute (real login required, C4) */}
         {/* v2 screens: /app, /app/notifikasi, /app/profil, etc. */}

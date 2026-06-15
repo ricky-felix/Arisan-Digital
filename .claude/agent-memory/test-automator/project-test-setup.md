@@ -32,4 +32,16 @@ React prints two `console.error` lines when a component throws outside an error 
 - Lines: 88.94% (338/380)
 - 240 tests across 18 test files, duration ~2 s
 
+**Coverage after expansion (2026-06-15):**
+- Statements: 91.18% (579/635)
+- Branches: 87.53% (330/377)
+- Functions: 84.74% (200/236)
+- Lines: 92.2% (532/577)
+- 414 tests across 38 test files, duration ~3.5 s
+- New files added: contacts/payments/storage/transactions/users services; useCreateGroup/useCreateBill/useInvite/useSettlement hooks; NotifBubble/GroupLabel/ReminderButton/ProgressIuran/RecipientCard/DeleteConfirmModal/MethodCard/WalletCard/MenuSection/SegFilter/FauxQr components
+
+**SegFilter selector pattern:** Both desktop pill and mobile trigger render buttons with matching names. Use `getAllByRole` + `.find(t => t.getAttribute('aria-haspopup') === 'listbox')` to get the mobile trigger specifically.
+
+**WalletCard/MethodCard:** Some values appear in multiple DOM locations (stats + due-strip). Use `getAllByText` + length assertion instead of `getByText` when text naturally duplicates.
+
 **Why:** [[project-context]]

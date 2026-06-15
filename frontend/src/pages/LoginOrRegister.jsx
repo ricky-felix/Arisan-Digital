@@ -48,13 +48,50 @@ function ErrorAlert({ message }) {
   );
 }
 
-function InfoAlert({ message }) {
+/**
+ * ConfirmationNotice — shown after a successful sign-up when Supabase has
+ * "Confirm email" enabled (signUp returns a user but no session). It replaces
+ * the register form entirely so the "check your email" step is unmissable,
+ * instead of a small inline banner buried under a still-filled form.
+ */
+function ConfirmationNotice({ email, onBackToLogin, onUseAnotherEmail }) {
   return (
-    <div role="status" aria-live="polite" className="flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-3">
-      <svg className="mt-px size-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <p className="text-xs leading-relaxed text-emerald-800">{message}</p>
+    <div className="flex flex-col items-center gap-5 py-4 text-center">
+      <div className="flex size-16 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/60">
+        <svg className="size-8 text-[#10b981]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+        </svg>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <h1 className="text-lg font-bold text-gray-900">Cek email kamu</h1>
+        <p className="text-sm leading-relaxed text-gray-500">
+          Kami mengirim tautan verifikasi ke{" "}
+          <span className="font-semibold text-gray-700">{email}</span>. Buka email
+          itu dan klik tautannya untuk mengaktifkan akun, lalu masuk.
+        </p>
+      </div>
+
+      <div className="flex w-full flex-col gap-2.5">
+        <button
+          type="button"
+          onClick={onBackToLogin}
+          className="flex min-h-11 w-full items-center justify-center rounded-lg bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0d9e6e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2 active:scale-[0.98]"
+        >
+          Lanjut ke Masuk
+        </button>
+        <button
+          type="button"
+          onClick={onUseAnotherEmail}
+          className="text-sm font-medium text-gray-500 transition hover:text-gray-700 focus-visible:underline focus-visible:outline-none"
+        >
+          Daftar dengan email lain
+        </button>
+      </div>
+
+      <p className="text-xs leading-relaxed text-gray-400">
+        Tidak menerima email dalam beberapa menit? Periksa folder spam atau promosi.
+      </p>
     </div>
   );
 }
@@ -184,13 +221,12 @@ function LoginForm({ onSuccess }) {
 }
 
 // ── Register form ─────────────────────────────────────────────────────────────
-function RegisterForm({ onSuccess }) {
+function RegisterForm({ onSuccess, onConfirmationPending }) {
   const { register } = useAuth();
 
   const [form, setForm] = useState({ email: "", phone: "", name: "", password: "", confirm: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
   const [pending, setPending] = useState(false);
 
   const set = (field) => (e) => {
@@ -224,7 +260,6 @@ function RegisterForm({ onSuccess }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setServerError("");
-    setInfoMessage("");
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
@@ -237,9 +272,10 @@ function RegisterForm({ onSuccess }) {
       onSuccess();
     } catch (err) {
       const msg = err.message ?? "Gagal mendaftar. Coba lagi.";
-      // Detect the "please confirm" case (signUp succeeded but no session yet).
+      // Detect the "please confirm" case (signUp succeeded but no session yet):
+      // hand the email up so the page can swap to a full confirmation screen.
       if (msg.toLowerCase().includes("konfirmasi") || msg.toLowerCase().includes("verifikasi")) {
-        setInfoMessage(msg);
+        onConfirmationPending(parseIdentifier(form.email)?.email ?? form.email.trim());
       } else {
         setServerError(msg);
       }
@@ -337,7 +373,6 @@ function RegisterForm({ onSuccess }) {
       </p>
 
       {serverError && <ErrorAlert message={serverError} />}
-      {infoMessage && <InfoAlert message={infoMessage} />}
 
       <button
         type="submit"
@@ -371,6 +406,9 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [tab, setTab] = useState(defaultTab);
+  // When set, the user just registered but must confirm their email first —
+  // we replace the tabs + form with a dedicated "check your email" screen.
+  const [pendingEmail, setPendingEmail] = useState(null);
 
   // ── Determine where to send the user after auth ───────────────────────────
   // Priority: query param ?returnTo → location.state.returnTo → /app
@@ -386,6 +424,16 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
       // Replace so the user can't hit back to the login page after authenticating.
       navigate(returnTo, { replace: true });
     }
+  }
+
+  function handleBackToLogin() {
+    setPendingEmail(null);
+    setTab("login");
+  }
+
+  function handleUseAnotherEmail() {
+    setPendingEmail(null);
+    setTab("register");
   }
 
   return (
@@ -423,7 +471,8 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
           </button>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs — hidden while showing the post-register confirmation screen */}
+        {!pendingEmail && (
         <div className="flex shrink-0 border-b border-gray-200 bg-gray-50">
           {TABS.map(({ key, label }) => (
             <button
@@ -444,49 +493,60 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
             </button>
           ))}
         </div>
+        )}
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="mb-5">
-            <h1 className="text-lg font-bold text-gray-900">
-              {tab === "login" ? "Selamat datang kembali!" : "Buat akun baru"}
-            </h1>
-            <p className="mt-0.5 text-sm text-gray-500">
+          {pendingEmail ? (
+            <ConfirmationNotice
+              email={pendingEmail}
+              onBackToLogin={handleBackToLogin}
+              onUseAnotherEmail={handleUseAnotherEmail}
+            />
+          ) : (
+            <>
+              <div className="mb-5">
+                <h1 className="text-lg font-bold text-gray-900">
+                  {tab === "login" ? "Selamat datang kembali!" : "Buat akun baru"}
+                </h1>
+                <p className="mt-0.5 text-sm text-gray-500">
+                  {tab === "login"
+                    ? "Masuk dengan email dan kata sandimu."
+                    : "Daftar dengan email dan nomor HP, lalu buat kata sandi."}
+                </p>
+              </div>
+
               {tab === "login"
-                ? "Masuk dengan email dan kata sandimu."
-                : "Daftar dengan email dan nomor HP, lalu buat kata sandi."}
-            </p>
-          </div>
+                ? <LoginForm onSuccess={handleSuccess} />
+                : <RegisterForm onSuccess={handleSuccess} onConfirmationPending={setPendingEmail} />}
 
-          {tab === "login"
-            ? <LoginForm onSuccess={handleSuccess} />
-            : <RegisterForm onSuccess={handleSuccess} />}
-
-          <p className="mt-5 text-center text-sm text-gray-500">
-            {tab === "login" ? (
-              <>
-                Belum punya akun?{" "}
-                <button
-                  type="button"
-                  onClick={() => setTab("register")}
-                  className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
-                >
-                  Daftar
-                </button>
-              </>
-            ) : (
-              <>
-                Sudah punya akun?{" "}
-                <button
-                  type="button"
-                  onClick={() => setTab("login")}
-                  className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
-                >
-                  Masuk
-                </button>
-              </>
-            )}
-          </p>
+              <p className="mt-5 text-center text-sm text-gray-500">
+                {tab === "login" ? (
+                  <>
+                    Belum punya akun?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setTab("register")}
+                      className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
+                    >
+                      Daftar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Sudah punya akun?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setTab("login")}
+                      className="font-semibold text-[#10b981] transition hover:text-[#0d9e6e] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]/40 focus-visible:ring-offset-1"
+                    >
+                      Masuk
+                    </button>
+                  </>
+                )}
+              </p>
+            </>
+          )}
         </div>
         </div>
       </div>

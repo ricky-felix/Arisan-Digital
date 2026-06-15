@@ -15,10 +15,16 @@ Backend unit test infrastructure for `/Users/rickyfelix/GitHub/Arisan-Digital/ba
 
 **Enum gotcha:** `PaymentMethodType` in `src/users/dto/create-payment-method.dto.ts` is a TypeScript enum (GOPAY/OVO/etc.), not string literals. Import the enum for use in specs. `PlanSlug` type is `'free' | 'boss' | 'business'` (not 'pro'/'premium'). 
 
-**Baseline after June 2026 additions:** 24 test suites, 213 tests, 100% pass rate, ~3.5s execution.
+**Baseline (2026-06-15 before expansion):** 24 test suites, 213 tests, 100% pass rate, ~3.5s execution. Overall statement coverage: 38%.
 
-**Coverage baseline (statement %):** bills.service 41%, bill-settlements 73%, bill-participants 90%, bill-comments 94%, group-members 89%, invite-links 81%, rounds 82%, payments 71%, users.service 55%, payment-methods 68%, notifications 30%, storage 100%, scheduler 100%, plans 38%, subscriptions 61%, usage 97%.
+**After expansion (2026-06-15):** 49 test suites, 371 tests, 100% pass rate, ~3.3s execution. Overall statement coverage: ~70%.
 
-**Untested services (skipped):** `billing.service.ts` (0% — webhook orchestration with midtrans/xendit; needs gateway-specific mocks), `payment-transactions.service.ts` (9% — straightforward CRUD but not prioritized), `recurring-bills.service.ts` (7% — materializeDue integration with BillsService via forwardRef makes isolated unit testing complex).
+**Coverage highlights after expansion (statement %):** ALL controllers 100%, billing.service 90%, midtrans/xendit webhook controllers 100%, payment-transactions.service 55%, recurring-bills.service 48%, bills.service 41% (complex service, needs more unit tests), notifications.service 30%, contacts.service 28%.
 
-**Why:** `billing.service.ts` depends on midtrans/xendit signature verification that requires real gateway request shapes to mock meaningfully; deferred to integration test layer.
+**New test files added (2026-06-15):** All 18 controller specs (bills, groups, payments, users, notifications, contacts, rounds, bill-comments, bill-participants, bill-settlements, debt-simplifications, invite-links, group-members, plans, recurring-bills, subscriptions, storage, payment-methods/controller), plus billing.service.spec, midtrans-webhook.controller.spec, xendit-webhook.controller.spec, payment-transactions.service.spec, recurring-bills.service.spec.
+
+**Controller test pattern:** Use `Test.createTestingModule`, override `AuthGuard`/`RolesGuard` with `{ canActivate: () => true }`, use `jest.Mocked<ServiceType>` with all methods mocked as `jest.fn()`. Test pure delegation — assert service method called with correct args and result returned.
+
+**Webhook controller test pattern:** Build module with `ConfigService` stub returning the secret key, mock `BillingService.reconcile`. Test signature validation rejection, status mapping, error-resilience (always returns `{ received: true }`).
+
+**Remaining service coverage gaps:** bills.service (complex Supabase mock required for update/listMine paths), notifications.service (createMany/batch paths), contacts.service (update/delete/touch paths), debt-simplifications.service (settle/dismiss paths).

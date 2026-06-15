@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { handleAnchorClick } from "../../utils/smoothScroll";
 
 const PRODUK = [
@@ -82,10 +83,10 @@ export function Footer() {
 
         <div className="foot-bot">
           <p>© 2026 Arisan Digital. All rights reserved.</p>
-          {/* <div className="foot-legal">
-            <a href="#">Syarat &amp; Ketentuan</a>
-            <a href="#">Kebijakan Privasi</a>
-          </div> */}
+          <div className="foot-legal">
+            <Link to="/syarat-ketentuan">Syarat &amp; Ketentuan</Link>
+            <Link to="/kebijakan-privasi">Kebijakan Privasi</Link>
+          </div>
         </div>
       </div>
     </footer>

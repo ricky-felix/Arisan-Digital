@@ -17,12 +17,12 @@ test.describe("Landing Page", () => {
   });
 
   test("shows the hero section with a CTA button", async ({ page }) => {
-    // The hero renders a full-viewport section. The first tab shows "Mulai Sekarang"
-    // as a link. Wait for the hero section to appear.
-    const heroSection = page.locator('section[aria-label="Hero section"]');
+    // The hero renders as <header aria-label="Hero section"> (not a <section>).
+    // Match by the accessible name rather than the element type.
+    const heroSection = page.locator('[aria-label="Hero section"]');
     await expect(heroSection).toBeVisible({ timeout: 10_000 });
 
-    // The active tab's buttons render as <a href="/app"> links.
+    // The primary hero CTA renders as an <a href="/app"> link.
     const appLink = page.locator('a[href="/app"]').first();
     await expect(appLink).toBeVisible();
   });
@@ -35,16 +35,19 @@ test.describe("Landing Page", () => {
   });
 
   test("shows the FAQ section", async ({ page }) => {
-    // Scroll to trigger any lazy rendering
-    await page.getByText(/FAQ|pertanyaan/i).first().scrollIntoViewIfNeeded();
-    await expect(page.getByText(/FAQ|pertanyaan/i).first()).toBeVisible();
+    // Target the FAQ section heading directly (#faq-heading = "Pertanyaan umum").
+    // Avoids matching the collapsed mobile nav "FAQ" link, which is hidden at the
+    // 390px viewport and would never scroll into view.
+    const faqHeading = page.locator("#faq-heading");
+    await faqHeading.scrollIntoViewIfNeeded();
+    await expect(faqHeading).toBeVisible();
   });
 
-  test("navigating to /masuk from CTA works", async ({ page }) => {
-    // The primary CTA links to /app which redirects unauthenticated users to /masuk
-    const cta = page.getByRole("link", { name: /mulai sekarang/i }).first();
+  test("navigating to /app from CTA works", async ({ page }) => {
+    // The primary CTA links to /app. In the MVP /app opens directly; if auth is
+    // enforced it redirects to /masuk. Accept either landing URL.
+    const cta = page.locator('a[href="/app"]').first();
     await cta.click();
-    // Should land on /masuk (login) or /app
     await expect(page).toHaveURL(/\/(masuk|app)/);
   });
 });
