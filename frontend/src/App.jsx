@@ -65,6 +65,10 @@ function ProtectedRoute({ children }) {
 
   if (loading) return <AppLoadingScreen />;
 
+  // TEMPORARY: the pre-launch password gate (see LoginOrRegister.jsx) grants
+  // access without a real session. Remove this line when the gate is removed.
+  if (sessionStorage.getItem("masuk_gate_unlocked") === "1") return children;
+
   if (!isAuthenticated) {
     // Build the returnTo value from the current path + search.
     const returnTo = location.pathname + location.search;

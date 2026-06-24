@@ -26,6 +26,69 @@ import { useAuth } from "../context/AuthContext";
 import { parseIdentifier } from "../utils/identifier";
 import { InputField } from "../components/auth/InputField";
 
+// ─── TEMPORARY PASSWORD GATE ──────────────────────────────────────────────────
+// Gates the whole /masuk page behind a shared passphrase during pre-launch.
+// This is client-side only — NOT real security, just a soft barrier.
+// To remove: delete this block + the <PasswordGate> wrapper at the bottom.
+const GATE_PASSWORD = import.meta.env.VITE_GATE_PASSWORD || "arisan-patungan-2026";
+const GATE_STORAGE_KEY = "masuk_gate_unlocked";
+
+function PasswordGate({ children }) {
+  const navigate = useNavigate();
+  const [unlocked, setUnlocked] = useState(
+    () => sessionStorage.getItem(GATE_STORAGE_KEY) === "1"
+  );
+  const [input, setInput] = useState("");
+  const [error, setError] = useState("");
+
+  if (unlocked) return children;
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (input === GATE_PASSWORD) {
+      sessionStorage.setItem(GATE_STORAGE_KEY, "1");
+      setUnlocked(true);
+      navigate("/app");
+    } else {
+      setError("Kata sandi salah.");
+    }
+  }
+
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center bg-gray-50 px-4 py-8">
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl"
+      >
+        <div className="flex flex-col gap-1">
+          <h1 className="text-lg font-bold text-gray-900">Halaman terkunci</h1>
+          <p className="text-sm text-gray-500">
+            Masukkan kata sandi untuk mengakses halaman ini.
+          </p>
+        </div>
+        <InputField
+          type="password"
+          placeholder="Kata sandi akses"
+          id="gate-password"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            if (error) setError("");
+          }}
+          autoFocus
+        />
+        {error && <ErrorAlert message={error} />}
+        <button
+          type="submit"
+          className="flex min-h-11 w-full items-center justify-center rounded-lg bg-[#10b981] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0d9e6e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2 active:scale-[0.98]"
+        >
+          Buka
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ── Small helpers ─────────────────────────────────────────────────────────────
 
 function Spinner() {
@@ -401,7 +464,7 @@ const TABS = [
  *   onSuccess    {Function} — if provided, called instead of navigate(returnTo)
  *   reason       {string}   — subtitle override (unused in page mode)
  */
-export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
+function LoginOrRegisterPage({ defaultTab = "login", onSuccess }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -551,6 +614,16 @@ export function LoginOrRegister({ defaultTab = "login", onSuccess }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// TEMPORARY: wrap the page in the password gate. To restore normal behaviour,
+// export LoginOrRegisterPage directly and remove PasswordGate.
+export function LoginOrRegister(props) {
+  return (
+    <PasswordGate>
+      <LoginOrRegisterPage {...props} />
+    </PasswordGate>
   );
 }
 
