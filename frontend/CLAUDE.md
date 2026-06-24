@@ -1,4 +1,4 @@
-# Arisan Digital — Frontend Conventions
+# Digisan — Frontend Conventions
 
 Guidance for working in `frontend/`. Read this before adding screens, components, or styles so the work stays consistent with the existing v2 app.
 
@@ -99,7 +99,7 @@ Use only for what Tailwind and tokens can't cleanly do. **Every rule must be sco
 - Complex positioning/layout for interactive UI (orbit stage, card deck, bottom sheets)
 - Responsive overrides — mobile-first (≤480px floating-card look), tablet (481–1023px full-width), desktop (≥1024px full-bleed + centered ~1200px content column)
 
-`src/styles/app-v1.css` is the **legacy** v1 component library (`.app-*`, `.btn-*`, `.badge-*`). Don't add v2 work there; only touch it to maintain old `/app/arisan`, `/app/patungan` v1 screens. 
+`src/styles/app-v1.css` is the **legacy** v1 component library (`.app-*`, `.btn-*`, `.badge-*`). Don't add v2 work there; only touch it to maintain old `/app/arisan`, `/app/patungan` v1 screens.
 
 ## Consistency checklist (before finishing a UI change)
 

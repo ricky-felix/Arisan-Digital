@@ -23,10 +23,10 @@ export function Navbar() {
           href="#beranda"
           className="brand"
           onClick={(e) => handleAnchorClick(e, "beranda")}
-          aria-label="Arisan Digital - Beranda"
+          aria-label="Digisan - Beranda"
         >
           <img src="/Arisan-Digital-Logo-nobg.png" alt="Arisan Digital" />
-          <span>Arisan Digital</span>
+          <span>Digisan</span>
         </a>
 
         <div className="nav-links">

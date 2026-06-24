@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Header — Arisan Digital v2</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── App Header — global v2 app-shell top bar ──────────────────────────────
+   A persistent sticky bar rendered above every v2 screen (except HomeDeck's
+   card-deck mode, which has its own bespoke story-topbar overlay).
+
+   Two responsive modes:
+   • Mobile (≤639px): compact bar — logo + wordmark left, icon actions right.
+   • Desktop (≥640px): same layout but inner content aligned to the same
+     1200px (max-w-[1200px]) content band that ScreenHeader uses, so the
+     brand mark / icons share the same horizontal rail as every page header.
+
+   Color hierarchy: white surface, --ink-1 primary text, --emerald accent for
+   the notification pip and avatar ring — arisan's brand color at the chrome
+   level signals "you're in the Digisan product shell."
+────────────────────────────────────────────────────────────────────────────── */
+
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-soft);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* subtle frosted glass — same as ScreenHeader */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  /* slight translucency so the page content shows behind when scrolled */
+  background: rgba(255, 255, 255, 0.95);
+  flex-shrink: 0;
+}
+
+/* 1200px inner band — mirrors ScreenHeader's max-w-[1200px] / mx-auto band */
+.app-header-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 56px;                  /* 56px total tap-area; comfortable but compact */
+  padding: 0 20px;               /* px-5 on mobile */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Brand / logo block (left side) ──────────────────────────────────────── */
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.app-header-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  overflow: hidden;
+  flex-shrink: 0;
+  /* fallback: emerald bg in case image fails */
+  background: var(--emerald);
+  display: grid;
+  place-items: center;
+}
+
+.app-header-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.app-header-wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  line-height: 1;
+}
+
+.app-header-wordmark-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink-1);
+  letter-spacing: -0.02em;
+}
+
+/* Greeting sub-line — "Halo, Ricky" — visible on mobile, hidden on wide desktop */
+.app-header-greeting {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+/* ── Spacer — pushes actions to the right ──────────────────────────────── */
+.app-header-spacer { flex: 1; }
+
+/* ── Right-side action cluster ──────────────────────────────────────────── */
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Icon action button — 40px tap target, 36px visual, rounded-[12px] */
+.app-header-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: none;
+  background: var(--gray-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--ink-1);
+  position: relative;
+  transition: background 0.15s;
+  /* expand tap area without growing visual footprint */
+  padding: 0;
+}
+.app-header-icon-btn:hover { background: var(--line); }
+.app-header-icon-btn:active { background: var(--line); transform: scale(0.95); }
+
+/* Notification unread dot — emerald brand color, white border */
+.app-header-notif-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+  border: 2px solid var(--surface);
+}
+
+/* Avatar action button — circular, 36px, emerald ring */
+.app-header-avatar-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--emerald-soft);
+  background: var(--emerald);
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+.app-header-avatar-btn:hover { border-color: var(--emerald); }
+.app-header-avatar-btn:active { transform: scale(0.92); }
+
+/* ── Desktop: wider padding in the 1200px band (≥640px) ──────────────────── */
+@media (min-width: 640px) {
+  .app-header-inner {
+    padding: 0 32px;             /* lg:px-8 equivalent */
+    height: 60px;
+  }
+  .app-header-wordmark-name { font-size: 16px; }
+}
+
+/* ── Show/hide rules ──────────────────────────────────────────────────────
+   The greeting sub-line is always shown; if you want to hide it on desktop
+   you can add a @media here. Kept visible for context since desktop has more
+   horizontal space.
+────────────────────────────────────────────────────────────────────────────── */
+
+
+/* ─── Demo / gallery scaffolding (not part of the component) ──────────────── */
+
+.demo-page {
+  min-height: 100vh;
+  background: var(--app-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Simulate a screen below the header */
+.demo-screen-body {
+  flex: 1;
+  padding: 24px 20px;
+}
+
+.demo-section {
+  margin-bottom: 32px;
+}
+
+.demo-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* Simulate a ScreenHeader below the AppHeader */
+.mock-screen-header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--line-soft);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mock-screen-back {
+  width: 40px; height: 40px;
+  border-radius: 13px;
+  background: var(--gray-soft);
+  display: grid; place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mock-screen-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink-1);
+  letter-spacing: -0.02em;
+  flex: 1;
+}
+
+/* Content skeleton rows */
+.skeleton {
+  background: var(--line-soft);
+  border-radius: 10px;
+  height: 14px;
+  margin-bottom: 10px;
+}
+.skeleton.w-full { width: 100%; }
+.skeleton.w-3-4  { width: 75%; }
+.skeleton.w-1-2  { width: 50%; }
+.skeleton.tall   { height: 80px; }
+.skeleton.card   { height: 120px; border-radius: var(--r-card); }
+
+/* Variant showcase */
+.variants-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.variant-box {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+.variant-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  background: var(--line-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+/* avatar initials for "no dot" variant */
+.app-header-avatar-btn.lv {
+  background: var(--lavender);
+  border-color: var(--lavender-soft);
+}
+
+/* ── Divider ── */
+.demo-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 32px 0;
+}
+
+/* Gallery wrapper for side-by-side phone frames */
+.gallery-phones {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.phone-wrap-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-1);
+  letter-spacing: -0.01em;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     GALLERY INDEX — documents the component and its variants
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="gallery-page">
+  <div class="gallery-title">AppHeader — v2 App Shell</div>
+  <div class="gallery-subtitle">Global top navigation bar for the Digisan v2 app. Sits above every v2 screen, distinct from per-page ScreenHeader.</div>
+
+  <div class="divider"></div>
+
+  <!-- ── Section 1: Context in a full page ── -->
+  <div class="gallery-section">
+    <div class="gallery-section-label">Layout in Context</div>
+    <div class="gallery-section-title">AppHeader + ScreenHeader coexistence</div>
+    <div class="gallery-section-desc">
+      The AppHeader is the outermost chrome — brand left, actions right. Below it, each sub-page renders
+      its own ScreenHeader with a back button and page title. They share the same 1200px content band
+      so their left edges (logo / back button) sit on the same invisible horizontal rail.
+    </div>
+
+    <div class="gallery-phones">
+      <!-- Phone: stacked view of AppHeader → ScreenHeader → content -->
+      <div class="phone-wrap">
+        <div class="phone-wrap-label">Notifikasi (phone)</div>
+        <div class="phone-frame" style="height: auto; min-height: 480px; border-radius: 32px;">
+          <div class="status-bar">
+            <span class="status-time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4" y="2" width="3" height="10" rx="1"/><rect x="8" y="0" width="3" height="12" rx="1"/><rect x="12" y="0" width="3" height="12" rx="1" opacity=".3"/></svg>
+              <svg width="16" height="12" viewBox="0 0 24 12" fill="currentColor"><path d="M1 1h22v10H1z" fill="none" stroke="currentColor" stroke-width="1.5" rx="2"/><rect x="3" y="3" width="14" height="6" rx="1"/><path d="M23 4v4a2 2 0 0 0 0-4z"/></svg>
+            </div>
+          </div>
+
+          <!-- AppHeader -->
+          <div class="app-header" style="position: static;">
+            <div class="app-header-inner" style="max-width: none; padding: 0 16px; height: 52px;">
+              <div class="app-header-brand">
+                <div class="app-header-logo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-header-wordmark">
+                  <div class="app-header-wordmark-name">Digisan</div>
+                  <div class="app-header-greeting">Halo, Ricky</div>
+                </div>
+              </div>
+              <div class="app-header-spacer"></div>
+              <div class="app-header-actions">
+                <button class="app-header-icon-btn" aria-label="Notifikasi">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                  <span class="app-header-notif-dot"></span>
+                </button>
+                <button class="app-header-avatar-btn" aria-label="Profil">RF</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ScreenHeader below (per-page) -->
+          <div class="mock-screen-header" style="padding: 12px 16px;">
+            <div class="mock-screen-back" style="width:36px;height:36px;border-radius:11px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <div class="mock-screen-title" style="font-size:16px;">Notifikasi</div>
+          </div>
+
+          <!-- Body content skeletons -->
+          <div class="screen" style="flex:1; padding: 16px;">
+            <div class="skeleton card w-full"></div>
+            <div class="skeleton w-full"></div>
+            <div class="skeleton w-3-4"></div>
+            <div class="skeleton card w-full" style="height:100px;"></div>
+            <div class="skeleton w-full"></div>
+            <div class="skeleton w-1-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone: HomeDeck — AppHeader replaced by bespoke StoryTopBar -->
+      <div class="phone-wrap">
+        <div class="phone-wrap-label">HomeDeck (AppHeader absent)</div>
+        <div class="phone-frame" style="height: auto; min-height: 480px; border-radius: 32px; background: #065f46;">
+          <div class="status-bar" style="background: transparent;">
+            <span class="status-time" style="color:white;">9:41</span>
+            <div class="status-icons" style="color:white;">
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4" y="2" width="3" height="10" rx="1"/><rect x="8" y="0" width="3" height="12" rx="1"/></svg>
+            </div>
+          </div>
+          <!-- Story top bar overlay (bespoke — no AppHeader here) -->
+          <div style="position:relative; flex:1; display:flex; align-items:flex-start; justify-content:space-between; padding: 12px 16px; z-index:10;">
+            <button style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.18);border:none;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.18);border:none;display:grid;place-items:center;position:relative;cursor:pointer;backdrop-filter:blur(6px);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span style="position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:#fbbf24;border:1.5px solid rgba(255,255,255,.4);"></span>
+              </button>
+              <button style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.5);display:grid;place-items:center;font-size:13px;font-weight:800;color:white;cursor:pointer;backdrop-filter:blur(6px);">RF</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;padding:0 22px 32px;min-height:280px;">
+            <div style="color:rgba(255,255,255,.6);font-size:11px;font-weight:600;margin-bottom:4px;">ARISAN · PUTARAN 3</div>
+            <div style="color:white;font-size:40px;font-weight:800;letter-spacing:-0.04em;line-height:1;margin-bottom:8px;">Rp 500.000</div>
+            <div style="color:rgba(255,255,255,.65);font-size:12px;margin-bottom:16px;">Jatuh tempo 28 Jun 2026</div>
+            <button style="width:100%;background:white;border-radius:14px;border:none;padding:14px 20px;font-size:15px;font-weight:800;color:#065f46;cursor:pointer;">Bayar Sekarang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-divider"></div>
+
+  <!-- ── Section 2: Component anatomy ── -->
+  <div class="gallery-section">
+    <div class="gallery-section-label">Component Variants</div>
+    <div class="gallery-section-title">AppHeader state variations</div>
+
+    <div class="variants-wrap" style="max-width: 480px;">
+
+      <!-- Variant A: With unread dot + greeting -->
+      <div class="variant-box">
+        <div class="variant-label">Default — unread notification dot</div>
+        <div style="background: var(--app-bg);">
+          <div class="app-header" style="position:static;">
+            <div class="app-header-inner" style="max-width:none; padding: 0 16px; height: 52px;">
+              <div class="app-header-brand">
+                <div class="app-header-logo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-header-wordmark">
+                  <div class="app-header-wordmark-name">Digisan</div>
+                  <div class="app-header-greeting">Halo, Ricky</div>
+                </div>
+              </div>
+              <div class="app-header-spacer"></div>
+              <div class="app-header-actions">
+                <button class="app-header-icon-btn" aria-label="Notifikasi">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  <span class="app-header-notif-dot"></span>
+                </button>
+                <button class="app-header-avatar-btn" aria-label="Profil">RF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variant B: No dot (all read) -->
+      <div class="variant-box">
+        <div class="variant-label">All notifications read — no dot</div>
+        <div style="background: var(--app-bg);">
+          <div class="app-header" style="position:static;">
+            <div class="app-header-inner" style="max-width:none; padding: 0 16px; height: 52px;">
+              <div class="app-header-brand">
+                <div class="app-header-logo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-header-wordmark">
+                  <div class="app-header-wordmark-name">Digisan</div>
+                  <div class="app-header-greeting">Halo, Budi</div>
+                </div>
+              </div>
+              <div class="app-header-spacer"></div>
+              <div class="app-header-actions">
+                <button class="app-header-icon-btn" aria-label="Notifikasi">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  <!-- no dot -->
+                </button>
+                <button class="app-header-avatar-btn" aria-label="Profil">BU</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variant C: Name not loaded yet (loading state — initials fallback icon) -->
+      <div class="variant-box">
+        <div class="variant-label">Profile loading — icon fallback</div>
+        <div style="background: var(--app-bg);">
+          <div class="app-header" style="position:static;">
+            <div class="app-header-inner" style="max-width:none; padding: 0 16px; height: 52px;">
+              <div class="app-header-brand">
+                <div class="app-header-logo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="app-header-wordmark">
+                  <div class="app-header-wordmark-name">Digisan</div>
+                  <div class="app-header-greeting" style="color:var(--ink-3);">Memuat…</div>
+                </div>
+              </div>
+              <div class="app-header-spacer"></div>
+              <div class="app-header-actions">
+                <button class="app-header-icon-btn" aria-label="Notifikasi">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <!-- Fallback: person icon when no initials -->
+                <button class="app-header-avatar-btn" aria-label="Profil" style="background:var(--gray-soft);border-color:var(--line);color:var(--ink-2);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="demo-divider"></div>
+
+  <!-- ── Section 3: Desktop view (wide) ── -->
+  <div class="gallery-section">
+    <div class="gallery-section-label">Desktop Breakpoint</div>
+    <div class="gallery-section-title">1200px content band alignment</div>
+    <div class="gallery-section-desc">
+      On ≥640px screens the inner padding increases to 32px and the height grows to 60px.
+      The logo sits at <code>calc(50% - 600px + 32px)</code> — the same horizontal origin as
+      ScreenHeader's back button and ProfileHero's controls on wide viewports.
+    </div>
+
+    <!-- Wide mockup (not a phone frame — shows the desktop band) -->
+    <div style="border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); max-width: 900px;">
+      <!-- Desktop AppHeader -->
+      <div class="app-header" style="position:static; background: rgba(255,255,255,.95);">
+        <div class="app-header-inner" style="height:60px; padding: 0 32px; max-width: 900px;">
+          <div class="app-header-brand">
+            <div class="app-header-logo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="app-header-wordmark">
+              <div class="app-header-wordmark-name" style="font-size:16px;">Digisan</div>
+              <div class="app-header-greeting">Halo, Ricky Felix</div>
+            </div>
+          </div>
+          <div class="app-header-spacer"></div>
+          <div class="app-header-actions">
+            <button class="app-header-icon-btn" aria-label="Notifikasi">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="app-header-notif-dot"></span>
+            </button>
+            <button class="app-header-avatar-btn" style="width:38px;height:38px;font-size:13px;" aria-label="Profil">RF</button>
+          </div>
+        </div>
+      </div>
+      <!-- Desktop ScreenHeader below -->
+      <div style="background:rgba(255,255,255,.95);border-bottom:1px solid var(--line-soft); padding: 12px 32px; display:flex; align-items:center; gap:12px; max-width:900px;">
+        <div style="width:40px;height:40px;border-radius:13px;background:var(--gray-soft);display:grid;place-items:center;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <div style="font-size:17px;font-weight:800;color:var(--ink-1);letter-spacing:-0.02em;flex:1;">Notifikasi</div>
+      </div>
+      <!-- Content area -->
+      <div style="padding: 24px 32px; background: var(--app-bg);">
+        <div class="skeleton w-3-4" style="height:18px;margin-bottom:16px;"></div>
+        <div class="skeleton card w-full"></div>
+        <div class="skeleton w-full" style="margin-top:12px;"></div>
+        <div class="skeleton w-1-2"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /gallery-page -->
+
+</body>
+</html>
