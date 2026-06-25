@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { handleAnchorClick } from "../../utils/smoothScroll";
 import { routes } from "../../config";
 
@@ -42,9 +43,9 @@ export function Navbar() {
         </div>
 
         <div className="nav-cta">
-          <a className="btn btn-emerald" href={routes.app}>
+          <Link className="btn btn-emerald" to={routes.app}>
             Mulai Gratis
-          </a>
+          </Link>
           <button
             type="button"
             className={`nav-toggle${open ? " open" : ""}`}

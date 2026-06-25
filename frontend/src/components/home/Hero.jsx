@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { routes } from "../../config";
 import { handleAnchorClick } from "../../utils/smoothScroll";
 import { Reveal } from "./Reveal";
@@ -43,9 +44,9 @@ export function Hero() {
             catatan, tanpa drama.
           </p>
           <div className="hero-actions">
-            <a className="btn btn-emerald btn-lg" href={routes.app}>
+            <Link className="btn btn-emerald btn-lg" to={routes.app}>
               Buat Grup Pertama →
-            </a>
+            </Link>
             <a
               className="btn btn-ghost btn-lg"
               href="#galeri"

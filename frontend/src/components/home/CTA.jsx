@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { routes } from "../../config";
 import { Reveal } from "./Reveal";
 
@@ -12,9 +13,9 @@ export function CTA() {
           <h2 id="cta-heading">Mulai gunakan Arisan Digital</h2>
           <p>Coba sekarang dan buat grup pertamamu dalam beberapa menit saja.</p>
           <div className="acts">
-            <a className="btn btn-emerald btn-lg" href={routes.app}>
+            <Link className="btn btn-emerald btn-lg" to={routes.app}>
               Coba Sekarang →
-            </a>
+            </Link>
             <a className="btn btn-ghost btn-lg" href="mailto:arisandigital@outlook.com">
               Hubungi Kami
             </a>

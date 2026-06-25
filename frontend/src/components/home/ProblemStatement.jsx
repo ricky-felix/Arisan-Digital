@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { routes } from "../../config";
 import { Reveal } from "./Reveal";
 
@@ -35,9 +36,9 @@ export function ProblemStatement() {
                 </li>
               ))}
             </ul>
-            <a className="btn btn-emerald btn-lg" href={routes.app}>
+            <Link className="btn btn-emerald btn-lg" to={routes.app}>
               Coba Sekarang →
-            </a>
+            </Link>
           </div>
           <div className="prob-img reveal-right" style={{ "--reveal-delay": "0.1s" }}>
             <img
